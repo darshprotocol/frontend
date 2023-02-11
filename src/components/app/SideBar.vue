@@ -1,0 +1,215 @@
+<template>
+    <main>
+        <div class="logo">
+            <img src="../../assets/images/logo.png" alt="">
+        </div>
+        <div class="tab_items">
+            <div class="tab_parent">
+                <div class="title">
+                    <IconDiscover />
+                    <h3>Discover</h3>
+                    <div class="indicator indicator_active"></div>
+                </div>
+                <div class="tabs">
+                    <RouterLink to="/discover">
+                        <div :class="$route.name.startsWith('discover-lend') ? 'tab tab_active' : 'tab'">Lend</div>
+                    </RouterLink>
+                    <RouterLink to="/discover/borrow">
+                        <div :class="$route.name.startsWith('discover-borrow') ? 'tab tab_active' : 'tab'">Borrow</div>
+                    </RouterLink>
+                    <RouterLink to="/discover/stake">
+                        <div :class="$route.name == 'discover-stake' ? 'tab tab_active' : 'tab'">Stake</div>
+                    </RouterLink>
+                </div>
+            </div>
+            <div class="tab_parent">
+                <div class="title">
+                    <IconBriefcase />
+                    <h3>Portfolio</h3>
+                    <div class="indicator"></div>
+                </div>
+                <div class="tabs">
+                    <div class="tab">My Lends</div>
+                    <div class="tab">My Borrows</div>
+                    <div class="tab">My Stakes</div>
+                </div>
+            </div>
+            <div class="tab_parent">
+                <div class="title">
+                    <IconCategory />
+                    <h3>Dashboard</h3>
+                    <div class="indicator"></div>
+                </div>
+            </div>
+        </div>
+        <div class="links">
+            <a href="" target="_blank">
+                <div class="support">
+                    <IconSupport />
+                    <h3>Support</h3>
+                </div>
+            </a>
+            <div class="socials">
+                <a href="" target="_blank">
+                    <IconMedium class="social_icon" />
+                </a>
+                <a href="" target="_blank">
+                    <IconTwitter class="social_icon" />
+                </a>
+                <a href="" target="_blank">
+                    <IconDiscord class="social_icon" />
+                </a>
+                <a href="" target="_blank">
+                    <IconTelegram class="social_icon" />
+                </a>
+            </div>
+        </div>
+    </main>
+</template>
+
+<script setup>
+
+import IconDiscover from '../icons/IconDiscover.vue';
+import IconBriefcase from '../icons/IconBriefcase.vue';
+import IconCategory from '../icons/IconCategory.vue';
+import IconDiscord from '../icons/IconDiscord.vue';
+import IconMedium from '../icons/IconMedium.vue';
+import IconTelegram from '../icons/IconTelegram.vue';
+import IconTwitter from '../icons/IconTwitter.vue';
+import IconSupport from '../icons/IconSupport.vue';
+
+</script>
+
+<style scoped>
+main {
+    height: 100vh;
+    top: 0;
+    width: 260px;
+    border-right: 1px solid var(--bglightest);
+    border-left: 1px solid var(--bglightest);
+    position: fixed;
+    z-index: 20;
+}
+
+.logo {
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.logo img {
+    width: 109px;
+    height: 30px;
+}
+
+.tab_items {
+    display: flex;
+    margin-top: 60px;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.tab_parent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.title {
+    width: 220px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0 30px;
+    gap: 20px;
+}
+
+.title h3 {
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 120%;
+    color: #EEF1F8;
+}
+
+.indicator {
+    position: absolute;
+    width: 4px;
+    height: 42px;
+    right: 0;
+    top: 4px;
+    border-radius: 3px 0px 0px 3px;
+    background: var(--bglightest);
+}
+
+.indicator_active {
+    background: var(--primary);
+}
+
+.tabs {
+    width: 180px;
+    border-left: 2px var(--bglightest) solid;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tab {
+    height: 40px;
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    color: var(--textdimmed);
+}
+
+.tab_active {
+    color: var(--primary);
+    background: var(--bglight);
+}
+
+.links {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 40px;
+}
+
+.support {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    text-decoration: none;
+}
+
+.support h3 {
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--textnormal);
+}
+
+.socials {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.social_icon {
+    width: 26px;
+    height: 26px;
+}
+</style>

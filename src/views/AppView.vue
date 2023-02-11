@@ -1,0 +1,43 @@
+<script setup>
+import AppHeader from '../components/app/AppHeader.vue';
+import SideBar from '../components/app/SideBar.vue';
+</script>
+
+<template>
+    <div class="app-section">
+        <div class="app-width">
+            <AppHeader :userAddress="userAddress" v-on:connected="userAddress = $event" />
+            <div class="app">
+                <SideBar class="sidebar" />
+                <div></div>
+                <div class="sandbox">
+                    <RouterView :userAddress="userAddress" />
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            userAddress: null
+        }
+    }
+}
+</script>
+
+<style scoped>
+.app {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 260px auto;
+    height: 100vh;
+}
+
+.sandbox {
+    border-right: 1px solid var(--bglightest);
+    padding: 90px 0;
+}
+</style>

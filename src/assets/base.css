@@ -1,0 +1,117 @@
+@font-face {
+  font-family: 'Axiforma';
+  src: url('../assets/fonts/Axiforma-Medium.ttf');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Axiforma SemiBold';
+  src: url('../assets/fonts/Axiforma-SemiBold.ttf');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Axiforma Bold';
+  src: url('../assets/fonts/Axiforma-Bold.ttf');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Axiforma ExtraBold';
+  src: url('../assets/fonts/Axiforma-ExtraBold.ttf');
+  font-weight: 700;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  letter-spacing: 0.02em;
+  font-family: 'Axiforma';
+  font-weight: normal;
+}
+
+:root {
+  --primary: #6936F5;
+  --primarydimmed: #3F2586;
+  --background: #141416;
+  --bglight: #1A1B1D;
+  --bglighter: #202225;
+  --bglightest: #25272E;
+  --textlight: #86868C;
+  --textdimmed: #6C6E73;
+  --textnormal: #EEF1F8;
+  --accentgreen: #8BBB25;
+
+  --slider-bg: #141416;
+  --slider-connect-bg: #6936F5;
+  --slider-connect-bg-disabled: #9CA3AF;
+  --slider-height: 10px;
+  --slider-vertical-height: 300px;
+  --slider-radius: 4px;
+
+  --slider-handle-bg: #fff;
+  --slider-handle-border: 0;
+  --slider-handle-width: 25px;
+  --slider-handle-height: 25px;
+  --slider-handle-radius: 6px;
+  --slider-handle-shadow: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0);
+  --slider-handle-shadow-active: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0);
+  --slider-handle-ring-width: 5px;
+  --slider-handle-ring-color: #141416;
+
+  --slider-tooltip-font-size: 0.875rem;
+  --slider-tooltip-line-height: 1.25rem;
+  --slider-tooltip-font-weight: 400;
+  --slider-tooltip-min-width: 40px;
+  --slider-tooltip-bg: #6936F5;
+  --slider-tooltip-bg-disabled: #9CA3AF;
+  --slider-tooltip-color: #EEF1F8;
+  --slider-tooltip-radius: 6px;
+  --slider-tooltip-py: 2px;
+  --slider-tooltip-px: 6px;
+  --slider-tooltip-arrow-size: 6px;
+  --slider-tooltip-distance: 6px;
+}
+
+body {
+  background: var(--background);
+}
+
+.app-width {
+  width: 1440px;
+  max-width: 100%;
+}
+
+.app-section {
+  display: flex;
+  justify-content: center;
+}
+
+/* width */
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  background: var(--bglightest);
+}
+
+/* Handle on hover */
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.modal {
+  height: 100vh;
+  overflow-y: hidden;
+  padding-right: 10px;
+}
