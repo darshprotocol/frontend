@@ -4,21 +4,24 @@
             <ProgressBox />
         </div>
 
-        <div class="lends" v-else>
-            <RouterLink v-for="offer in offers" :to="`/discover/lend/${index}`" :key="offer.offerId">
-                <div class="lend">
+        <div class="borrows" v-else>
+            <RouterLink v-for="offer in offers" :to="`/discover/borrow/${offer._id}`" :key="offer.offerId">
+                <div class="borrow">
                     <div class="asset">
                         <div class="label">
-                            <p>Principal needed</p>
-                            <p>Collateral</p>
+                            <p>Principal</p>
+                            <p>Collaterals</p>
                         </div>
                         <div class="tokens">
                             <div>
                                 <img :src="`/images/${findAsset(offer.principalType).image}.png`" alt="">
-                                <p>{{ fromWei(offer.currentPrincipal) }} {{ findAsset(offer.principalType).name }}</p>
+                                <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} {{
+                                    findAsset(offer.principalType).name
+                                }}</p>
                             </div>
                             <div>
-                                <img src="../../../assets/images/usdc.png" alt="">
+                                <img v-for="asset in findConjugates(offer.principalType)"
+                                    :src="`/images/${asset.image}.png`" :key="asset.id" alt="">
                             </div>
                         </div>
                     </div>
@@ -44,14 +47,17 @@
                     </div>
                     <div class="progress" v-else>
                         <div class="users">
-                            <img src="../../../assets/images/user1.png" alt="">
-                            <img src="../../../assets/images/user2.png" alt="">
-                            <img src="../../../assets/images/user3.png" alt="">
+                            <img src="/images/user1.png" alt="">
+                            <img src="/images/user2.png" alt="">
+                            <img src="/images/user3.png" alt="">
                             <div class="extra_user">3</div>
                         </div>
                         <div class="needed">
                             <div class="label">
-                                <p>14.2 <span>/ 24.2 WETH</span></p>
+                                <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} <span>/ {{
+                                toMoney(fromWei(offer.initialPrincipal)) }} {{
+        findAsset(offer.principalType).name
+    }}</span></p>
                                 <IconInfo />
                             </div>
                             <div class="bar">
@@ -67,15 +73,15 @@
 
 
 <script setup>
-import IconClock from '../../icons/IconClock.vue';
-import IconInfo from '../../icons/IconInfo.vue';
-import IconInterest from '../../icons/IconInterest.vue';
-import ProgressBox from '../../ProgressBox.vue'
-</script>
+import IconClock from '../../../icons/IconClock.vue';
+import IconInfo from '../../../icons/IconInfo.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
+import ProgressBox from '../../../ProgressBox.vue'
+</script >
 
 <script>
-import Converter from '../../../utils/Converter'
-import AssetLibrary from '../../../utils/AssetLibrary'
+import Converter from '../../../../utils/Converter'
+import AssetLibrary from '../../../../utils/AssetLibrary'
 export default {
     data() {
         return {
@@ -90,11 +96,17 @@ export default {
         findAsset: function (id) {
             return AssetLibrary.findAsset(id)
         },
+        findConjugates: function (id) {
+            return AssetLibrary.findConjugates(this.findAsset(id).type)
+        },
         progress: function (offer) {
             return (offer.currentPrincipal / offer.initialPrincipal) * 100
         },
         fromWei: function (value) {
             return Converter.fromWei(value)
+        },
+        toMoney: function (value, mF = 2) {
+            return Converter.toMoney(value, mF)
         },
         fetchLendingOffers: function () {
             this.fetching = true
@@ -118,7 +130,7 @@ export default {
     margin-top: 200px;
 }
 
-.lends {
+.borrows {
     display: flex;
     flex-wrap: wrap;
     padding: 40px 0;
@@ -126,7 +138,7 @@ export default {
     justify-content: center;
 }
 
-.lend {
+.borrow {
     width: 333px;
     background: var(--bglight);
     border-radius: 6px;
@@ -135,7 +147,7 @@ export default {
     /* border: 2px transparent solid; */
 }
 
-.lend:hover {
+.borrow:hover {
     transform: translateY(-2px);
     /* border: 2px var(--bglighter) solid; */
 }
@@ -183,11 +195,16 @@ export default {
 
 .asset .tokens>div:nth-child(2) img {
     width: 18px;
+    margin-left: -18px;
+}
+
+.asset .tokens>div:nth-child(2) img:first-child {
+    margin-left: 0;
 }
 
 .asset .tokens>div:nth-child(2) {
+    width: 58px;
     height: 30px;
-    width: 34px;
     background: var(--bglighter);
     display: flex;
     align-items: center;
@@ -310,6 +327,7 @@ export default {
 }
 
 .percentage {
+    width: 40%;
     height: 100%;
     background: var(--primary);
     border-radius: 6px;

@@ -1,12 +1,12 @@
 <template>
-    <div :class="`button ${state}`">
+    <div :class="`button ${state}`" :style="`width: ${width};`">
         <p>{{ text }}</p>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['text', 'state']
+    props: ['text', 'state', 'width']
 }
 </script>
 
@@ -15,7 +15,7 @@ export default {
     padding: 0 40px;
     height: 40px;
     background: var(--primary);
-    border-radius: 2px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;

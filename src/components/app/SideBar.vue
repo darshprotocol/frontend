@@ -8,7 +8,7 @@
                 <div class="title">
                     <IconDiscover />
                     <h3>Discover</h3>
-                    <div class="indicator indicator_active"></div>
+                    <div :class="$route.name.startsWith('discover') ? 'indicator indicator_active' : 'indicator'"></div>
                 </div>
                 <div class="tabs">
                     <RouterLink to="/discover">
@@ -26,19 +26,25 @@
                 <div class="title">
                     <IconBriefcase />
                     <h3>Portfolio</h3>
-                    <div class="indicator"></div>
+                    <div :class="$route.name.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'"></div>
                 </div>
                 <div class="tabs">
-                    <div class="tab">My Lends</div>
-                    <div class="tab">My Borrows</div>
-                    <div class="tab">My Stakes</div>
+                    <RouterLink to="/portfolio">
+                        <div :class="$route.name.startsWith('portfolio-lend') ? 'tab tab_active' : 'tab'">My Lends</div>
+                    </RouterLink>
+                    <RouterLink to="/portfolio/borrow">
+                        <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows</div>
+                    </RouterLink>
+                    <RouterLink to="/portfolio/stake">
+                        <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">My Stakes</div>
+                    </RouterLink>
                 </div>
             </div>
             <div class="tab_parent">
                 <div class="title">
                     <IconCategory />
                     <h3>Dashboard</h3>
-                    <div class="indicator"></div>
+                    <div :class="$route.name.startsWith('dashboard') ? 'indicator indicator_active' : 'indicator'"></div>
                 </div>
             </div>
         </div>

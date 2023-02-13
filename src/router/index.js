@@ -3,10 +3,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppView from '../views/AppView.vue'
 import HomeView from '../views/HomeView.vue'
 import DiscoverView from '../views/DiscoverView.vue'
-import DiscoverLend from '../components/app/discover/DiscoverLend.vue'
-import DiscoverBorrow from '../components/app/discover/DiscoverBorrow.vue'
-import DiscoverLendItem from '../components/app/discover/DiscoverLendItem.vue'
-import DiscoverBorrowItem from '../components/app/discover/DiscoverBorrowItem.vue'
+import PortfolioView from '../views/PortfolioView.vue'
+
+import DiscoverLend from '../components/app/discover/lend/DiscoverLend.vue'
+import DiscoverBorrow from '../components/app/discover/borrow/DiscoverBorrow.vue'
+import DiscoverLendItem from '../components/app/discover/lend/DiscoverLendItem.vue'
+import DiscoverBorrowItem from '../components/app/discover/borrow/DiscoverBorrowItem.vue'
+import CreateBorrowOffer from '../components/app/portfolio/CreateBorrowOffer.vue'
+import CreateLendOffer from '../components/app/portfolio/CreateLendOffer.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +50,22 @@ const router = createRouter({
           ]
         },
         {
+          path: '/portfolio',
+          name: 'portfolio-lend',
+          component: PortfolioView,
+          children: [
+            {
+              path: '/portfolio',
+              name: 'portfolio-lend',
+              // component: 
+            },{
+              path: '/portfolio/borrow',
+              name: 'portfolio-borrow',
+              // component:
+            }
+          ]
+        },
+        {
           path: '/discover/lend/:id',
           name: 'discover-lend-id',
           component: DiscoverLendItem
@@ -54,6 +74,16 @@ const router = createRouter({
           path: '/discover/borrow/:id',
           name: 'discover-borrow-id',
           component: DiscoverBorrowItem
+        },
+        {
+          path: '/portfolio/borrow/create',
+          name: 'portfolio-borrow-create',
+          component: CreateBorrowOffer
+        },
+        {
+          path: '/portfolio/lend/create',
+          name: 'portfolio-lend-create',
+          component: CreateLendOffer
         }
       ]
     }

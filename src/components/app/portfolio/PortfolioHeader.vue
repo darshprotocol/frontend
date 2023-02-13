@@ -1,7 +1,7 @@
 <template>
     <main>
         <div class="header">
-            <h3 class="title">Discover</h3>
+            <h3 class="title">Portfolio</h3>
             <div class="tvl">
                 <div class="label">
                     <p>TVL</p>
@@ -14,19 +14,19 @@
         </div>
         <div class="toolbar">
             <div class="tab_items">
-                <RouterLink to="/discover">
-                    <div :class="$route.name == 'discover-lend' ? 'tab tab_active' : 'tab'">
-                        <p>Lend</p>
+                <RouterLink to="/portfolio">
+                    <div :class="$route.name == 'portfolio-lend' ? 'tab tab_active' : 'tab'">
+                        <p>My Lends</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/discover/borrow">
-                    <div :class="$route.name == 'discover-borrow' ? 'tab tab_active' : 'tab'">
-                        <p>Borrow</p>
+                <RouterLink to="/portfolio/borrow">
+                    <div :class="$route.name == 'portfolio-borrow' ? 'tab tab_active' : 'tab'">
+                        <p>My Borrows</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/discover/stake">
-                    <div :class="$route.name == 'discover-stake' ? 'tab tab_active' : 'tab'">
-                        <p>Stake</p>
+                <RouterLink to="/portfolio/stake">
+                    <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">
+                        <p>My Stakes</p>
                     </div>
                 </RouterLink>
             </div>
@@ -38,10 +38,18 @@
                     <IconSort />
                     <p>Sort By</p>
                 </div>
-                <div class="filter">
-                    <IconFilter />
-                    <p>Filter</p>
-                </div>
+                <RouterLink v-if="$route.name == 'portfolio-lend'" to="/portfolio/lend/create">
+                    <div class="filter create_offer">
+                        <IconAdd :color="'#fff'" />
+                        <p>Create Offer</p>
+                    </div>
+                </RouterLink>
+                <RouterLink v-else-if="$route.name == 'portfolio-borrow'" to="/portfolio/borrow/create">
+                    <div class="filter create_offer">
+                        <IconAdd :color="'#fff'" />
+                        <p>Create Offer</p>
+                    </div>
+                </RouterLink>
             </div>
         </div>
     </main>
@@ -50,7 +58,7 @@
 <script setup>
 import IconInfo from '../../icons/IconInfo.vue';
 import IconSort from '../../icons/IconSort.vue';
-import IconFilter from '../../icons/IconFilter.vue';
+import IconAdd from '../../icons/IconAdd.vue';
 </script>
 
 <style scoped>
@@ -166,11 +174,16 @@ main {
 .filter {
     gap: 10px;
     padding: 10px 20px;
+    height: 100%;
     background: var(--bglight);
     border-radius: 4px 4px 0px 0px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.create_offer {
+    background: var(--primary);
 }
 
 .filter p {

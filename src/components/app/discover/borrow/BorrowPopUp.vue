@@ -44,8 +44,8 @@
 
 <script setup>
 import Slider from '@vueform/slider'
-import IconClose from '../../icons/IconClose.vue';
-import PrimaryButton from '../../PrimaryButton.vue';
+import IconClose from '../../../icons/IconClose.vue';
+import PrimaryButton from '../../../PrimaryButton.vue';
 </script>
 
 <script>

@@ -56,9 +56,9 @@
                         <div>
                             <div class="progress">
                                 <div class="users">
-                                    <img src="../../../assets/images/user1.png" alt="">
-                                    <img src="../../../assets/images/user2.png" alt="">
-                                    <img src="../../../assets/images/user3.png" alt="">
+                                    <img src="/images/user1.png" alt="">
+                                    <img src="/images/user2.png" alt="">
+                                    <img src="/images/user3.png" alt="">
                                     <div class="extra_user">3</div>
                                 </div>
                                 <div class="date">
@@ -243,26 +243,26 @@
 </template>
 
 <script setup>
-import BorrowPopUp from '../discover/BorrowPopUp.vue'
-import LoanInfoPopUp from '../discover/LoanInfoPopUp.vue'
-import IconClock from '../../icons/IconClock.vue';
-import IconReceipt from '../../icons/IconReceipt.vue'
-import IconInformation from '../../icons/IconInformation.vue'
-import IconBadge from '../../icons/IconBadge.vue'
-import IconAdd from '../../icons/IconAdd.vue'
-import IconChart from '../../icons/IconChart.vue'
-import IconMenu from '../../icons/IconMenu.vue'
-import PrimaryButton from '../../PrimaryButton.vue';
-import IconInterest from '../../icons/IconInterest.vue';
-import IconOut from '../../icons/IconOut.vue'
-import ProgressBox from '../../ProgressBox.vue'
+import BorrowPopUp from '../borrow/BorrowPopUp.vue'
+import LoanInfoPopUp from '../LoanInfoPopUp.vue'
+import IconClock from '../../../icons/IconClock.vue';
+import IconReceipt from '../../../icons/IconReceipt.vue'
+import IconInformation from '../../../icons/IconInformation.vue'
+import IconBadge from '../../../icons/IconBadge.vue'
+import IconAdd from '../../../icons/IconAdd.vue'
+import IconChart from '../../../icons/IconChart.vue'
+import IconMenu from '../../../icons/IconMenu.vue'
+import PrimaryButton from '../../../PrimaryButton.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
+import IconOut from '../../../icons/IconOut.vue'
+import ProgressBox from '../../../ProgressBox.vue'
 </script >
 
 <script>
-import Converter from '../../../utils/Converter'
-import AssetLibrary from '../../../utils/AssetLibrary'
-import IconSort from '../../icons/IconSort.vue';
-import LoanPayBackPopUp from './LoanPayBackPopUp.vue';
+import Converter from '../../../../utils/Converter'
+import AssetLibrary from '../../../../utils/AssetLibrary'
+import IconSort from '../../../icons/IconSort.vue';
+import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import BorrowRequestPopUp from './BorrowRequestPopUp.vue';
 export default {
     data() {
@@ -354,7 +354,7 @@ export default {
 .asset .tokens>div p {
     font-family: 'Axiforma SemiBold';
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 25px;
     margin-top: 6px;
     color: var(--textnormal);
@@ -599,7 +599,7 @@ export default {
     color: var(--textlight);
     font-family: 'Axiforma';
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 12px;
 }
 
@@ -699,7 +699,7 @@ export default {
 .created>div>div p:first-child {
     font-family: 'Axiforma';
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);
 }
