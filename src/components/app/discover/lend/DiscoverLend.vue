@@ -18,7 +18,7 @@
                                 <p>{{ fromWei(offer.currentPrincipal) }} {{ findAsset(offer.principalType).name }}</p>
                             </div>
                             <div>
-                                <img src="../../../assets/images/usdc.png" alt="">
+                                <img src="/images/usdc.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -44,9 +44,9 @@
                     </div>
                     <div class="progress" v-else>
                         <div class="users">
-                            <img src="../../../assets/images/user1.png" alt="">
-                            <img src="../../../assets/images/user2.png" alt="">
-                            <img src="../../../assets/images/user3.png" alt="">
+                            <img src="/images/user1.png" alt="">
+                            <img src="/images/user2.png" alt="">
+                            <img src="/images/user3.png" alt="">
                             <div class="extra_user">3</div>
                         </div>
                         <div class="needed">

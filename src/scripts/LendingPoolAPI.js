@@ -38,7 +38,7 @@ const LendingPoolAPI = {
         if (collateralTypes.length == 0) return null
 
         try {
-            await instance.createLendingOffer(
+            return await instance.createLendingOffer(
                 principalType,
                 isNative ? 0 : principalAmount,
                 interest,

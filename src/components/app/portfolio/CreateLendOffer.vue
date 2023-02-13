@@ -17,7 +17,7 @@
                     <div class="option">
                         <p>Principal needed</p>
                         <div>
-                            <p>40,000</p>
+                            <input type="number" placeholder="0.00" min="0" v-model="principalAmount">
                             <div class="click_1">
                                 <img src="/images/usdc.png" alt="">
                                 <p>USDC</p>
@@ -42,12 +42,15 @@
                     <div class="option">
                         <p>Duration</p>
                         <div>
-                            <p>20 <span>days</span></p>
+                            <div class="input">
+                                <input type="number" placeholder="0" min="0" max="90" v-model="daysToMaturity">
+                                <span>days</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementDuration()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementDuration()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -56,12 +59,15 @@
                     <div class="option">
                         <p>Interest</p>
                         <div>
-                            <p>9.00 <span>%</span></p>
+                            <div class="input">
+                                <input type="number" placeholder="0.00" min="0" v-model="interest">
+                                <span>%</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementInterest()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementInterest()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -70,12 +76,15 @@
                     <div class="option">
                         <p>Offer expires in</p>
                         <div>
-                            <p>24 <span>hrs</span></p>
+                            <div class="input">
+                                <input type="number" placeholder="0" min="0" v-model="daysToExpire">
+                                <span>days</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementExpire()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementExpire()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -95,6 +104,81 @@
 import PrimaryButton from '../../PrimaryButton.vue';
 import IconMinus from '../../icons/IconMinus.vue';
 import IconPlus from '../../icons/IconPlus.vue';
+</script>
+
+<script>
+import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
+import Authentication from '../../../scripts/Authentication';
+export default {
+    data() {
+        return {
+            principalAmount: '',
+            principalToken: '',
+            collateralTokens: [],
+            interest: 0,
+            daysToMaturity: 0,
+            daysToExpire: 0,
+            creating: false
+        }
+    },
+    methods: {
+        createOffer: async function () {
+            this.creating = true
+            let calcInterest = 0
+            let userAddress = await Authentication.userAddress()
+            const trx = await LendingPoolAPI.createLendingOffer(
+                this.principalToken,
+                this.principalAmount,
+                calcInterest,
+                this.daysToMaturity,
+                this.daysToExpire,
+                this.collateralTokens,
+                userAddress
+            )
+            if (!trx) {
+                console.error('Create Offer Failed');
+            }
+            this.creating = false
+        },
+
+
+        incrementDuration: function () {
+            if (this.daysToMaturity < 60) {
+                this.daysToMaturity += 1
+            }
+        },
+
+        decrementDuration: function () {
+            if (this.daysToMaturity > 0) {
+                this.daysToMaturity -= 1
+            }
+        },
+
+        incrementExpire: function () {
+            if (this.daysToExpire < 7) {
+                this.daysToExpire += 1
+            }
+        },
+
+        decrementExpire: function () {
+            if (this.daysToExpire > 0) {
+                this.daysToExpire -= 1
+            }
+        },
+
+        incrementInterest: function () {
+            if (this.interest < 50) {
+                this.interest += 1
+            }
+        },
+
+        decrementInterest: function () {
+            if (this.interest > 0) {
+                this.interest -= 1
+            }
+        }
+    }
+}
 </script>
 
 <style scoped>
@@ -213,8 +297,15 @@ import IconPlus from '../../icons/IconPlus.vue';
     height: 24px;
 }
 
-.option>div:nth-child(2) p:first-child {
+.input {
+    display: flex;
+    align-items: center;
+}
+.option>div:nth-child(2) input {
     font-family: 'Axiforma';
+    background: transparent;
+    border: none;
+    outline: none;
     font-style: normal;
     font-weight: 500;
     font-size: 25px;
