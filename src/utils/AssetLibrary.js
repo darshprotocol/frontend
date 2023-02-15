@@ -14,35 +14,35 @@ const AssetLibrary = {
             name: 'Bitcoin',
             image: 'btc',
             type: 'variable',
-            address: '0xAfC025C55C2BCB2BFD6Cd071203b281D788DFBcD'
+            address: '0xb513Df504aa2bC176373556dC7A5Dc77106A12E5'
         }, {
             id: 2,
             symbol: 'WETH',
             name: 'Ethereum',
             image: 'eth',
             type: 'variable',
-            address: '0x59c5067A5B389589B2ecFa687bD18B45a5bAED2B'
+            address: '0xD2c6C76c88Fc9509877bC8a85D92807caC296A81'
         }, {
             id: 3,
             symbol: 'USDT',
             name: 'USDT',
             image: 'usdt',
             type: 'stable',
-            address: '0x31cfb373E59d543d442b11e7112A192c7Bec6d7f'
+            address: '0x7dFA705e4045bDF13B613e8F50B059DFA58E494B'
         }, {
             id: 4,
             symbol: 'USDC',
             name: 'USDC',
             image: 'usdc',
             type: 'stable',
-            address: '0x48D55a6D64084b52Bd257b932A6d5F78F139705E'
+            address: '0x8b6bf1d64A918c919174d03920dd0f4bfaA77390'
         }, {
             id: 5,
             symbol: 'DAI',
             name: 'DAI',
             image: 'dai',
             type: 'stable',
-            address: '0x47114aC0c40b0FE9B549fC96F7BAd5b68ba0e7C9'
+            address: '0xF29AC70f09366d9ACA216775713E8b858164276A'
         },
     ],
     findAsset: function(address) {

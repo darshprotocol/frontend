@@ -7,6 +7,7 @@ const nativeAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 const LendingPoolAPI = {
     instance: null,
+    address: LendingPoolABI.networks[4002].address,
     getInstance: async function () {
         if (this.instance != null) return this.instance
         if (typeof ethereum === 'undefined') return null

@@ -19,8 +19,8 @@
                             }}</p>
                         </div>
                         <div>
-                            <img v-for="asset in findConjugates(offer.principalToken)"
-                                :src="`/images/${asset.image}.png`" :key="asset.id" alt="">
+                            <img v-for="address in offer.collateralTokens"
+                                :src="`/images/${findAsset(address).image}.png`" :key="address" alt="">
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,9 @@
                             </div>
                         </div>
                         <div class="borrow">
-                            <PrimaryButton v-on:click="borrow = true" :text="'Borrow'" :state="''" />
+                            <PrimaryButton v-if="borrowerLoan || userType != 'borrower'" :text="'Borrow'"
+                                :state="'disable'" />
+                            <PrimaryButton v-else v-on:click="borrow = true" :text="'Borrow'" />
                         </div>
                     </div>
                 </div>
@@ -101,7 +103,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="index in 5" :key="index">
+                            <tr v-for="requests in offer.requests" :key="requests._id">
                                 <td>
                                     <div>
                                         <img src="/images/usdc.png" alt="">
@@ -143,6 +145,10 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="t_empty" v-if="offer.requests.length == 0">
+                        <img src="../../../../assets/images/receipt-text.png" alt="">
+                        <p>No Borrow Requests found.</p>
+                    </div>
                 </div>
             </div>
             <div>
@@ -167,7 +173,9 @@
                                 <p>Amount Borrowed</p>
                                 <div>
                                     <img :src="`/images/${findAsset(borrowerLoan.principalToken).image}.png`" alt="">
-                                    <h3>{{ toMoney(fromWei(borrowerLoan.currentPrincipal)) }} {{ findAsset(borrowerLoan.principalToken).symbol }}</h3>
+                                    <h3>{{ toMoney(fromWei(borrowerLoan.currentPrincipal)) }} {{
+                                        findAsset(borrowerLoan.principalToken).symbol
+                                    }}</h3>
                                 </div>
                             </div>
                             <div class="loan_info" v-on:click="loanInfo = true">
@@ -180,7 +188,9 @@
                                 <p>My Collateral</p>
                                 <div>
                                     <img :src="`/images/${findAsset(borrowerLoan.collateralToken).image}.png`" alt="">
-                                    <p>{{ toMoney(fromWei(borrowerLoan.currentCollateral)) }} {{ findAsset(borrowerLoan.collateralToken).symbol }}</p>
+                                    <p>{{ toMoney(fromWei(borrowerLoan.currentCollateral)) }} {{
+                                        findAsset(borrowerLoan.collateralToken).symbol
+                                    }}</p>
                                     <IconOut />
                                 </div>
                             </div>
@@ -196,56 +206,59 @@
                             <PrimaryButton v-on:click="payback = true" :state="''" :text="'Payback'" />
                         </div>
                     </div>
-                    <div class="active_loans" v-if="userType == 'lender'">
-                        <h3>Open Loans</h3>
-                        <div>
-                            <div class="amount_borrowed">
-                                <p>Amount Borrowed</p>
+                    <div class="slides" :style="`grid-template-columns: repeat(${offer.loans.length}, 380px);`"
+                        v-if="userType == 'lender'">
+                        <div class="active_loans" v-for="loan in offer.loans" :key="loan">
+                            <h3>Open Loans</h3>
+                            <div>
+                                <div class="amount_borrowed">
+                                    <p>Amount Borrowed</p>
+                                    <div>
+                                        <img src="/images/usdc.png" alt="">
+                                        <h3>20,000 USDC</h3>
+                                    </div>
+                                </div>
+                                <div class="loan_info" v-on:click="loanInfo = true">
+                                    <IconInformation />
+                                    <p>Info</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    <p>My Collateral</p>
+                                    <div>
+                                        <img src="/images/btc.png" alt="">
+                                        <p>0.72 WBTC</p>
+                                        <IconOut />
+                                    </div>
+                                </div>
+                                <div>
+                                    <p>Due in</p>
+                                    <div>
+                                        <IconClock />
+                                        <p>30 days</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="claim">
+                                <p>Borrower's payback</p>
                                 <div>
                                     <img src="/images/usdc.png" alt="">
-                                    <h3>20,000 USDC</h3>
+                                    <h3>10,000 USDC</h3>
                                 </div>
+                                <PrimaryButton class="claim_button" v-on:click="claimPayback = true" :state="''"
+                                    :text="'Claim Payback'" />
                             </div>
-                            <div class="loan_info" v-on:click="loanInfo = true">
-                                <IconInformation />
-                                <p>Info</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div>
-                                <p>My Collateral</p>
-                                <div>
-                                    <img src="/images/btc.png" alt="">
-                                    <p>0.72 WBTC</p>
-                                    <IconOut />
-                                </div>
-                            </div>
-                            <div>
-                                <p>Due in</p>
-                                <div>
-                                    <IconClock />
-                                    <p>30 days</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="claim">
-                            <p>Borrower's payback</p>
-                            <div>
-                                <img src="/images/usdc.png" alt="">
-                                <h3>10,000 USDC</h3>
-                            </div>
-                            <PrimaryButton class="claim_button" v-on:click="claimPayback = true" :state="''"
-                                :text="'Claim Payback'" />
                         </div>
                     </div>
-                    <div class="open_loans" v-if="userType != 'lender' && !borrowerLoan">
+                    <div class="open_loans" v-if="offer.loans.length == 0">
                         <h3>Open Loans</h3>
                         <div class="box">
                             <IconReceipt />
                             <p>No open loan Found on <br> this Borrow offer.</p>
                         </div>
                     </div>
-                    <div class="stats">
+                    <div class="stats" v-if="userType != 'lender'">
                         <div class="owner">
                             <p>Owner's Stats</p>
                             <div>
@@ -308,14 +321,16 @@ export default {
             fetching: true,
             userType: 'none',
             borrowerLoan: null,
+            userAddress: null,
             loanInfo: false,
             borrow: false,
             payback: false,
             borrowRequest: false
         };
     },
-    created() {
+    async created() {
         this.fetchLendingOffer()
+        this.userAddress = await Authentication.userAddress()
     },
     methods: {
         findAsset: function (address) {
@@ -345,39 +360,35 @@ export default {
             let interest = fromWei(result.toString())
             return Converter.toMoney(interest)
         },
-        loadAsBorrower: async function() {
-            let id = this.offer.offerId
-            let borrower = await Authentication.userAddress()
-            this.axios.get(`https://darshprotocol.onrender.com/loans?offerId=${id}&borrower=${borrower}`).then(response => {
-                let loans = response.data;
-                if (loans.length > 0) {
-                    this.borrowerLoan = loans[0]
-                }
-            }).catch(error => {
-                console.error(error);
-                // this.fetching = false
-            });
-
-        },
         fetchLendingOffer: async function () {
             this.fetching = true;
             let id = this.$route.params.id;
             try {
-                let response = await this.axios.get(`https://darshprotocol.onrender.com/lending-offers/${id}`)
-                this.offer = response.data;
-                this.fetching = false;
+                let response = await this.axios.get(`https://darshprotocol.onrender.com/offers/${id}`)
+                this.offer = response.data
 
                 this.startCountdown()
-                let userAddress =  await Authentication.userAddress()
-                if (this.offer.lender != userAddress) {
-                    this.loadAsBorrower()
-                    this.userType = 'borrower'
+
+                if (this.userAddress) {
+                    if (this.offer.creator != this.userAddress) {
+                        this.userType = 'borrower'
+                    } else {
+                        this.userType = 'lender'
+                    }
+
+                    this.offer.loans.forEach(loan => {
+                        if (loan.borrower.toLowerCase() == this.userAddress) {
+                            this.borrowerLoan = loan
+                            return
+                        }
+                    })
                 } else {
-                    // load
+                    this.userType = 'none'
                 }
+
+                this.fetching = false;
             } catch (error) {
                 console.error(error);
-                // this.fetching = false
             }
         }
     },
@@ -828,6 +839,11 @@ export default {
     color: var(--textdimmed);
 }
 
+.slides {
+    display: grid;
+    overflow-x: auto;
+}
+
 .stats {
     width: 100%;
     background: var(--bglight);
@@ -1103,5 +1119,23 @@ export default {
 
 .active_loans .claim_button {
     width: 100%;
+}
+
+.t_empty {
+    width: 100%;
+    height: 298px;
+    background: var(--bglight);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.t_empty p {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 </style>

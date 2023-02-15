@@ -121,7 +121,7 @@ export default {
         },
         fetchLendingOffers: function () {
             this.fetching = true
-            this.axios.get('https://darshprotocol.onrender.com/lending-offers').then(response => {
+            this.axios.get('https://darshprotocol.onrender.com/offers?offerType=0').then(response => {
                 this.offers = response.data
                 this.fetching = false
             }).catch(error => {

@@ -111,7 +111,7 @@ export default {
             let amount = await Approval.getAllocationOf(
                 await Authentication.userAddress(),
                 this.collateralToken,
-                '0xb880ac301219328589f36dce275ba091d7c2cd61'
+                LendingPoolAPI.address
             )
             this.allowance = amount
         },
@@ -131,7 +131,7 @@ export default {
                 await Authentication.userAddress(),
                 this.collateralAmount,
                 this.collateralToken,
-                '0xb880ac301219328589f36dce275ba091d7c2cd61',
+                LendingPoolAPI.address
             )
             this.getAllowance()
         },

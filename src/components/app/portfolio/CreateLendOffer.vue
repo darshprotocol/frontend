@@ -9,7 +9,9 @@
                     <span>/</span>
                     <p class="cr">Create Lend Offer</p>
                 </div>
-                <PrimaryButton :text="'Create'" v-on:click="createOffer()" :width="'180px'" />
+                <PrimaryButton v-if="principalAmount == ''" :text="'Create'" :state="'disable'" />
+                <PrimaryButton v-else-if="fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()" :text="'Create'" />
+                <PrimaryButton v-else :text="`Approve ${findAsset(principalToken).symbol}`" v-on:click="approve()" :width="'220px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -60,8 +62,8 @@
                         <p>Duration</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0" min="5"
-                                    max="60" v-model="daysToMaturity">
+                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0"
+                                    min="5" max="60" v-model="daysToMaturity">
                                 <span>days</span>
                             </div>
                             <div class="clicks">
@@ -96,8 +98,8 @@
                         <p>Offer expires in</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0" min="0"
-                                    v-model="daysToExpire">
+                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0"
+                                    min="0" v-model="daysToExpire">
                                 <span>days</span>
                             </div>
                             <div class="clicks">
@@ -136,11 +138,13 @@ import Authentication from '../../../scripts/Authentication';
 import AssetLibrary from '../../../utils/AssetLibrary';
 import CovalentAPI from '../../../utils/CovalentAPI'
 import Converter from '../../../utils/Converter';
+import Approval from '../../../scripts/Approval';
 export default {
     data() {
         return {
-            principalAmount: 0,
+            principalAmount: '0',
             principalToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+            allowance: '0',
             collateralTokens: [],
             tokenBalances: [],
             interest: 2,
@@ -166,6 +170,12 @@ export default {
             if (value > 50) {
                 this.interest = 50;
             }
+        },
+        principalToken: function() {
+            this.getAllowance()
+        },
+        principalAmount: function () {
+            this.getAllowance()
         }
     },
     mounted() {
@@ -183,6 +193,10 @@ export default {
             }
             this.collateralTokens.push(address)
         },
+        safePrincipal: function() {
+            if (this.principalAmount == '') return '0'
+            return this.principalAmount.toString()
+        },
         otherAssets: function () {
             return AssetLibrary.otherAssets(this.principalToken)
         },
@@ -195,7 +209,7 @@ export default {
             if (address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
                 address = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
             }
-            let token = this.tokenBalances.find(token => token.contract_address == address)
+            let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase())
             if (!token) return '0.00'
             return Converter.toMoney(fromWei(token.balance))
         },
@@ -213,6 +227,23 @@ export default {
             let response = await CovalentAPI.getTokenBalances(userAddress)
             if (!response) return
             this.tokenBalances = response.data.items
+        },
+        getAllowance: async function() {
+            let amount = await Approval.getAllocationOf(
+                await Authentication.userAddress(),
+                this.principalToken,
+                LendingPoolAPI.address
+            )
+            this.allowance = amount
+        },
+        approve: async function() {
+            await Approval.approve(
+                await Authentication.userAddress(),
+                this.principalAmount,
+                this.principalToken,
+                LendingPoolAPI.address
+            )
+            this.getAllowance()
         },
         createOffer: async function () {
             this.creating = true;
