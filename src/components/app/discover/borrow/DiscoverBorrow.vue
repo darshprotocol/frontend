@@ -14,13 +14,13 @@
                         </div>
                         <div class="tokens">
                             <div>
-                                <img :src="`/images/${findAsset(offer.principalType).image}.png`" alt="">
+                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
                                 <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} {{
-                                    findAsset(offer.principalType).name
+                                    findAsset(offer.principalToken).name
                                 }}</p>
                             </div>
                             <div>
-                                <img v-for="asset in findConjugates(offer.principalType)"
+                                <img v-for="asset in findConjugates(offer.principalToken)"
                                     :src="`/images/${asset.image}.png`" :key="asset.id" alt="">
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                             <div class="label">
                                 <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} <span>/ {{
                                 toMoney(fromWei(offer.initialPrincipal)) }} {{
-        findAsset(offer.principalType).name
+        findAsset(offer.principalToken).name
     }}</span></p>
                                 <IconInfo />
                             </div>

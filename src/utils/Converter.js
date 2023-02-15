@@ -6,6 +6,7 @@ const Converter = {
             const web3 = new Web3()
             return web3.utils.fromWei(value, 'ether')
         } catch (error) {
+            console.error(error);
             return null
         }
     },
@@ -14,6 +15,7 @@ const Converter = {
             const web3 = new Web3()
             return web3.utils.toWei(value, 'ether')
         } catch (error) {
+            console.error(error);
             return null
         }
     },

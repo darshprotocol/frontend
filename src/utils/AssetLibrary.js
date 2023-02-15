@@ -2,39 +2,54 @@ const AssetLibrary = {
     assets: [
         {
             id: 0,
-            name: 'FTM',
+            symbol: 'FTM',
+            name: 'Fantom',
             image: 'ftm',
-            type: 'variable'
+            type: 'variable',
+            address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
         },
         {
             id: 1,
-            name: 'WBTC',
+            symbol: 'WBTC',
+            name: 'Bitcoin',
             image: 'btc',
-            type: 'variable'
+            type: 'variable',
+            address: '0xAfC025C55C2BCB2BFD6Cd071203b281D788DFBcD'
         }, {
             id: 2,
-            name: 'WETH',
+            symbol: 'WETH',
+            name: 'Ethereum',
             image: 'eth',
-            type: 'variable'
+            type: 'variable',
+            address: '0x59c5067A5B389589B2ecFa687bD18B45a5bAED2B'
         }, {
             id: 3,
+            symbol: 'USDT',
             name: 'USDT',
             image: 'usdt',
-            type: 'stable'
+            type: 'stable',
+            address: '0x31cfb373E59d543d442b11e7112A192c7Bec6d7f'
         }, {
             id: 4,
+            symbol: 'USDC',
             name: 'USDC',
             image: 'usdc',
-            type: 'stable'
+            type: 'stable',
+            address: '0x48D55a6D64084b52Bd257b932A6d5F78F139705E'
         }, {
             id: 5,
+            symbol: 'DAI',
             name: 'DAI',
             image: 'dai',
-            type: 'stable'
+            type: 'stable',
+            address: '0x47114aC0c40b0FE9B549fC96F7BAd5b68ba0e7C9'
         },
     ],
     findAsset: function(id) {
         return this.assets.find(asset => asset.id == id)
+    },
+    otherAssets: function(id) {
+        return this.assets.filter(asset => asset.id != id)
     },
     findConjugates: function(type) {
         return this.assets.filter(asset => asset.type != type)

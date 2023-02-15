@@ -14,8 +14,8 @@
                         </div>
                         <div class="tokens">
                             <div>
-                                <img :src="`/images/${findAsset(offer.principalType).image}.png`" alt="">
-                                <p>{{ fromWei(offer.currentPrincipal) }} {{ findAsset(offer.principalType).name }}</p>
+                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ fromWei(offer.currentPrincipal) }} {{ findAsset(offer.principalToken).name }}</p>
                             </div>
                             <div>
                                 <img src="/images/usdc.png" alt="">

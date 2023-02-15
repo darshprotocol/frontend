@@ -3,6 +3,8 @@ import contract from 'truffle-contract'
 import LendingPoolABI from '../contracts/LendingPool.json'
 import AssetLibrary from '../utils/AssetLibrary'
 
+const nativeAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+
 const LendingPoolAPI = {
     instance: null,
     getInstance: async function () {
@@ -23,33 +25,35 @@ const LendingPoolAPI = {
 
     // @lenders
     createLendingOffer: async function (
-        principalType,
+        principalToken,
         principalAmount,
         interest,
         daysToMaturity,
         daysToExpire,
-        collateralTypes,
+        collateralTokens,
         userAddress
     ) {
         const instance = await this.getInstance()
+        console.log(instance);
         if (instance == null) return null
 
-        let isNative = AssetLibrary.findAsset(principalType) == 0
-        if (collateralTypes.length == 0) return null
+        let isNative = principalToken == nativeAddress
+        if (collateralTokens.length == 0) return null
 
         try {
-            return await instance.createLendingOffer(
-                principalType,
-                isNative ? 0 : principalAmount,
-                interest,
+            const trx = await instance.createLendingOffer(
+                isNative ? 0 : principalAmount, // only for ERC20 assets
+                principalToken,
+                collateralTokens,
                 daysToMaturity,
+                interest,
                 daysToExpire,
-                collateralTypes,
                 {
                     from: userAddress,
                     value: isNative ? principalAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -110,7 +114,7 @@ const LendingPoolAPI = {
 
     // @borrower
     createBorrowingOffer: async function (
-        principalType,
+        principalToken,
         collateralType,
         collateralAmount,
         interest,
@@ -125,7 +129,7 @@ const LendingPoolAPI = {
 
         try {
             await instance.createBorrowingOffer(
-                principalType,
+                principalToken,
                 collateralType,
                 isNative ? 0 : collateralAmount,
                 interest,
