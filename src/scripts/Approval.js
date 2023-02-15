@@ -5,7 +5,7 @@ import ERC20 from '../contracts/ERC20.json'
 const Approval = {
     approve: async function(userAddress, amount, tokenAddress, spender) {
         const web3 = new Web3(ethereum)
-        const contract = new web3.eth.Contract(ERC20, tokenAddress)
+        const contract = new web3.eth.Contract(ERC20.abi, tokenAddress)
 
         try {
             await  contract.methods.approve(spender, amount).send({ from: userAddress })

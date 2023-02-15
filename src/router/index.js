@@ -7,8 +7,16 @@ import PortfolioView from '../views/PortfolioView.vue'
 
 import DiscoverLend from '../components/app/discover/lend/DiscoverLend.vue'
 import DiscoverBorrow from '../components/app/discover/borrow/DiscoverBorrow.vue'
+import DiscoverStake from '../components/app/discover/stake/DiscoverStake.vue'
+
+import PortfolioLend from '../components/app/portfolio/lend/PortfolioLend.vue'
+import PortfolioBorrow from '../components/app/portfolio/borrow/PortfolioBorrow.vue'
+import PortfolioStake from '../components/app/portfolio/stake/PortfolioStake.vue'
+
 import DiscoverLendItem from '../components/app/discover/lend/DiscoverLendItem.vue'
 import DiscoverBorrowItem from '../components/app/discover/borrow/DiscoverBorrowItem.vue'
+
+
 import CreateBorrowOffer from '../components/app/portfolio/CreateBorrowOffer.vue'
 import CreateLendOffer from '../components/app/portfolio/CreateLendOffer.vue'
 
@@ -46,6 +54,11 @@ const router = createRouter({
               path: '/discover/borrow',
               name: 'discover-borrow',
               component: DiscoverBorrow
+            },
+            {
+              path: '/discover/stake',
+              name: 'discover-stake',
+              component: DiscoverStake
             }
           ]
         },
@@ -57,11 +70,17 @@ const router = createRouter({
             {
               path: '/portfolio',
               name: 'portfolio-lend',
-              // component: 
-            },{
+              component: PortfolioLend
+            },
+            {
               path: '/portfolio/borrow',
               name: 'portfolio-borrow',
-              // component:
+              component: PortfolioBorrow
+            },
+            {
+              path: '/portfolio/stake',
+              name: 'portfolio-stake',
+              component: PortfolioStake
             }
           ]
         },

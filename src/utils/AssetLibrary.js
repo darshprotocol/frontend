@@ -45,14 +45,14 @@ const AssetLibrary = {
             address: '0x47114aC0c40b0FE9B549fC96F7BAd5b68ba0e7C9'
         },
     ],
-    findAsset: function(id) {
-        return this.assets.find(asset => asset.id == id)
+    findAsset: function(address) {
+        return this.assets.find(asset => asset.address.toLowerCase() == address.toLowerCase())
     },
-    otherAssets: function(id) {
-        return this.assets.filter(asset => asset.id != id)
+    otherAssets: function(address) {
+        return this.assets.filter(asset => asset.address.toLowerCase() != address.toLowerCase())
     },
-    findConjugates: function(type) {
-        return this.assets.filter(asset => asset.type != type)
+    findConjugates: function(type, except = null) {
+        return this.assets.filter(asset => asset.type != type && asset.address != except)
     }
 }
 

@@ -16,12 +16,12 @@
                             <div>
                                 <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
                                 <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} {{
-                                    findAsset(offer.principalToken).name
+                                    findAsset(offer.principalToken).symbol
                                 }}</p>
                             </div>
                             <div>
-                                <img v-for="asset in findConjugates(offer.principalToken)"
-                                    :src="`/images/${asset.image}.png`" :key="asset.id" alt="">
+                                <img v-for="asset in offer.collateralTokens"
+                                    :src="`/images/${findAsset(asset).image}.png`" :key="asset.id" alt="">
                             </div>
                         </div>
                     </div>
@@ -37,16 +37,20 @@
                             <p>Interest</p>
                             <div>
                                 <IconInterest />
-                                <p>{{ Number(fromWei(offer.interest)).toFixed(2) }} %</p>
+                                <p>{{ getInterest(offer.interest, offer.daysToMaturity) }} %</p>
                             </div>
                         </div>
                     </div>
                     <div class="expire" v-if="index % 2 == 0">
                         <p>Offer expires in</p>
-                        <p>20d : 8h : 20min</p>
+                        <p>{{ countdown(offer.expiresAt) }}</p>
                     </div>
                     <div class="progress" v-else>
-                        <div class="users">
+                        <div class="users" v-if="offer.currentPrincipal == offer.initialPrincipal">
+                            <div class="img" v-for="index in 4" :key="index"></div>
+                            <div class="extra_user">0</div>
+                        </div>
+                        <div class="users" v-else>
                             <img src="/images/user1.png" alt="">
                             <img src="/images/user2.png" alt="">
                             <img src="/images/user3.png" alt="">
@@ -56,7 +60,7 @@
                             <div class="label">
                                 <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} <span>/ {{
                                 toMoney(fromWei(offer.initialPrincipal)) }} {{
-        findAsset(offer.principalToken).name
+        findAsset(offer.principalToken).symbol
     }}</span></p>
                                 <IconInfo />
                             </div>
@@ -80,8 +84,10 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script >
 
 <script>
+import { fromWei } from 'web3-utils';
 import Converter from '../../../../utils/Converter'
 import AssetLibrary from '../../../../utils/AssetLibrary'
+import Countdown from '../../../../utils/Countdown'
 export default {
     data() {
         return {
@@ -93,20 +99,25 @@ export default {
         this.fetchLendingOffers()
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id)
-        },
-        findConjugates: function (id) {
-            return AssetLibrary.findConjugates(this.findAsset(id).type)
+        findAsset: function (address) {
+            return AssetLibrary.findAsset(address)
         },
         progress: function (offer) {
             return (offer.currentPrincipal / offer.initialPrincipal) * 100
         },
-        fromWei: function (value) {
-            return Converter.fromWei(value)
-        },
         toMoney: function (value, mF = 2) {
             return Converter.toMoney(value, mF)
+        },
+        countdown: function (to) {
+            let from = Math.floor(Date.now() / 1000)
+            Countdown.start(from, to, function (text) {
+                console.log(text);
+            })
+        },
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60
+            let interest = fromWei(result.toString())
+            return Converter.toMoney(interest)
         },
         fetchLendingOffers: function () {
             this.fetching = true
@@ -133,9 +144,9 @@ export default {
 .borrows {
     display: flex;
     flex-wrap: wrap;
-    padding: 40px 0;
+    padding: 40px 60px;
     gap: 30px;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 .borrow {
@@ -270,24 +281,24 @@ export default {
     align-items: center;
 }
 
-.users img {
+.users img,
+.users .img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-}
-
-.users img {
     margin-left: -16px;
+    background: var(--bglight);
 }
 
-.users img:first-child {
+.users img:first-child,
+.users .img:first-child {
     margin: 0;
 }
 
 .extra_user {
-    width: 32px;
+    width: 40px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;

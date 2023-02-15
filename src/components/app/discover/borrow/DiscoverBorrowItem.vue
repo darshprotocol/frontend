@@ -15,7 +15,7 @@
                         <div>
                             <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
                             <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} {{
-                                findAsset(offer.principalToken).name
+                                findAsset(offer.principalToken).symbol
                             }}</p>
                         </div>
                         <div>
@@ -36,17 +36,17 @@
                         <div class="interest">
                             <div>
                                 <IconInterest class="icon" />
-                                <p>{{ Number(fromWei(offer.interest)).toFixed(2) }} %</p>
+                                <p>{{ getInterest(offer.interest) }} %</p>
                             </div>
                             <p>Interest</p>
                         </div>
                         <div class="borrowed">
                             <div>
                                 <IconChart class="icon" />
-                                <p><span>{{ toMoney(fromWei(offer.currentPrincipal - offer.currentPrincipal)) }}</span>/
+                                <p><span>{{ toMoney(fromWei(remainPrincipal())) }}</span>/
                                     {{
                                     toMoney(fromWei(offer.initialPrincipal)) }} {{
-        findAsset(offer.principalToken).name
+        findAsset(offer.principalToken).symbol
     }}</p>
                             </div>
                             <p>Borrowed</p>
@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="date">
                                     <p>Offer expires in</p>
-                                    <p>20d : 8h : 20min</p>
+                                    <p>{{ countdown }}</p>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +147,7 @@
             </div>
             <div>
                 <div class="sticky">
-                    <!-- <div class="created">
+                    <div class="created" v-if="userType == 'borrower'">
                         <p>Created by</p>
                         <div>
                             <div>
@@ -156,11 +156,47 @@
                             </div>
                             <img src="/images/user1.png" alt="">
                         </div>
-                    </div> -->
-                    <div class="manage_offer">
+                    </div>
+                    <div class="manage_offer" v-if="userType == 'lender'">
                         <PrimaryButton class="manage_offer_button" :text="'Manage Offer'" />
                     </div>
-                    <div class="active_loans" v-for="index in 2" :key="index">
+                    <div class="active_loans" v-if="userType == 'borrower' && borrowerLoan">
+                        <h3>Open Loans</h3>
+                        <div>
+                            <div class="amount_borrowed">
+                                <p>Amount Borrowed</p>
+                                <div>
+                                    <img :src="`/images/${findAsset(borrowerLoan.principalToken).image}.png`" alt="">
+                                    <h3>{{ toMoney(fromWei(borrowerLoan.currentPrincipal)) }} {{ findAsset(borrowerLoan.principalToken).symbol }}</h3>
+                                </div>
+                            </div>
+                            <div class="loan_info" v-on:click="loanInfo = true">
+                                <IconInformation />
+                                <p>Info</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                <p>My Collateral</p>
+                                <div>
+                                    <img :src="`/images/${findAsset(borrowerLoan.collateralToken).image}.png`" alt="">
+                                    <p>{{ toMoney(fromWei(borrowerLoan.currentCollateral)) }} {{ findAsset(borrowerLoan.collateralToken).symbol }}</p>
+                                    <IconOut />
+                                </div>
+                            </div>
+                            <div>
+                                <p>Due in</p>
+                                <div>
+                                    <IconClock />
+                                    <p>30 days</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <PrimaryButton v-on:click="payback = true" :state="''" :text="'Payback'" />
+                        </div>
+                    </div>
+                    <div class="active_loans" v-if="userType == 'lender'">
                         <h3>Open Loans</h3>
                         <div>
                             <div class="amount_borrowed">
@@ -192,10 +228,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="index % 2 == 0">
-                            <PrimaryButton v-on:click="payback = true" :state="''" :text="'Payback'" />
-                        </div>
-                        <div v-else class="claim">
+                        <div class="claim">
                             <p>Borrower's payback</p>
                             <div>
                                 <img src="/images/usdc.png" alt="">
@@ -205,7 +238,7 @@
                                 :text="'Claim Payback'" />
                         </div>
                     </div>
-                    <div class="open_loans">
+                    <div class="open_loans" v-if="userType != 'lender' && !borrowerLoan">
                         <h3>Open Loans</h3>
                         <div class="box">
                             <IconReceipt />
@@ -235,9 +268,9 @@
             </div>
         </div>
 
-        <BorrowRequestPopUp v-if="borrowRequest" v-on:close="borrowRequest = false" />
+        <BorrowRequestPopUp :offer="offer" v-if="borrowRequest" v-on:close="borrowRequest = false" />
         <LoanPayBackPopUp v-if="payback" v-on:close="payback = false" />
-        <BorrowPopUp v-if="borrow" v-on:close="borrow = false" />
+        <BorrowPopUp v-if="borrow" :offer="offer" v-on:close="borrow = false" />
         <LoanInfoPopUp v-if="loanInfo" v-on:close="loanInfo = false" />
     </main>
 </template>
@@ -259,16 +292,22 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script >
 
 <script>
+import { fromWei } from 'web3-utils';
 import Converter from '../../../../utils/Converter'
 import AssetLibrary from '../../../../utils/AssetLibrary'
 import IconSort from '../../../icons/IconSort.vue';
 import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import BorrowRequestPopUp from './BorrowRequestPopUp.vue';
+import Countdown from '../../../../utils/Countdown';
+import Authentication from '../../../../scripts/Authentication';
 export default {
     data() {
         return {
             offer: null,
+            countdown: '',
             fetching: true,
+            userType: 'none',
+            borrowerLoan: null,
             loanInfo: false,
             borrow: false,
             payback: false,
@@ -276,35 +315,70 @@ export default {
         };
     },
     created() {
-        this.fetchLendingOffer();
+        this.fetchLendingOffer()
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id);
+        findAsset: function (address) {
+            return AssetLibrary.findAsset(address);
         },
-        findConjugates: function (id) {
-            return AssetLibrary.findConjugates(this.findAsset(id).type);
+        findConjugates: function (address) {
+            return AssetLibrary.findConjugates(this.findAsset(address).type);
         },
         progress: function (offer) {
             return (offer.currentPrincipal / offer.initialPrincipal) * 100;
         },
-        fromWei: function (value) {
-            return Converter.fromWei(value);
-        },
         toMoney: function (value, mF = 2) {
             return Converter.toMoney(value, mF);
         },
-        fetchLendingOffer: function () {
-            this.fetching = true;
-            let id = this.$route.params.id;
-            this.axios.get(`https://darshprotocol.onrender.com/lending-offers/${id}`).then(response => {
-                this.offer = response.data;
-                console.log(response);
-                this.fetching = false;
+        remainPrincipal: function () {
+            return (this.offer.initialPrincipal - this.offer.currentPrincipal).toString()
+        },
+        startCountdown: function () {
+            let to = this.offer.expiresAt * 1000
+            let _this = this
+            Countdown.start(to, (countdown) => {
+                _this.countdown = countdown
+            })
+        },
+        getInterest: function (rate) {
+            let result = rate * this.offer.daysToMaturity * 24 * 60 * 60
+            let interest = fromWei(result.toString())
+            return Converter.toMoney(interest)
+        },
+        loadAsBorrower: async function() {
+            let id = this.offer.offerId
+            let borrower = await Authentication.userAddress()
+            this.axios.get(`https://darshprotocol.onrender.com/loans?offerId=${id}&borrower=${borrower}`).then(response => {
+                let loans = response.data;
+                if (loans.length > 0) {
+                    this.borrowerLoan = loans[0]
+                }
             }).catch(error => {
                 console.error(error);
                 // this.fetching = false
             });
+
+        },
+        fetchLendingOffer: async function () {
+            this.fetching = true;
+            let id = this.$route.params.id;
+            try {
+                let response = await this.axios.get(`https://darshprotocol.onrender.com/lending-offers/${id}`)
+                this.offer = response.data;
+                this.fetching = false;
+
+                this.startCountdown()
+                let userAddress =  await Authentication.userAddress()
+                if (this.offer.lender != userAddress) {
+                    this.loadAsBorrower()
+                    this.userType = 'borrower'
+                } else {
+                    // load
+                }
+            } catch (error) {
+                console.error(error);
+                // this.fetching = false
+            }
         }
     },
     components: { IconSort, LoanPayBackPopUp, BorrowRequestPopUp }
@@ -801,7 +875,7 @@ export default {
 }
 
 .stats .score {
-    background-image: url('../../../assets/images/score_img.png');
+    background-image: url('/images/score_img.png');
     height: 97px;
     background-repeat: no-repeat;
     background-size: cover;
@@ -854,7 +928,7 @@ export default {
 
 .active_loans {
     width: 100%;
-    background-image: url('../../../assets/images/loan_gradient.png');
+    background-image: url('/images/loan_gradient.png');
     background-color: var(--bglight);
     background-size: cover;
     overflow: hidden;
@@ -982,7 +1056,7 @@ export default {
 .active_loans>div:nth-child(4) {
     padding: 30px;
     background: var(--bglighter);
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -990,7 +1064,7 @@ export default {
 .active_loans .claim {
     padding: 30px;
     background-color: var(--bglighter);
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
     display: flex;

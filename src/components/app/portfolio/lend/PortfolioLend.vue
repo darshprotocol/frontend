@@ -74,9 +74,9 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script>
 
 <script>
-import { fromWei } from 'web3-utils';
-// import Converter from '../../../../utils/Converter'
+import Converter from '../../../../utils/Converter'
 import AssetLibrary from '../../../../utils/AssetLibrary'
+import Authentication from '../../../../scripts/Authentication';
 export default {
     data() {
         return {
@@ -94,9 +94,18 @@ export default {
         progress: function (offer) {
             return (offer.currentPrincipal / offer.initialPrincipal) * 100
         },
-        fetchLendingOffers: function () {
+        fromWei: function (value) {
+            return Converter.fromWei(value)
+        },
+        getUserAddress: async function () {
+            if (this.userAddress != null) return this.userAddress
+            this.userAddress = await Authentication.userAddress()
+            return this.userAddress
+        },
+        fetchLendingOffers: async function () {
             this.fetching = true
-            this.axios.get('https://darshprotocol.onrender.com/borrowing-offers').then(response => {
+            let userAddress = await this.getUserAddress()
+            this.axios.get(`https://darshprotocol.onrender.com/lending-offers?lender=${userAddress}`).then(response => {
                 this.offers = response.data
                 this.fetching = false
             }).catch(error => {

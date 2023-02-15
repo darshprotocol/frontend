@@ -149,20 +149,24 @@ const LendingPoolAPI = {
     // @borrower
     acceptLendingOffer: async function (
         offerId,
-        desiredPercentage,
-        isNative,
+        percentage,
+        collateralToken,
+        collateralAmount,
         userAddress
     ) {
         const instance = await this.getInstance()
         if (instance == null) return null
 
+        let isNative = collateralToken == nativeAddress
+
         try {
             await instance.acceptLendingOffer(
                 offerId,
-                desiredPercentage,
+                percentage,
+                collateralToken,
                 {
                     from: userAddress,
-                    value: isNative ? 1 : 0
+                    value: isNative ? collateralAmount : 0
                 }
             )
         } catch (error) {

@@ -27,7 +27,7 @@
                                 <IconArrowDown />
                                 <div class="drop_down" v-show="dropDown">
                                     <div class="drop_item" v-for="asset in otherAssets()" :key="asset.id"
-                                        v-on:click="selectedPrincipal(asset.id)">
+                                        v-on:click="selectedPrincipal(asset.address)">
                                         <img :src="`/images/${asset.image}.png`" alt="">
                                         <p>{{ asset.symbol }}</p>
                                     </div>
@@ -42,8 +42,8 @@
                         </div>
                         <div class="tokens">
                             <div v-for="asset in conjugates()"
-                                :class="collateralTokens.includes(asset.id) ? 'active border' : 'border'"
-                                :key="asset.id" v-on:click="toggleToken(asset.id)">
+                                :class="collateralTokens.includes(asset.address) ? 'active border' : 'border'"
+                                :key="asset.id" v-on:click="toggleToken(asset.address)">
                                 <div class="token">
                                     <img :src="`/images/${asset.image}.png`" />
                                     <h3 class="symbol">{{ asset.symbol }}</h3>
@@ -96,7 +96,7 @@
                         <p>Offer expires in</p>
                         <div>
                             <div class="input">
-                                <input type="number" :style="getInputWidth(daysToExpire)" placeholder="0" min="0"
+                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0" min="0"
                                     v-model="daysToExpire">
                                 <span>days</span>
                             </div>
@@ -130,6 +130,7 @@ import IconChecked from '../../icons/IconChecked.vue'
 </script>
 
 <script>
+import { fromWei, toWei } from 'web3-utils';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
 import Authentication from '../../../scripts/Authentication';
 import AssetLibrary from '../../../utils/AssetLibrary';
@@ -138,8 +139,8 @@ import Converter from '../../../utils/Converter';
 export default {
     data() {
         return {
-            principalAmount: "",
-            principalToken: 0,
+            principalAmount: 0,
+            principalToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             collateralTokens: [],
             tokenBalances: [],
             interest: 2,
@@ -171,16 +172,16 @@ export default {
         this.getTokenBalances()
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id)
+        findAsset: function (address) {
+            return AssetLibrary.findAsset(address)
         },
-        toggleToken: function (id) {
-            if (this.collateralTokens.includes(id)) {
-                const index = this.collateralTokens.indexOf(id);
+        toggleToken: function (address) {
+            if (this.collateralTokens.includes(address)) {
+                const index = this.collateralTokens.indexOf(address);
                 if (index > -1) this.collateralTokens.splice(index, 1);
                 return
             }
-            this.collateralTokens.push(id)
+            this.collateralTokens.push(address)
         },
         otherAssets: function () {
             return AssetLibrary.otherAssets(this.principalToken)
@@ -190,16 +191,16 @@ export default {
             return AssetLibrary.findConjugates(type)
         },
         findTokenBalance: function () {
-            let address = this.findAsset(this.principalToken).address
+            let address = this.principalToken
             if (address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
                 address = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
             }
             let token = this.tokenBalances.find(token => token.contract_address == address)
             if (!token) return '0.00'
-            return Converter.toMoney(Converter.fromWei(token.balance))
+            return Converter.toMoney(fromWei(token.balance))
         },
-        selectedPrincipal: function (id) {
-            this.principalToken = id
+        selectedPrincipal: function (address) {
+            this.principalToken = address
             this.collateralTokens = []
         },
         getUserAddress: async function () {
@@ -218,20 +219,14 @@ export default {
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (this.principalAmount * targetDurationInSecs);
-            let principalToken = this.findAsset(this.principalToken).address
-            let collateralTokens = []
-            this.collateralTokens.forEach(id => {
-                collateralTokens.push(this.findAsset(id).address)
-            })
             let userAddress = await this.getUserAddress();
-            console.log(principalToken, collateralTokens);
             const trx = await LendingPoolAPI.createLendingOffer(
-                principalToken,
-                Converter.toWei(this.principalAmount.toString()),
-                Converter.toWei(calcInterest.toFixed(18).toString()),
+                this.principalToken,
+                toWei(this.principalAmount.toString()),
+                toWei(calcInterest.toFixed(18).toString()),
                 this.daysToMaturity,
                 this.daysToExpire,
-                collateralTokens,
+                this.collateralTokens,
                 userAddress
             );
             if (!trx) {
@@ -277,8 +272,7 @@ export default {
                 calWidth = minWidth;
             return `width: ${calWidth}px;`;
         }
-    },
-    components: { IconAdd }
+    }
 }
 </script>
 

@@ -10,24 +10,31 @@
             <div>
                 <p>Borrow Amount</p>
                 <div>
-                    <p>40,000</p>
+                    <p>{{ toMoney(fromWei(getPrincipal())) }}</p>
                     <div>
-                        <img src="/images/usdc.png" alt="">
-                        <p>USDC</p>
+                        <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
+                        <p>{{ findAsset(offer.principalToken).symbol }}</p>
                     </div>
                 </div>
             </div>
             <div class="slider">
-                <Slider v-model="percentage" :step="25" :format="{ suffix: '%' }" />
+                <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
             </div>
             <div>
                 <p>Collateral Amount</p>
                 <div>
-                    <p>40,000</p>
-                    <div>
-                        <img src="/images/usdc.png" alt="">
-                        <p>USDC</p>
+                    <p>{{ toMoney(fromWei(collateralAmount)) }}</p>
+                    <div class="click_1" v-on:click="dropDown = !dropDown">
+                        <img :src="`/images/${findAsset(collateralToken).image}.png`" alt="">
+                        <p>{{ findAsset(collateralToken).symbol }}</p>
                         <IconArrowDown />
+                        <div class="drop_down" v-show="dropDown">
+                            <div class="drop_item" v-for="address in collateralTokens()" :key="address"
+                                v-on:click="collateralToken = address">
+                                <img :src="`/images/${findAsset(address).image}.png`" alt="">
+                                <p>{{ findAsset(address).symbol }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -36,26 +43,110 @@
                 </div>
             </div>
             <div>
-                <PrimaryButton :text="'Borrow'" />
+                <PrimaryButton v-if="fromWei(allowance) >= fromWei(collateralAmount)" v-on:click="borrowLoan()" :text="'Borrow'" />
+                <PrimaryButton v-else v-on:click="approve()" :text="'Approve & Borrow'" />
             </div>
         </div>
     </main>
 </template>
 
 <script setup>
+import { fromWei } from 'web3-utils';
 import Slider from '@vueform/slider'
 import IconClose from '../../../icons/IconClose.vue';
 import PrimaryButton from '../../../PrimaryButton.vue';
+import IconArrowDown from '../../../icons/IconArrowDown.vue';
 </script>
 
 <script>
+import Converter from '../../../../utils/Converter';
+import AssetLibrary from '../../../../utils/AssetLibrary';
+import LtvAPI from '../../../../scripts/LtvAPI';
+import Authentication from '../../../../scripts/Authentication'
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
+import Approval from '../../../../scripts/Approval'
 export default {
+    props: ['offer'],
     data() {
         return {
-            percentage: 25
+            percentage: 25,
+            collateralToken: this.offer.collateralTokens[0],
+            collateralAmount: '0',
+            allowance: '0',
+            dropDown: false
         }
     },
+    watch: {
+        percentage: function () {
+            this.getCollateralAmount()
+        },
+        collateralToken: function () {
+            this.getCollateralAmount()
+        }
+    },
+    methods: {
+        findAsset: function (id) {
+            return AssetLibrary.findAsset(id);
+        },
+        toMoney: function (value, mF = 2) {
+            return Converter.toMoney(value, mF)
+        },
+        max: function () {
+            return (this.offer.currentPrincipal / this.offer.initialPrincipal) * 100
+        },
+        getPrincipal: function () {
+            let principal = this.offer.initialPrincipal * (this.percentage / 100)
+            return principal.toString()
+        },
+        collateralTokens: function () {
+            let tokens = []
+            this.offer.collateralTokens.forEach(token => {
+                if (token != this.collateralToken) {
+                    tokens.push(token)
+                }
+            })
+            return tokens
+        },
+        getAllowance: async function() {
+            let amount = await Approval.getAllocationOf(
+                await Authentication.userAddress(),
+                this.collateralToken,
+                '0xb880ac301219328589f36dce275ba091d7c2cd61'
+            )
+            this.allowance = amount
+        },
+        getCollateralAmount: async function () {
+            let collateralAmount = await LtvAPI.getCollateralAmount(
+                this.offer.principalToken,
+                this.collateralToken,
+                this.getPrincipal(),
+                await Authentication.userAddress()
+            )
+            this.collateralAmount = collateralAmount.toString()
+
+            this.getAllowance()
+        },
+        approve: async function() {
+            await Approval.approve(
+                await Authentication.userAddress(),
+                this.collateralAmount,
+                this.collateralToken,
+                '0xb880ac301219328589f36dce275ba091d7c2cd61',
+            )
+            this.getAllowance()
+        },
+        borrowLoan: async function() {
+            await LendingPoolAPI.acceptLendingOffer(
+                this.offer.offerId,
+                this.percentage,
+                this.collateralToken,
+                this.collateralAmount,
+                await Authentication.userAddress()
+            )
+        }     
+    },
     mounted() {
+        this.getCollateralAmount()
         document.body.classList.add('modal')
     },
     unmounted() {
@@ -257,8 +348,54 @@ main {
 .box>div:nth-child(5) {
     width: 100%;
     padding: 30px;
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
+}
+
+.click_1 {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.drop_down {
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    z-index: 4;
+    background: var(--bglighter);
+    border-radius: 4px;
+}
+
+.drop_item {
+    height: 50px;
+    padding: 0 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bglightest);
+}
+
+.drop_item:first-child {
+    border-top: 1px solid var(--bglightest);
+}
+
+.drop_item:last-child {
+    border: none;
+}
+
+.drop_down img {
+    width: 24px;
+    height: 24px;
+}
+
+.drop_item p {
+    font-family: 'Axiforma';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textnormal);
 }
 </style>

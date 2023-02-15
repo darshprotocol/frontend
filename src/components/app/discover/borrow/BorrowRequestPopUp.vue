@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="slider">
-                        <Slider v-model="percentage" :step="25" :format="{ suffix: '%' }" />
+                        <Slider v-model="percentage" :step="25" max="100" :format="{ suffix: '%' }" />
                     </div>
                     <div class="option">
                         <p>Duration</p>
@@ -99,10 +99,14 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 
 <script>
 export default {
+    props: ['offer'],
     data() {
         return {
             percentage: 25
         }
+    },
+    methods: {
+    
     },
     mounted() {
         document.body.classList.add('modal')
