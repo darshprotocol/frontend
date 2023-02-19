@@ -27,8 +27,8 @@
                     <tr>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>You</p>
+                                <img class="photo" src="/images/usdc.png" alt="">
+                                <p >You</p>
                             </div>
                         </td>
                         <td>
@@ -175,7 +175,11 @@ export default {
 .request_table tbody td div {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+}
+
+.request_table tbody td span {
+    color: var(--textdimmed);
 }
 
 .request_table tbody p {
@@ -183,6 +187,16 @@ export default {
     font-size: 14px;
     color: var(--textnormal);
     margin-top: 2px;
+}
+
+.request_table tbody td img {
+    width: 20px;
+    height: 20px;
+}
+
+.request_table tbody .photo {
+    width: 24px;
+    height: 24px;
 }
 
 .request_table .action {

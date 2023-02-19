@@ -182,7 +182,7 @@ export default {
 .request_table tbody td div {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 }
 
 .request_table tbody p {
