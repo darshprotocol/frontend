@@ -10,18 +10,20 @@
             <div>
                 <p>Payback Amount</p>
                 <div>
-                    <p>40,000</p>
+                    <p>{{ $toMoney($fromWei(getPaybackAmount()), $findAsset(loan.principalToken).maxDecimal) }}</p>
                     <div>
-                        <img src="/images/usdc.png" alt="">
-                        <p>USDC</p>
+                        <img :src="`/images/${$findAsset(loan.principalToken).image}.png`" alt="">
+                        <p>{{ $findAsset(loan.principalToken).symbol }}</p>
                     </div>
                 </div>
             </div>
             <div class="slider">
-                <Slider v-model="percentage" :step="25" :format="{ suffix: '%' }" />
+                <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
             </div>
             <div>
-                <PrimaryButton :text="'Payback'" />
+                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(getPaybackAmount())" v-on:click="repayLoan()"
+                    :text="'Payback'" />
+                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" />
             </div>
         </div>
     </main>
@@ -34,13 +36,61 @@ import PrimaryButton from '../../PrimaryButton.vue';
 </script>
 
 <script>
+import Authentication from '../../../scripts/Authentication';
+import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
 export default {
+    props: ['loan'],
     data() {
         return {
-            percentage: 25
+            percentage: 25,
+            allowance: '0',
         }
     },
+    methods: {
+        max: function () {
+            return (this.loan.currentPrincipal / this.loan.initialPrincipal) * 100
+        },
+        getPaybackAmount: function() {
+            return ((this.loan.initialPrincipal * this.percentage) / 100) + this.getAccrued()
+        },
+        getAccrued: function() {
+            let now = Date.now() + (2 * 60 * 1000)
+            let duration = (now / 1000) - (this.loan.startDate)
+            let interest = this.$fromWei(this.loan.interest)
+            let principalAmount = (this.loan.initialPrincipal * this.percentage) / 100
+            let accrued = (principalAmount * interest * duration) / 100
+            return accrued
+        },
+        repayLoan: async function () {
+            await LendingPoolAPI.repayLoan(
+                this.loan.loanId,
+                this.percentage,
+                this.getPaybackAmount(),
+                this.loan.principalToken,
+                await Authentication.userAddress()
+            )
+        },
+        getAllowance: async function () {
+            let amount = await this.$allowanceOf(
+                await Authentication.userAddress(),
+                this.loan.principalToken,
+                LendingPoolAPI.address
+            )
+            console.log(amount);
+            this.allowance = amount
+        },
+        approve: async function () {
+            await this.$approve(
+                await Authentication.userAddress(),
+                this.getPaybackAmount().toFixed(0),
+                this.loan.principalToken,
+                LendingPoolAPI.address
+            )
+            this.getAllowance()
+        },
+    },
     mounted() {
+        this.getAllowance()
         document.body.classList.add('modal')
     },
     unmounted() {
@@ -87,8 +137,8 @@ main {
 }
 
 .title h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -113,8 +163,8 @@ main {
 }
 
 .box>div:nth-child(2)>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -144,16 +194,16 @@ main {
 }
 
 .box>div:nth-child(2)>div p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 20px;
     color: var(--textnormal);
 }
 
 .box>div:nth-child(2)>div>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -168,7 +218,7 @@ main {
     width: 100%;
     padding: 30px;
     margin-top: 30px;
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
 }

@@ -1,24 +1,29 @@
 <template>
     <main>
-        <div class="progress_box" v-if="fetching">
+        <p v-if="!userAddress">Connect Wallet</p>
+
+        <div class="progress_box" v-if="fetching && userAddress != null">
             <ProgressBox />
         </div>
 
-        <div class="lends" v-else>
-            <RouterLink v-for="offer in offers" :to="`/discover/lend/${index}`" :key="offer.offerId">
+        <div class="lends" v-if="!fetching && userAddress != null">
+            <RouterLink v-for="offer in offers" :to="`/portfolio/lend/${offer._id}`" :key="offer.offerId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
-                            <p>Principal needed</p>
-                            <p>Collateral</p>
+                            <p>Principal</p>
+                            <p>Collaterals</p>
                         </div>
                         <div class="tokens">
                             <div>
-                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
-                                <p>{{ fromWei(offer.currentPrincipal) }} {{ findAsset(offer.principalToken).name }}</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} {{
+                                    $findAsset(offer.principalToken).symbol
+                                }}</p>
                             </div>
                             <div>
-                                <img src="/images/usdc.png" alt="">
+                                <img v-for="asset in offer.collateralTokens"
+                                    :src="`/images/${$findAsset(asset).image}.png`" :key="asset.id" alt="">
                             </div>
                         </div>
                     </div>
@@ -34,34 +39,38 @@
                             <p>Interest</p>
                             <div>
                                 <IconInterest />
-                                <p>{{ Number(fromWei(offer.interest)).toFixed(2) }} %</p>
+                                <p>{{ getInterest(offer.interest, offer.daysToMaturity) }} %</p>
                             </div>
                         </div>
                     </div>
                     <div class="expire" v-if="index % 2 == 0">
                         <p>Offer expires in</p>
-                        <p>20d : 8h : 20min</p>
+                        <p>{{ countdown(offer.expiresAt) }}</p>
                     </div>
                     <div class="progress" v-else>
-                        <div class="users">
-                            <img src="/images/user1.png" alt="">
-                            <img src="/images/user2.png" alt="">
-                            <img src="/images/user3.png" alt="">
-                            <div class="extra_user">3</div>
+                        <div class="users" v-if="offer.currentPrincipal == offer.initialPrincipal">
+                            <div class="img" v-for="index in 4" :key="index"></div>
+                            <div class="extra_user">0</div>
                         </div>
+                        <div class="users" v-else>
+                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
+                            <div class="extra_user">{{ offer.loans.length }}</div>
+                        </div>
+
                         <div class="needed">
                             <div class="label">
                                 <p>14.2 <span>/ 24.2 WETH</span></p>
                                 <IconInfo />
                             </div>
                             <div class="bar">
-                                <div class="percentage" :style="`width: ${progress(offer)}%`"></div>
+                                <div class="percentage" :style="`width: ${$progress(offer)}%`"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </RouterLink>
         </div>
+
     </main>
 </template>
 
@@ -74,44 +83,45 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script>
 
 <script>
-import Converter from '../../../../utils/Converter'
-import AssetLibrary from '../../../../utils/AssetLibrary'
+import Countdown from '../../../../utils/Countdown'
 import Authentication from '../../../../scripts/Authentication';
 export default {
     data() {
         return {
             offers: [],
-            fetching: true
-        }
+            fetching: true,
+            userAddress: null
+        };
     },
-    created() {
-        this.fetchLendingOffers()
+    async created() {
+        this.userAddress = await Authentication.userAddress();
+        this.fetchLendingOffers();
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id)
+        countdown: function (to) {
+            let from = Math.floor(Date.now() / 1000)
+            Countdown.start(from, to, function (text) {
+                console.log(text);
+            })
         },
-        progress: function (offer) {
-            return (offer.currentPrincipal / offer.initialPrincipal) * 100
-        },
-        fromWei: function (value) {
-            return Converter.fromWei(value)
-        },
-        getUserAddress: async function () {
-            if (this.userAddress != null) return this.userAddress
-            this.userAddress = await Authentication.userAddress()
-            return this.userAddress
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60
+            let interest = this.$fromWei(result.toString())
+            return this.$toMoney(interest)
         },
         fetchLendingOffers: async function () {
-            this.fetching = true
-            let userAddress = await this.getUserAddress()
-            this.axios.get(`https://darshprotocol.onrender.com/lending-offers?lender=${userAddress}`).then(response => {
-                this.offers = response.data
-                this.fetching = false
+            this.fetching = true;
+            if (this.userAddress == null) {
+                return;
+            }
+            this.axios.get(`https://darshprotocol.onrender.com/offers?offerType=0&creator=${this.userAddress.toLowerCase()}`).then(response => {
+                console.log(response.data);
+                this.offers = response.data;
+                this.fetching = false;
             }).catch(error => {
                 console.error(error);
-                this.fetching = false
-            })
+                this.fetching = false;
+            });
         }
     }
 }
@@ -128,9 +138,8 @@ export default {
 .lends {
     display: flex;
     flex-wrap: wrap;
-    padding: 40px 0;
+    padding: 40px 60px;
     gap: 30px;
-    justify-content: center;
 }
 
 .lend {
@@ -159,8 +168,8 @@ export default {
 }
 
 .asset>.label>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -178,7 +187,7 @@ export default {
 
 .asset .tokens>div p {
     font-family: 'Axiforma SemiBold';
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -190,11 +199,16 @@ export default {
 
 .asset .tokens>div:nth-child(2) img {
     width: 18px;
+    margin-left: -18px;
+}
+
+.asset .tokens>div:nth-child(2) img:first-child {
+    margin-left: 0;
 }
 
 .asset .tokens>div:nth-child(2) {
+    width: 58px;
     height: 30px;
-    width: 34px;
     background: var(--bglighter);
     display: flex;
     align-items: center;
@@ -213,8 +227,8 @@ export default {
 }
 
 .info>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -235,8 +249,8 @@ export default {
 }
 
 .info>div>div p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);
@@ -282,8 +296,8 @@ export default {
     align-items: center;
     justify-content: center;
     background: var(--background);
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
@@ -297,8 +311,8 @@ export default {
 }
 
 .needed>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);
@@ -329,16 +343,16 @@ export default {
 }
 
 .expire p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
 }
 
 .expire p:nth-child(2) {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);

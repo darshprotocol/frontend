@@ -26,7 +26,7 @@
                 </RouterLink>
                 <RouterLink to="/portfolio/stake">
                     <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">
-                        <p>My Stakes</p>
+                        <p>Vaults</p>
                     </div>
                 </RouterLink>
             </div>
@@ -81,8 +81,8 @@ main {
 }
 
 .title {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 30px;
     color: var(--textnormal);
@@ -99,8 +99,8 @@ main {
 }
 
 .label p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     line-height: 12px;
@@ -117,8 +117,8 @@ main {
 }
 
 .value p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     line-height: 14px;
@@ -151,8 +151,8 @@ main {
 }
 
 .tab p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textdimmed);
@@ -187,8 +187,8 @@ main {
 }
 
 .filter p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);

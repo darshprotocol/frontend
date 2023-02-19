@@ -1,18 +1,19 @@
 <template>
-    <div :class="`button ${state}`" :style="`width: ${width};`">
+    <div :class="`button ${state}`" :style="`width: ${width}; background: ${bg};`">
         <p>{{ text }}</p>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['text', 'state', 'width']
+    props: ['text', 'state', 'width', 'bg']
 }
 </script>
 
 <style scoped>
 .button {
-    padding: 0 40px;
+    padding: 0 20px;
+    min-width: 140px;
     height: 40px;
     background: var(--primary);
     border-radius: 4px;
@@ -30,7 +31,6 @@ export default {
 
 
 p {
-    font-style: normal;
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);

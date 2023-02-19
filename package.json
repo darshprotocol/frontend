@@ -19,7 +19,8 @@
     "vue": "^3.2.45",
     "vue-axios": "^3.5.2",
     "vue-router": "^4.1.6",
-    "web3": "^1.8.1"
+    "web3": "^1.8.1",
+    "web3-providers-http": "^1.8.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.28.1",

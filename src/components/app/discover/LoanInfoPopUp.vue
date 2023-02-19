@@ -1,76 +1,177 @@
 <template>
     <main>
-        <div class="box">
+        <div :class="`box ${loanState}`">
             <div class="title">
                 <h3>Loan Info</h3>
-                <div class="close" v-on:click="$emit('close')">
-                    <IconClose />
-                </div>
-            </div>
-            <div>
                 <div>
-                    <p>Amount Borrowed</p>
-                    <div>
-                        <img src="/images/usdc.png" alt="">
-                        <h3>20,000 USDC</h3>
-                    </div>
-                </div>
-                <div>
-                    <p>My Collateral</p>
-                    <div>
-                        <h3>0.72 BTC</h3>
-                        <img src="/images/btc.png" alt="">
+                    <LoanState :state="loanState" :height="30" />
+                    <div class="close" v-on:click="$emit('close')">
+                        <IconClose />
                     </div>
                 </div>
             </div>
-            <div>
+            <div class="fill fill_1">
                 <div>
+                    <p>Amount Borrowed + Interest</p>
+                    <div class="fill_1_detail">
+                        <img :src="`/images/${$findAsset(loan.principalToken).image}.png`" alt="">
+                        <h3>{{ $fromWei(loan.initialPrincipal) }} {{ $findAsset(loan.principalToken).symbol }}</h3>
+                        <div class="accrued">
+                            <IconAdd class="icon" />
+                            <p>{{ $toMoney($fromWei(getAccrued())) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="paid">
+                    <div class="paid_token">
+                        <p>-{{ $toMoney($fromWei(loan.initialPrincipal) - $fromWei(loan.currentPrincipal)) }}</p>
+                        <img :src="`/images/${$findAsset(loan.principalToken).image}.png`" alt="">
+                    </div>
+                    <p class="paid_text">Paidback</p>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="grid_1">
                     <p>Interest</p>
                     <div>
                         <IconInterest class="icon" />
-                        <p>9.00 %</p>
+                        <p>{{ getInterest(loan.interest) }} %</p>
                     </div>
                 </div>
-                <div>
+
+                <!---->
+                <div class="grid_1" v-if="loanState == 'open'">
                     <p>Due in</p>
                     <div>
                         <IconClock class="icon" />
-                        <p>19 days</p>
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
-            </div>
-            <div>
-                <p>Total Interest Accrued</p>
-                <div>
-                    <p>14.259333</p>
+                <div class="grid_1" v-if="loanState == 'repaid'">
+                    <p>Repaid on</p>
                     <div>
-                        <img src="/images/usdc.png" alt="">
-                        <p>USDC</p>
+                        <IconCalendar class="icon" />
+                        <p>{{ dueDate }} days</p>
+                    </div>
+                </div>
+                <div class="grid_1" v-if="loanState == 'defaulting'">
+                    <p>Default in</p>
+                    <div>
+                        <IconClock class="icon" />
+                        <p>{{ dueDate }} days</p>
+                    </div>
+                </div>
+                <div class="grid_1" v-if="loanState == 'defaulted'">
+                    <p>Defaulted on</p>
+                    <div>
+                        <IconCalendar class="icon" />
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
             </div>
-            <div>
-                <PrimaryButton :text="'Payback'" />
+            <div class="grid">
+                <div class="grid_2">
+                    <p>Lender</p>
+                    <div>
+                        <img src="/images/user1.png" alt="">
+                        <p>Elon Musk</p>
+                    </div>
+                </div>
+
+                <!---->
+                <div class="grid_2" v-if="loanState != 'defaulted'">
+                    <p>My Collateral</p>
+                    <div>
+                        <p>{{ $toMoney($fromWei(loan.currentCollateral)) + ' ' + $findAsset(loan.collateralToken).symbol }}
+                        </p>
+                        <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
+                    </div>
+                </div>
+                <div class="grid_2" v-if="loanState == 'defaulted'">
+                    <p>My Collateral</p>
+                    <div>
+                        <p class="strike">{{ $toMoney($fromWei(loan.currentCollateral)) + ' ' + $findAsset(loan.collateralToken).symbol }}
+                        </p>
+                        <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
+                    </div>
+                </div>
+            </div>
+            <div class="action">
+                <PrimaryButton v-if="loanState != 'repaid'" :text="'Payback'" v-on:click="$emit('payback')" />
+                <PrimaryButton v-if="loanState == 'repaid'" :text="'Payback'" :state="'disable'" />
             </div>
         </div>
-    </main>
+</main>
 </template>
 
 <script setup>
+import IconAdd from '../../icons/IconAdd.vue';
 import IconClock from '../../icons/IconClock.vue';
 import IconClose from '../../icons/IconClose.vue';
 import IconInterest from '../../icons/IconInterest.vue';
+import LoanState from '../../LoanState.vue';
 import PrimaryButton from '../../PrimaryButton.vue';
 </script>
 
 <script>
+import Countdown from '../../../utils/Countdown';
+import IconCalendar from '../../icons/IconCalendar.vue';
 export default {
+    props: ["loan"],
+    data() {
+        return {
+            dueDate: 0,
+            loanState: "open"
+        };
+    },
+    methods: {
+        getInterest: function (rate) {
+            let daysToMaturity = this.loan.maturityDate - this.loan.startDate;
+            let result = rate * daysToMaturity;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
+        },
+        getDueDate: function () {
+            let due = this.loan.maturityDate * 1000;
+            Countdown.startOnlyDay(due, (text) => {
+                this.dueDate = text;
+            });
+        },
+        getAccrued: function () {
+            let now = Date.now() + (60 * 1000);
+            let duration = (now / 1000) - (this.loan.startDate);
+            let interest = this.$fromWei(this.loan.interest);
+            let accrued = (this.loan.currentPrincipal * interest * duration) / 100;
+            return accrued;
+        },
+        getLoanState: function () {
+            let due = this.loan.maturityDate * 1000;
+            let grace = this.loan.graceDays * 24 * 60 * 60 * 1000;
+            let defaulted = due + grace;
+            let now = Date.now();
+            if (this.loan.state != 1 && now >= due) {
+                this.loanState = "defaulting";
+            }
+            else if (this.loan.state == 0) {
+                this.loanState = "open";
+            }
+            else if (this.loan.state == 1) {
+                this.loanState = "repaid";
+            }
+            else if (this.loanState == 2 || now >= defaulted) {
+                this.loanState = "defaulted";
+            }
+        }
+    },
     mounted() {
-        document.body.classList.add('modal')
+        this.getDueDate();
+        this.getLoanState()
+        document.body.classList.add("modal");
     },
     unmounted() {
-        document.body.classList.remove('modal')
-    }
+        document.body.classList.remove("modal");
+    },
+    components: { IconCalendar }
 }
 </script>
 
@@ -91,7 +192,6 @@ main {
 
 .box {
     width: 500px;
-    background-image: url('../../../assets/images/loan_gradient.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-color: var(--bglight);
@@ -110,14 +210,19 @@ main {
 }
 
 .title h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
 
 .title div {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.title .close {
     width: 30px;
     height: 30px;
     background: var(--bglighter);
@@ -128,151 +233,178 @@ main {
     justify-content: center;
 }
 
-.box>div:nth-child(2),
-.box>div:nth-child(3) {
+
+.fill {
+    width: 100%;
+    border-bottom: 1px solid var(--background);
+}
+
+.fill_1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px;
+}
+
+.fill p:first-child {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.fill_1_detail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.fill_1_detail img {
+    width: 28px;
+    height: 28px;
+}
+
+.fill_1_detail h3 {
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--textnormal);
+}
+
+.paid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.paid_token {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.paid_text {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.accrued {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.accrued .icon {
+    background: #6936f560;
+    border-radius: 50%;
+}
+
+.accrued p {
+    font-size: 16px;
+    color: var(--primary);
+}
+
+.grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     border-bottom: 1px solid var(--background);
 }
 
-.box>div:nth-child(2) p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--textdimmed);
-}
-
-.box>div:nth-child(2)>div>div {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 16px;
-}
-
-.box>div:nth-child(2)>div img {
-    height: 28px;
-    width: 28px;
-}
-
-.box>div:nth-child(2)>div h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    margin-top: 4px;
-    font-size: 20px;
-    color: var(--textnormal);
-}
-
-.box>div:nth-child(2)>div,
-.box>div:nth-child(3)>div {
-    padding: 30px;
-}
-
-
-.box>div:nth-child(3)>div {
-    padding: 30px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.box>div:nth-child(2)>div:first-child,
-.box>div:nth-child(3)>div:first-child {
+.grid>div:first-child {
     border-right: 1px solid var(--background);
+}
+
+.grid>div {
     padding: 30px;
 }
 
-.box>div:nth-child(3)>div p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--textdimmed);
-}
-
-
-.box>div:nth-child(3)>div>div p {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    color: var(--textnormal);
-}
-
-
-.box>div:nth-child(3)>div div {
+.grid_1 {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
 }
 
-.box>div:nth-child(3)>div .icon {
-    width: 28px;
-    height: 28px;
-}
-
-.box>div:nth-child(4) {
-    margin: 0 30px;
-    padding-top: 30px;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--background);
-}
-
-.box>div:nth-child(4)>p {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--textdimmed);
-}
-
-.box>div:nth-child(4)>div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.box>div:nth-child(4)>div>div {
-    height: 50px;
-    padding: 0 20px;
-    background: var(--bglighter);
-    border-radius: 4px 4px 0px 0px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-}
-
-.box>div:nth-child(4)>div:nth-child(2) img {
-    width: 24px;
-    height: 24px;
-}
-
-.box>div:nth-child(4)>div p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    color: var(--textnormal);
-}
-
-.box>div:nth-child(4)>div>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+.grid_1>p {
     font-weight: 400;
     font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.grid_1>div {
+    display: flex;
+    margin-top: 16px;
+    gap: 12px;
+    align-items: center;
+}
+
+.grid_1 svg {
+    width: 28px;
+    height: 28px;
+}
+
+.grid_1>div p {
+    font-weight: 400;
+    font-size: 20px;
     color: var(--textnormal);
 }
 
-.box>div:nth-child(5) {
+.grid_2>div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.grid_2>p {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.grid_2:last-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.grid_2:first-child img {
+    width: 30px;
+    height: 30px;
+}
+
+.grid_2:last-child img {
+    width: 28px;
+    height: 28px;
+}
+
+.grid_2>div p {
+    font-size: 20px;
+    color: var(--textnormal);
+}
+
+.action {
     width: 100%;
     padding: 30px;
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    margin-top: 40px;
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
+}
+
+/* states */
+.open {
+    background-image: url('/images/loan_gradient_open2.png');
+}
+.repaid {
+    background-image: url('/images/loan_gradient_repaid2.png');
+}
+
+.defaulting {
+    background-image: url('/images/loan_gradient_defaulting2.png');
+}
+
+.defaulted {
+    background-image: url('/images/loan_gradient_defaulted2.png');
 }
 </style>

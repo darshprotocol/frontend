@@ -12,26 +12,29 @@
                     <div class="option">
                         <p>Principal needed</p>
                         <div>
-                            <p>40,000</p>
-                            <div class="click_1"> 
-                                <img src="/images/usdc.png" alt="">
-                                <p>USDC</p>
-                                <IconArrowDown />
+                            <p>{{ toMoney(getPrincipal() / 1e18) }}</p>
+                            <div class="click_1">
+                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ findAsset(offer.principalToken).symbol }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="slider">
-                        <Slider v-model="percentage" :step="25" max="100" :format="{ suffix: '%' }" />
+                        <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
                     </div>
                     <div class="option">
                         <p>Duration</p>
                         <div>
-                            <p>20 <span>days</span></p>
+                            <div class="input">
+                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0" min="5"
+                                    max="60" v-model="daysToMaturity">
+                                <span>days</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementDuration()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementDuration()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -40,12 +43,16 @@
                     <div class="option">
                         <p>Interest</p>
                         <div>
-                            <p>9.00 <span>%</span></p>
+                            <div class="input">
+                                <input type="number" :style="getInputWidth(interest)" placeholder="0" min="1" max="50"
+                                    v-model="interest">
+                                <span>%</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementInterest()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementInterest()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -54,23 +61,34 @@
                     <div class="option">
                         <p>Collateral Amount</p>
                         <div>
-                            <p>40,000</p>
-                            <div class="click_1"> 
-                                <img src="/images/usdc.png" alt="">
-                                <p>USDC</p>
+                            <p>{{ toMoney(collateralAmount / 1e18) }}</p>
+                            <div class="click_1" v-on:click="dropDown = !dropDown">
+                                <img :src="`/images/${findAsset(collateralToken).image}.png`" alt="">
+                                <p>{{ findAsset(collateralToken).symbol }}</p>
                                 <IconArrowDown />
+                                <div class="drop_down" v-show="dropDown">
+                                    <div class="drop_item" v-for="address in collateralTokens()" :key="address"
+                                        v-on:click="collateralToken = address">
+                                        <img :src="`/images/${findAsset(address).image}.png`" alt="">
+                                        <p>{{ findAsset(address).symbol }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="option">
                         <p>Request Expires in</p>
                         <div>
-                            <p>24 <span>hrs</span></p>
+                            <div class="input">
+                                <input type="number" disabled :style="getInputWidth(hoursToExpire)" placeholder="0" min="0"
+                                    v-model="hoursToExpire">
+                                <span>hrs</span>
+                            </div>
                             <div class="clicks">
-                                <div class="click">
+                                <div class="click" v-on:click="decrementExpire()">
                                     <IconMinus />
                                 </div>
-                                <div class="click">
+                                <div class="click" v-on:click="incrementExpire()">
                                     <IconPlus />
                                 </div>
                             </div>
@@ -81,12 +99,14 @@
                         </div>
                     </div>
                     <div>
-                        <PrimaryButton :text="'Make Request'" />
+                        <PrimaryButton v-on:click="approve()" :text="'Approve'"
+                            v-if="fromWei(allowance) < (collateralAmount / 1e18)" />
+                        <PrimaryButton v-else v-on:click="createRequest()" :text="'Make Request'" />
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+</main>
 </template>
 
 <script setup>
@@ -95,20 +115,177 @@ import IconClose from '../../../icons/IconClose.vue';
 import IconMinus from '../../../icons/IconMinus.vue';
 import IconPlus from '../../../icons/IconPlus.vue';
 import PrimaryButton from '../../../PrimaryButton.vue';
+import IconArrowDown from '../../../icons/IconArrowDown.vue';
 </script>
 
 <script>
+import Converter from '../../../../utils/Converter';
+import AssetLibrary from '../../../../utils/AssetLibrary';
+import LtvAPI from '../../../../scripts/LtvAPI';
+import Authentication from '../../../../scripts/Authentication'
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
+import Approval from '../../../../scripts/Approval'
 export default {
     props: ['offer'],
     data() {
         return {
-            percentage: 25
+            percentage: 25,
+            collateralToken: this.offer.collateralTokens[0],
+            allowance: '0',
+            collateralAmount: '0',
+            interest: 0,
+            daysToMaturity: this.offer.daysToMaturity,
+            hoursToExpire: 24,
+            dropDown: false
+        }
+    },
+    watch: {
+        hoursToExpire: function (value) {
+            if (value > 24) {
+                this.hoursToExpire = 24;
+            }
+        },
+        daysToMaturity: function (value) {
+            if (value > 60) {
+                this.daysToMaturity = 60;
+            }
+        },
+        interest: function (value) {
+            if (value > 50) {
+                this.interest = 50;
+            }
+        },
+        percentage: function () {
+            this.getCollateralAmount()
+        },
+        collateralToken: function () {
+            this.getCollateralAmount()
         }
     },
     methods: {
-    
+        findAsset: function (id) {
+            return AssetLibrary.findAsset(id);
+        },
+        toMoney: function (value, mF = 2) {
+            return Converter.toMoney(value, mF)
+        },
+        fromWei: function(value) {
+            return Converter.fromWei(value)
+        },
+        toWei: function(value) {
+            return Converter.toWei(value)
+        },
+        collateralTokens: function () {
+            let tokens = []
+            this.offer.collateralTokens.forEach(token => {
+                if (token != this.collateralToken) {
+                    tokens.push(token)
+                }
+            })
+            return tokens
+        },
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60
+            let interest = this.fromWei(result.toString())
+            return Converter.toMoney(interest)
+        },
+        getAllowance: async function () {
+            let amount = await Approval.getAllocationOf(
+                await Authentication.userAddress(),
+                this.collateralToken,
+                LendingPoolAPI.address
+            )
+            this.allowance = amount
+        },
+        getCollateralAmount: async function () {
+            let collateralAmount = await LtvAPI.getCollateralAmount(
+                this.offer.principalToken,
+                this.collateralToken,
+                this.getPrincipal(),
+                await Authentication.userAddress()
+            )
+            this.collateralAmount = collateralAmount.toString()
+
+            this.getAllowance()
+        },
+        approve: async function () {
+            await Approval.approve(
+                await Authentication.userAddress(),
+                this.collateralAmount,
+                this.collateralToken,
+                LendingPoolAPI.address
+            )
+            this.getAllowance()
+        },
+        max: function () {
+            return (this.offer.currentPrincipal / this.offer.initialPrincipal) * 100
+        },
+        getPrincipal: function () {
+            let principal = this.offer.initialPrincipal * (this.percentage / 100)
+            return principal.toString()
+        },
+        createRequest: async function () {
+            let principalAmount = Converter.fromWei(this.getPrincipal())
+            let targetProfit = (this.interest / 100) * principalAmount
+            let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
+            let calcInterest = (targetProfit * 100) / (principalAmount * targetDurationInSecs)
+            let userAddress = await Authentication.userAddress()
+            console.log(Converter.toWei(calcInterest));
+            const trx = await LendingPoolAPI.createBorrowingRequest(
+                this.offer.offerId,
+                this.percentage,
+                this.collateralToken,
+                this.collateralAmount,
+                Converter.toWei(calcInterest),
+                this.daysToMaturity,
+                this.hoursToExpire,
+                userAddress
+            )
+            console.log(trx);
+        },
+        incrementDuration: function () {
+            if (this.daysToMaturity < 60) {
+                this.daysToMaturity += 5;
+            }
+        },
+        decrementDuration: function () {
+            if (this.daysToMaturity > 5) {
+                this.daysToMaturity -= 5;
+            }
+        },
+        incrementExpire: function () {
+            if (this.hoursToExpire < 24) {
+                this.hoursToExpire += 1;
+            }
+        },
+        decrementExpire: function () {
+            if (this.hoursToExpire > 1) {
+                this.hoursToExpire -= 1;
+            }
+        },
+        incrementInterest: function () {
+            if (this.interest < 50) {
+                this.interest += 1;
+            }
+        },
+        decrementInterest: function () {
+            if (this.interest > 1) {
+                this.interest -= 1;
+            }
+        },
+        getInputWidth: function (value) {
+            let minWidth = 25;
+            let spacePerLength = 20;
+            let calWidth = value.toString().length * spacePerLength;
+            if (calWidth < minWidth)
+                calWidth = minWidth;
+            return `width: ${calWidth}px;`;
+        }
     },
     mounted() {
+        this.getCollateralAmount()
+        let interest = this.getInterest(this.offer.interest, this.offer.daysToMaturity)
+        this.interest = Number(interest)
         document.body.classList.add('modal')
     },
     unmounted() {
@@ -117,9 +294,7 @@ export default {
 }
 </script>
 
-<style src="@vueform/slider/themes/default.css">
-
-</style>
+<style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 main {
     width: 100%;
@@ -171,8 +346,8 @@ main {
 }
 
 .title h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -207,9 +382,31 @@ main {
     margin-bottom: 20px;
 }
 
+
+.input {
+    display: flex;
+    align-items: center;
+}
+
+.option>div:nth-child(2) input {
+    
+    background: transparent;
+    border: none;
+    outline: none;
+    
+    font-weight: 500;
+    font-size: 25px;
+    color: var(--textnormal);
+}
+
+.option>div:nth-child(2) .input span {
+    color: var(--textdimmed);
+    font-size: 25px;
+}
+
 .option>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -252,6 +449,7 @@ main {
     justify-content: center;
     cursor: pointer;
     user-select: none;
+    position: relative;
 }
 
 .option>div:nth-child(2) img {
@@ -260,8 +458,8 @@ main {
 }
 
 .option>div:nth-child(2) p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -272,8 +470,8 @@ main {
 }
 
 .option>div:nth-child(2)>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -287,8 +485,8 @@ main {
 }
 
 .option>div:nth-child(3) p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -303,11 +501,52 @@ main {
 .box>div:nth-child(8) {
     width: 100%;
     padding: 30px;
-    background-image: url('../../../assets/images/subtle_gradient.png');
+    background-image: url('/images/subtle_gradient.png');
     background-size: cover;
     background-repeat: no-repeat;
     position: absolute;
     bottom: 0;
     left: 0;
+}
+
+
+.drop_down {
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    z-index: 4;
+    background: var(--bglighter);
+    border-radius: 4px;
+}
+
+.drop_item {
+    height: 50px;
+    padding: 0 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bglightest);
+}
+
+.drop_item:first-child {
+    border-top: 1px solid var(--bglightest);
+}
+
+.drop_item:last-child {
+    border: none;
+}
+
+.drop_down img {
+    width: 24px;
+    height: 24px;
+}
+
+.drop_item p {
+    
+    
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textnormal);
 }
 </style>

@@ -4,6 +4,7 @@ import AppView from '../views/AppView.vue'
 import HomeView from '../views/HomeView.vue'
 import DiscoverView from '../views/DiscoverView.vue'
 import PortfolioView from '../views/PortfolioView.vue'
+import VaultView from '../views/VaultView.vue'
 
 import DiscoverLend from '../components/app/discover/lend/DiscoverLend.vue'
 import DiscoverBorrow from '../components/app/discover/borrow/DiscoverBorrow.vue'
@@ -16,9 +17,13 @@ import PortfolioStake from '../components/app/portfolio/stake/PortfolioStake.vue
 import DiscoverLendItem from '../components/app/discover/lend/DiscoverLendItem.vue'
 import DiscoverBorrowItem from '../components/app/discover/borrow/DiscoverBorrowItem.vue'
 
-
 import CreateBorrowOffer from '../components/app/portfolio/CreateBorrowOffer.vue'
 import CreateLendOffer from '../components/app/portfolio/CreateLendOffer.vue'
+
+import PortfolioLendItem from '../components/app/portfolio/lend/PortfolioLendItem.vue'
+import PortfolioBorrowItem from '../components/app/portfolio/borrow/PortfolioBorrowItem.vue'
+
+import VaultItem from '../components/app/vault/VaultItem.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -85,6 +90,18 @@ const router = createRouter({
           ]
         },
         {
+          path: '/vault',
+          name: 'vault',
+          component: VaultView,
+          children: [
+            {
+              path: '/vault/:id',
+              name: 'vault-id',
+              component: VaultItem
+            }
+          ]
+        },
+        {
           path: '/discover/lend/:id',
           name: 'discover-lend-id',
           component: DiscoverLendItem
@@ -103,6 +120,14 @@ const router = createRouter({
           path: '/portfolio/lend/create',
           name: 'portfolio-lend-create',
           component: CreateLendOffer
+        },{
+          path: '/portfolio/lend/:id',
+          name: 'portfolio-lend-id',
+          component: PortfolioLendItem
+        },{
+          path: '/portfolio/borrow/:id',
+          name: 'portfolio-borrow-id',
+          component: PortfolioBorrowItem
         }
       ]
     }

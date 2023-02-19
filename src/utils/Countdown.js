@@ -20,6 +20,22 @@ const Countdown = {
         let interval = setInterval(fnc, 10000)
         fnc()
     },
+    startOnlyDay: function(to, callback) {
+        let fnc = function () {
+            let from = Date.now()
+            let distance = to - from
+
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            callback(days)
+
+            if (distance < 0) {
+                callback(0)
+                clearInterval(interval);
+            }
+        }
+        let interval = setInterval(fnc, 60000)
+        fnc()
+    }
 }
 
 export default Countdown

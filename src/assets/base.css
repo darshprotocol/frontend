@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Axiforma';
-  src: url('../assets/fonts/Axiforma-Medium.ttf');
+  src: url('../assets/fonts/Axiforma-Regular.ttf');
   font-weight: 400;
 }
 
@@ -44,6 +44,7 @@
   --textdimmed: #6C6E73;
   --textnormal: #EEF1F8;
   --accentgreen: #8BBB25;
+  --accentred: #E94703;
 
   --slider-bg: #141416;
   --slider-connect-bg: #6936F5;
@@ -125,4 +126,8 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
   /* Firefox */
+}
+
+.strike {
+  text-decoration: line-through;
 }

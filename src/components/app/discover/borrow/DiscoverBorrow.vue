@@ -14,14 +14,14 @@
                         </div>
                         <div class="tokens">
                             <div>
-                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
-                                <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} {{
-                                    findAsset(offer.principalToken).symbol
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} {{
+                                    $findAsset(offer.principalToken).symbol
                                 }}</p>
                             </div>
                             <div>
                                 <img v-for="asset in offer.collateralTokens"
-                                    :src="`/images/${findAsset(asset).image}.png`" :key="asset.id" alt="">
+                                    :src="`/images/${$findAsset(asset).image}.png`" :key="asset.id" alt="">
                             </div>
                         </div>
                     </div>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="expire" v-if="index % 2 == 0">
+                    <div class="expire" v-if="offer.loans.length == 0">
                         <p>Offer expires in</p>
                         <p>{{ countdown(offer.expiresAt) }}</p>
                     </div>
@@ -51,21 +51,20 @@
                             <div class="extra_user">0</div>
                         </div>
                         <div class="users" v-else>
-                            <img src="/images/user1.png" alt="">
-                            <img src="/images/user2.png" alt="">
-                            <img src="/images/user3.png" alt="">
-                            <div class="extra_user">3</div>
+                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
+                            <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
+
                         <div class="needed">
                             <div class="label">
-                                <p>{{ toMoney(fromWei(offer.currentPrincipal)) }} <span>/ {{
-                                toMoney(fromWei(offer.initialPrincipal)) }} {{
-        findAsset(offer.principalToken).symbol
+                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} <span>/ {{
+                                $toMoney($fromWei(offer.initialPrincipal)) }} {{
+        $findAsset(offer.principalToken).symbol
     }}</span></p>
                                 <IconInfo />
                             </div>
                             <div class="bar">
-                                <div class="percentage" :style="`width: ${progress(offer)}%`"></div>
+                                <div class="percentage" :style="`width: ${$progress(offer)}%`"></div>
                             </div>
                         </div>
                     </div>
@@ -84,9 +83,6 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script >
 
 <script>
-import { fromWei } from 'web3-utils';
-import Converter from '../../../../utils/Converter'
-import AssetLibrary from '../../../../utils/AssetLibrary'
 import Countdown from '../../../../utils/Countdown'
 export default {
     data() {
@@ -99,15 +95,6 @@ export default {
         this.fetchLendingOffers()
     },
     methods: {
-        findAsset: function (address) {
-            return AssetLibrary.findAsset(address)
-        },
-        progress: function (offer) {
-            return (offer.currentPrincipal / offer.initialPrincipal) * 100
-        },
-        toMoney: function (value, mF = 2) {
-            return Converter.toMoney(value, mF)
-        },
         countdown: function (to) {
             let from = Math.floor(Date.now() / 1000)
             Countdown.start(from, to, function (text) {
@@ -116,8 +103,8 @@ export default {
         },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60
-            let interest = fromWei(result.toString())
-            return Converter.toMoney(interest)
+            let interest = this.$fromWei(result.toString())
+            return this.$toMoney(interest)
         },
         fetchLendingOffers: function () {
             this.fetching = true
@@ -146,7 +133,6 @@ export default {
     flex-wrap: wrap;
     padding: 40px 60px;
     gap: 30px;
-    justify-content: space-between;
 }
 
 .borrow {
@@ -175,8 +161,8 @@ export default {
 }
 
 .asset>.label>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -194,7 +180,6 @@ export default {
 
 .asset .tokens>div p {
     font-family: 'Axiforma SemiBold';
-    font-style: normal;
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -234,8 +219,8 @@ export default {
 }
 
 .info>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -256,8 +241,8 @@ export default {
 }
 
 .info>div>div p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);
@@ -303,8 +288,8 @@ export default {
     align-items: center;
     justify-content: center;
     background: var(--background);
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
@@ -318,8 +303,8 @@ export default {
 }
 
 .needed>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);
@@ -351,16 +336,16 @@ export default {
 }
 
 .expire p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
 }
 
 .expire p:nth-child(2) {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);

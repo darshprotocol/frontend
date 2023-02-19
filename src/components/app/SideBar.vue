@@ -36,7 +36,7 @@
                         <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows</div>
                     </RouterLink>
                     <RouterLink to="/portfolio/stake">
-                        <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">My Stakes</div>
+                        <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">Vaults</div>
                     </RouterLink>
                 </div>
             </div>
@@ -134,8 +134,8 @@ main {
 }
 
 .title h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     line-height: 120%;
@@ -167,8 +167,8 @@ main {
 
 .tab {
     height: 40px;
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     display: flex;
@@ -201,8 +201,8 @@ main {
 }
 
 .support h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);

@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import contract from 'truffle-contract'
 import LendingPoolABI from '../contracts/LendingPool.json'
-import AssetLibrary from '../utils/AssetLibrary'
 
 const nativeAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
@@ -35,7 +34,6 @@ const LendingPoolAPI = {
         userAddress
     ) {
         const instance = await this.getInstance()
-        console.log(instance);
         if (instance == null) return null
 
         let isNative = principalToken == nativeAddress
@@ -64,22 +62,23 @@ const LendingPoolAPI = {
     // @lenders
     acceptBorrowingOffer: async function (
         offerId,
-        desiredPercentage,
-        isNative,
+        percentage,
+        principalAmount,
+        principalToken,
         userAddress
     ) {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let amount = isNative ? 1 : 0
+        let isNative = principalToken == nativeAddress
 
         try {
             await instance.acceptBorrowingOffer(
                 offerId,
-                desiredPercentage,
+                percentage,
                 {
                     from: userAddress,
-                    value: amount
+                    value: isNative ? principalAmount : 0
                 }
             )
         } catch (error) {
@@ -113,29 +112,77 @@ const LendingPoolAPI = {
         }
     },
 
-    // @borrower
-    createBorrowingOffer: async function (
+    // @lenders
+    createLendingRequest: async function (
+        offerId,
+        percentage,
+        principalAmount,
         principalToken,
-        collateralType,
-        collateralAmount,
         interest,
         daysToMaturity,
-        daysToExpire,
+        hoursToExpire,
         userAddress
     ) {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = AssetLibrary.findAsset(collateralType) == 0
+        let isNative = principalToken == nativeAddress
+
+        try {
+            await instance.createLendingRequest(
+                offerId,
+                percentage,
+                daysToMaturity,
+                interest,
+                hoursToExpire,
+                {
+                    from: userAddress,
+                    value: isNative ? principalAmount : 0
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // @borrower
+    createBorrowingOffer: async function (
+        principalToken,
+        principalAmount,
+        collateralToken,
+        interest,
+        daysToMaturity,
+        hoursToExpire,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        let isNative = collateralToken == nativeAddress
 
         try {
             await instance.createBorrowingOffer(
                 principalToken,
-                collateralType,
-                isNative ? 0 : collateralAmount,
+                principalAmount,
+                collateralToken,
                 interest,
                 daysToMaturity,
-                daysToExpire,
+                hoursToExpire,
                 {
                     from: userAddress,
                     value: isNative ? collateralAmount : 0
@@ -199,22 +246,82 @@ const LendingPoolAPI = {
         }
     },
 
+    // @borrower
+    createBorrowingRequest: async function (
+        offerId,
+        percentage,
+        collateralToken,
+        collateralAmount,
+        interest,
+        daysToMaturity,
+        hoursToExpire,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        let isNative = collateralToken == nativeAddress
+
+        try {
+            await instance.createBorrowingRequest(
+                offerId,
+                percentage,
+                collateralToken,
+                interest,
+                daysToMaturity,
+                hoursToExpire,
+                {
+                    from: userAddress,
+                    value: isNative ? collateralAmount : 0
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
 
     // @repayment
     repayLoan: async function (
         loanId,
-        isNative,
+        percentage,
+        principalAmount,
+        principalToken,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        let isNative = principalToken == nativeAddress
+
+        try {
+            await instance.repayLoan(
+                loanId,
+                percentage,
+                {
+                    from: userAddress,
+                    value: isNative ? principalAmount : 0
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    // @claim
+    claimPrincipal: async function (
+        loanId,
         userAddress
     ) {
         const instance = await this.getInstance()
         if (instance == null) return null
 
         try {
-            await instance.repayLoan(
+            await instance.claimPrincipal(
                 loanId,
                 {
-                    from: userAddress,
-                    value: isNative ? 1 : 0
+                    from: userAddress
                 }
             )
         } catch (error) {

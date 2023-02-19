@@ -1,0 +1,338 @@
+<template>
+    <main>
+        <div class="dashboard">
+            <div class="first_box">
+                <div class="principal">
+                    <p class="label">Principal Locked</p>
+                    <div>
+                        <img src="/images/usdc.png" alt="">
+                        <p>10,000 USDC</p>
+                    </div>
+                </div>
+                <div class="apy">
+                    <p class="label">APY</p>
+                    <div>
+                        <p>12.10%</p>
+                        <IconInfo />
+                    </div>
+                </div>
+            </div>
+            <div class="second_box">
+                <div class="buttons">
+                    <RouterLink :to="`/vault/`">
+                        <div class="go_to_vault">
+                            <p>Go to Vault's Loan</p>
+                            <IconOut :color="'var(--textnormal)'" />
+                        </div>
+                    </RouterLink>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard">
+            <div class="firstbox">
+                <div class="offer">
+                    <div class="first_row">
+                        <div>
+                            <IconClock />
+                            <p class="deep_text">22 Days <span>ago</span></p>
+                            <p class="light_text">Time Locked</p>
+                        </div>
+                        <div>
+                            <IconChart />
+                            <p class="deep_text">0k<span>/10k USDC</span></p>
+                            <p class="light_text">Amount Locked</p>
+                        </div>
+                    </div>
+                    <div class="second_row">
+                        <div class="total_emitted">
+                            <div class="total_emitted_tokens">
+                                <div class="images">
+                                    <img src="/images/btc.png" v-for="index in 3" :key="index" alt="">
+                                </div>
+                                <p>~ $34.25</p>
+                            </div>
+                            <div class="total_emitted_label">
+                                <p>Total Emitted</p>
+                                <IconInfo />
+                            </div>
+                        </div>
+                        <div class="collateral_info">
+                            <IconInfo />
+                            <p>Collaterals Info</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="second_box">
+                <div class="emission">
+                    <h3 class="emission_title">Emissions</h3>
+                    <div class="emission_grid">
+                        <div>
+                            <p class="emission_grid_label">Principal's</p>
+                            <div class="emission_grid_token">
+                                <img src="/images/usdc.png" alt="">
+                                <p>0.51 USDC</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="emission_grid_label">Principal's</p>
+                            <div class="emission_grid_token">
+                                <p>~0.79 USD</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="emission_action">
+                        <PrimaryButton :text="'Claim All'" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</template>
+
+<script setup>
+import IconChart from '../../icons/IconChart.vue';
+import IconClock from '../../icons/IconClock.vue';
+import IconInfo from '../../icons/IconInfo.vue';
+import IconOut from '../../icons/IconOut.vue';
+import PrimaryButton from '../../PrimaryButton.vue';
+</script>
+
+<style scoped>
+main {
+    margin-top: 60px;
+    padding: 0 60px;
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.first_box {
+    width: 620px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.second_box {
+    width: 380px;
+}
+
+.first_box .label {
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.principal>div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.principal>div img {
+    width: 34px;
+    height: 34px;
+}
+
+.principal>div p {
+    font-size: 25px;
+    color: var(--textnormal);
+    font-family: 'Axiforma SemiBold';
+}
+
+.apy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.apy>div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 30px;
+    background: var(--bglighter);
+    border-radius: 4px;
+    padding: 0 10px;
+    margin-top: 16px;
+}
+
+.apy>div p {
+    font-size: 14px;
+    color: var(--textnormal);
+}
+
+.apy svg {
+    width: 14px;
+    height: 14px;
+}
+
+.dashboard .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    margin-top: 34px;
+}
+
+
+.go_to_vault {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: var(--bglighter);
+    border-radius: 2px;
+}
+
+.go_to_vault svg {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.go_to_vault p {
+    padding: 0 30px;
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+/*  */
+
+.offer {
+    margin-top: 50px;
+    width: 620px;
+    background: var(--bglight);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.offer .first_row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-bottom: 2px solid var(--background);
+}
+
+.offer .first_row>div:first-child {
+    border-right: 2px solid var(--background);
+}
+
+.offer .first_row>div {
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.offer .first_row svg {
+    width: 25px;
+    height: 25px;
+}
+
+.offer .first_row .deep_text {
+    font-size: 20px;
+    color: var(--textnormal);
+    margin-top: 20px;
+}
+
+.offer .deep_text span {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.offer .light_text {
+    font-size: 14px;
+    color: var(--textdimmed);
+    margin-top: 10px;
+}
+
+.offer .second_row {
+    background: var(--bglighter);
+    padding: 28px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.offer .total_emitted_tokens {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.total_emitted_tokens .images {
+    display: flex;
+    align-items: center;
+}
+
+.total_emitted_tokens .images img {
+    height: 24px;
+    width: 24px;
+    margin-left: -4px;
+}
+
+.total_emitted_tokens .images img:first-child {
+    margin: 0;
+}
+
+.total_emitted_tokens p {
+    font-size: 16px;
+    color: var(--textnormal);
+}
+
+.total_emitted_label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.total_emitted_label p {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.collateral_info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.collateral_info p {
+    font-size: 14px;
+    color: var(--textnormal);
+}
+
+.emission {
+    margin-top: 50px;
+    background-color: var(--bglight);
+    border-radius: 6px;
+    overflow: hidden;
+    background-image: url('/images/vault_emission.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.emission_title {
+    padding: 30px;
+    padding-bottom: 20px;
+    font-size: 16px;
+    color: var(--textnormal);
+    border-bottom: 2px solid var(--background);
+}
+
+.emission_grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-bottom: 2px solid var(--background);
+}
+</style>

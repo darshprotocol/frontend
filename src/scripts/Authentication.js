@@ -1,13 +1,22 @@
 /* eslint-disable no-undef */
 const Authentication = {
-    userAddress: async function() {
+    userAddress: async function (request = false) {
         if (typeof ethereum === 'undefined') return null
         try {
+            if (!this.isAuth() && !request) return null
             await ethereum.request({
                 method: 'eth_requestAccounts'
             });
             await this.switchToFantomTestnet()
-            const accounts = await ethereum.enable();
+            let accounts = await ethereum.enable();
+            ethereum.on('accountsChanged', (_accounts) => {
+                if (_accounts.length == 0) {
+                    this.setAuth("false")
+                } else {
+                    accounts = _accounts
+                }
+            })
+            this.setAuth("true")
             return accounts[0]
         } catch (error) {
             console.error(error);
@@ -15,7 +24,20 @@ const Authentication = {
         }
     },
 
-    switchToFantomTestnet: async function() {
+    isAuth: function () {
+        if (typeof (Storage) !== "undefined") {
+            return localStorage.getItem("auth") == "true"
+        }
+        return false
+    },
+
+    setAuth: function (value) {
+        if (typeof (Storage) !== "undefined") {
+            localStorage.setItem("auth", value)
+        }
+    },
+
+    switchToFantomTestnet: async function () {
         try {
             await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
@@ -36,7 +58,7 @@ const Authentication = {
                             },
                             blockExplorerUrls: ['https://testnet.ftmscan.com'],
                             rpcUrls: ['https://fantom-testnet.public.blastapi.io'],
-                        }, ],
+                        },],
                     });
                 } catch (addError) {
                     console.error(addError);

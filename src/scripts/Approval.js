@@ -6,7 +6,7 @@ const nativeAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 const Approval = {
     approve: async function(userAddress, amount, tokenAddress, spender) {
-        const web3 = new Web3(ethereum)
+        const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
         const contract = new web3.eth.Contract(ERC20.abi, tokenAddress)
 
         if (tokenAddress == nativeAddress) return
@@ -20,7 +20,7 @@ const Approval = {
         }
     },
     getAllocationOf: async function(userAddress, tokenAddress, spender) {
-        const web3 = new Web3(ethereum)
+        const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
         const contract = new web3.eth.Contract(ERC20.abi, tokenAddress)
 
         if (tokenAddress == nativeAddress) return '10000000000000000000000000000000000000000000000000000000'

@@ -71,8 +71,8 @@ main {
 }
 
 .pages a {
-  font-family: 'Axiforma';
-  font-style: normal;
+  
+  
   font-weight: 500;
   font-size: 16px;
   color: #989898;
@@ -106,8 +106,8 @@ main {
 }
 
 .connect_wallet p {
-  font-family: 'Axiforma';
-  font-style: normal;
+  
+  
   font-weight: 500;
   font-size: 16px;
   color: var(--textnormal);

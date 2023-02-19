@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-    </main>
+</main>
 </template>
 
 <script setup>
@@ -39,10 +39,14 @@ import Authentication from '../../scripts/Authentication'
 export default {
     props: ['userAddress'],
     methods: {
-        authenticate: async function () {
-            const userAddress = await Authentication.userAddress()
+        authenticate: async function (request = false) {
+            const userAddress = await Authentication.userAddress(request)
+            if (request) this.$router.go()
             this.$emit('connected', userAddress)
         }
+    },
+    mounted() {
+        this.authenticate()
     }
 }
 </script>
@@ -76,8 +80,6 @@ main {
 }
 
 .pages a {
-    font-family: 'Axiforma';
-    font-style: normal;
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -112,8 +114,8 @@ main {
 }
 
 .connect_wallet p {
-    font-family: 'Axiforma';
-    font-style: normal;
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);

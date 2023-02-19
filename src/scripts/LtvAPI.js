@@ -2,6 +2,7 @@
 import contract from 'truffle-contract'
 import LoanToValueABI from '../contracts/LoanToValueRatio.json'
 import PriceFeedABI from '../contracts/PriceFeed.json'
+import Web3 from 'web3'
 
 const LtvAPI = {
     ltv: null,
@@ -13,13 +14,13 @@ const LtvAPI = {
             priceFeed: this.priceFeed
         }
 
-        if (typeof ethereum === 'undefined') return null
-
         const LoanToValue = contract(LoanToValueABI)
         const PriceFeed = contract(PriceFeedABI)
 
-        LoanToValue.setProvider(ethereum)
-        PriceFeed.setProvider(ethereum)
+        const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
+
+        LoanToValue.setProvider(web3.currentProvider)
+        PriceFeed.setProvider(web3.currentProvider)
 
         try {
             this.ltv = await LoanToValue.deployed()
@@ -39,24 +40,31 @@ const LtvAPI = {
         principalAmount,
         userAddress
     ) {
-        const ins = await this.getInstance()
-        console.log(ins);
-        if (ins == null) return null
-        let principalPriceInUSD = await ins.priceFeed.amountInUSD(
-            principalToken,
-            principalAmount
-        );
-        let ltv = await ins.ltv.getRelativeLTV(userAddress, principalPriceInUSD);
-        let collateralNormalAmount = await ins.priceFeed.exchangeRate(
-            principalToken,
-            collateralToken,
-            principalAmount
-        );
-        
-        let base = await ins.ltv.getBase()
-        return this.percentageOf(collateralNormalAmount, ltv) / base;
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            let principalPriceInUSD = await instance.priceFeed.amountInUSD(
+                principalToken,
+                principalAmount
+            );
+
+            let ltv = await instance.ltv.getRelativeLTV(userAddress, principalPriceInUSD);
+
+            let collateralNormalAmount = await instance.priceFeed.exchangeRate(
+                principalToken,
+                collateralToken,
+                principalAmount
+            );
+
+            let base = await instance.ltv.getBase()
+            return this.percentageOf(collateralNormalAmount, ltv) / base;
+        } catch (error) {
+            console.error(error);
+            return '0'
+        }
     },
-    percentageOf: function(total, percent) {
+    percentageOf: function (total, percent) {
         if (percent == 0) return total;
         return (total * percent) / this.PERCENT;
     }

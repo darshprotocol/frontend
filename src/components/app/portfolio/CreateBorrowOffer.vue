@@ -9,7 +9,8 @@
                     <span>/</span>
                     <p class="cr">Create Borrow Offer</p>
                 </div>
-                <PrimaryButton :text="'Create'" :width="'180px'" />
+                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(collateralAmount)" v-on:click="createBorrowingOffer()" :text="'Create'" :width="'180px'" />
+                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" :width="'180px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -22,11 +23,11 @@
                         <div>
                             <input type="number" placeholder="0.00" min="0" v-model="principalAmount">
                             <div class="click_1" v-on:click="dropDown1 = !dropDown1">
-                                <img :src="`/images/${findAsset(principalToken).image}.png`" alt="">
-                                <p>{{ findAsset(principalToken).symbol }}</p>
+                                <img :src="`/images/${$findAsset(principalToken).image}.png`" alt="">
+                                <p>{{ $findAsset(principalToken).symbol }}</p>
                                 <IconArrowDown />
                                 <div class="drop_down" v-show="dropDown1">
-                                    <div class="drop_item" v-for="asset in otherAssets()" :key="asset.id"
+                                    <div class="drop_item" v-for="asset in $otherAssets(principalToken)" :key="asset.id"
                                         v-on:click="selectedPrincipal(asset.address)">
                                         <img :src="`/images/${asset.image}.png`" alt="">
                                         <p>{{ asset.symbol }}</p>
@@ -41,14 +42,14 @@
                             <p>Bal : <span>{{ findTokenBalance() }}</span></p>
                         </div>
                         <div>
-                            <input type="number" placeholder="0.00" disabled min="0" v-model="collateralAmount">
+                            <input placeholder="0.00" disabled min="0" :value="$toMoney($fromWei(collateralAmount))">
                             <div class="click_1" v-on:click="dropDown2 = !dropDown2">
-                                <img :src="`/images/${findAsset(collateralToken).image}.png`" alt="">
-                                <p>{{ findAsset(collateralToken).symbol }}</p>
+                                <img :src="`/images/${$findAsset(collateralToken).image}.png`" alt="">
+                                <p>{{ $findAsset(collateralToken).symbol }}</p>
                                 <IconArrowDown />
                                 <div class="drop_down" v-show="dropDown2">
-                                    <div class="drop_item" v-for="asset in conjugates(collateralToken)" :key="asset.id"
-                                        v-on:click="selectedCollateral(asset.address)">
+                                    <div class="drop_item" v-for="asset in $findConjugates(principalToken, collateralToken)"
+                                        :key="asset.id" v-on:click="selectedCollateral(asset.address)">
                                         <img :src="`/images/${asset.image}.png`" alt="">
                                         <p>{{ asset.symbol }}</p>
                                     </div>
@@ -60,8 +61,8 @@
                         <p>Duration</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0"
-                                    min="5" max="60" v-model="daysToMaturity">
+                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0" min="5"
+                                    max="60" v-model="daysToMaturity">
                                 <span>days</span>
                             </div>
                             <div class="clicks">
@@ -96,8 +97,8 @@
                         <p>Offer expires in</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0"
-                                    min="0" v-model="daysToExpire">
+                                <input type="number" disabled :style="getInputWidth(hoursToExpire)" placeholder="0" min="0"
+                                    v-model="hoursToExpire">
                                 <span>hrs</span>
                             </div>
                             <div class="clicks">
@@ -128,22 +129,22 @@ import IconPlus from '../../icons/IconPlus.vue';
 </script>
 
 <script>
+import LtvAPI from '../../../scripts/LtvAPI';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
 import Authentication from '../../../scripts/Authentication';
-import AssetLibrary from '../../../utils/AssetLibrary';
 import CovalentAPI from '../../../utils/CovalentAPI'
-import Converter from '../../../utils/Converter';
 export default {
     data() {
         return {
             principalAmount: 0,
+            collateralAmount : '0',
             principalToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-            collateralToken: '0x31cfb373E59d543d442b11e7112A192c7Bec6d7f',
+            collateralToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             tokenBalances: [],
             interest: 2,
             daysToMaturity: 15,
-            daysToExpire: 24,
-            userAddress: null,
+            hoursToExpire: 24,
+            allowance: '0',
             creating: false,
             dropDown1: false,
             dropDown2: false
@@ -160,9 +161,9 @@ export default {
                 this.dropDown1 = false
             }
         },
-        daysToExpire: function (value) {
+        hoursToExpire: function (value) {
             if (value > 24) {
-                this.daysToExpire = 24;
+                this.hoursToExpire = 24;
             }
         },
         daysToMaturity: function (value) {
@@ -174,16 +175,22 @@ export default {
             if (value > 50) {
                 this.interest = 50;
             }
+        },
+        principalAmount: function () {
+            this.getCollateralAmount()
+        },
+        principalToken: function () {
+            this.getCollateralAmount()
+        },
+        collateralToken: function () {
+            this.getCollateralAmount()
         }
     },
     mounted() {
-        this.collateralToken = this.conjugates()[0].address
+        this.collateralToken = this.$findConjugates(this.principalToken, this.collateralToken)[0].address
         this.getTokenBalances()
     },
     methods: {
-        findAsset: function (address) {
-            return AssetLibrary.findAsset(address)
-        },
         toggleToken: function (address) {
             if (this.collateralTokens.includes(address)) {
                 const index = this.collateralTokens.indexOf(address);
@@ -192,57 +199,70 @@ export default {
             }
             this.collateralTokens.push(address)
         },
-        otherAssets: function () {
-            return AssetLibrary.otherAssets(this.principalToken)
-        },
-        conjugates: function (except) {
-            let type = AssetLibrary.findAsset(this.principalToken).type
-            return AssetLibrary.findConjugates(type, except)
-        },
         findTokenBalance: function () {
             let address = this.collateralToken
             if (address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
                 address = '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83'
             }
-            let token = this.tokenBalances.find(token => token.contract_address == address)
+            let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase())
             if (!token) return '0.00'
-            return Converter.toMoney(Converter.fromWei(token.balance))
+            return this.$toMoney(this.$fromWei(token.balance))
         },
         selectedPrincipal: function (address) {
             this.principalToken = address
-            this.collateralToken = this.conjugates()[0].address
+            this.collateralToken = this.$findConjugates(this.principalToken, this.collateralToken)[0].address
         },
         selectedCollateral: function (address) {
             this.collateralToken = address
         },
-        getUserAddress: async function () {
-            if (this.userAddress != null) return this.userAddress
-            this.userAddress = await Authentication.userAddress()
-            return this.userAddress
-        },
         getTokenBalances: async function () {
-            let userAddress = await this.getUserAddress()
-            let response = await CovalentAPI.getTokenBalances(userAddress)
+            let response = await CovalentAPI.getTokenBalances(
+                await Authentication.userAddress()
+            )
             if (!response) return
             this.tokenBalances = response.data.items
         },
-        getRelativeLTV: async function() {
-            
+        getAllowance: async function () {
+            let amount = await this.$allowanceOf(
+                await Authentication.userAddress(),
+                this.collateralToken,
+                LendingPoolAPI.address
+            )
+            this.allowance = amount
         },
-        createOffer: async function () {
+        approve: async function () {
+            await this.$approve(
+                await Authentication.userAddress(),
+                this.collateralAmount,
+                this.collateralToken,
+                LendingPoolAPI.address
+            )
+            this.getAllowance()
+        },
+        getCollateralAmount: async function () {
+            let collateralAmount = await LtvAPI.getCollateralAmount(
+                this.principalToken,
+                this.collateralToken,
+                this.$toWei(this.principalAmount),
+                await Authentication.userAddress()
+            )
+            this.collateralAmount = collateralAmount.toString()
+
+            this.getAllowance()
+        },
+        createBorrowingOffer: async function () {
             this.creating = true;
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (this.principalAmount * targetDurationInSecs);
-            let userAddress = await this.getUserAddress();
-            const trx = await LendingPoolAPI.createLendingOffer(
+            const trx = await LendingPoolAPI.createBorrowingOffer(
                 this.principalToken,
-                Converter.toWei(this.principalAmount.toString()),
-                Converter.toWei(calcInterest.toFixed(18).toString()),
+                this.$toWei(this.principalAmount),
+                this.collateralToken,
+                this.$toWei(calcInterest),
                 this.daysToMaturity,
-                this.daysToExpire,
-                this.collateralTokens,
-                userAddress
+                this.hoursToExpire,
+                await Authentication.userAddress()
             );
             if (!trx) {
                 console.error("Create Offer Failed");
@@ -260,13 +280,13 @@ export default {
             }
         },
         incrementExpire: function () {
-            if (this.daysToExpire < 24) {
-                this.daysToExpire += 1;
+            if (this.hoursToExpire < 24) {
+                this.hoursToExpire += 1;
             }
         },
         decrementExpire: function () {
-            if (this.daysToExpire > 1) {
-                this.daysToExpire -= 1;
+            if (this.hoursToExpire > 1) {
+                this.hoursToExpire -= 1;
             }
         },
         incrementInterest: function () {
@@ -316,7 +336,7 @@ export default {
 
 .toolbar p,
 .toolbar span {
-    font-style: normal;
+
     font-weight: 500;
     font-size: 14px;
 }
@@ -339,7 +359,7 @@ export default {
 }
 
 .create_form>h3 {
-    font-style: normal;
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -356,8 +376,8 @@ export default {
 }
 
 .option>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -442,11 +462,11 @@ export default {
 }
 
 .option>div:nth-child(2) input {
-    font-family: 'Axiforma';
+
     background: transparent;
     border: none;
     outline: none;
-    font-style: normal;
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -458,8 +478,8 @@ export default {
 
 .option>div:nth-child(2)>div>p,
 .drop_item p {
-    font-family: 'Axiforma';
-    font-style: normal;
+
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -473,8 +493,8 @@ export default {
 }
 
 .option>div:nth-child(3) p {
-    font-family: 'Axiforma';
-    font-style: normal;
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -500,7 +520,7 @@ export default {
 
 .choose_col>div>p,
 .option>div:first-child p {
-    font-style: normal;
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
@@ -547,14 +567,14 @@ export default {
 }
 
 .token .symbol {
-    font-style: normal;
+
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
 
 .token .name {
-    font-style: normal;
+
     font-weight: 400;
     font-size: 12px;
     color: var(--textdimmed);

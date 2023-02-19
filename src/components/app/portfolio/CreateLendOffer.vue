@@ -10,8 +10,8 @@
                     <p class="cr">Create Lend Offer</p>
                 </div>
                 <PrimaryButton v-if="principalAmount == ''" :text="'Create'" :state="'disable'" />
-                <PrimaryButton v-else-if="fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()" :text="'Create'" />
-                <PrimaryButton v-else :text="`Approve ${findAsset(principalToken).symbol}`" v-on:click="approve()" :width="'220px'" />
+                <PrimaryButton v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()" :text="'Create'" />
+                <PrimaryButton v-else :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()" :width="'220px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -24,11 +24,11 @@
                         <div>
                             <input type="number" placeholder="0.00" min="0" v-model="principalAmount">
                             <div class="click_1" v-on:click="dropDown = !dropDown">
-                                <img :src="`/images/${findAsset(principalToken).image}.png`" alt="">
-                                <p>{{ findAsset(principalToken).symbol }}</p>
+                                <img :src="`/images/${$findAsset(principalToken).image}.png`" alt="">
+                                <p>{{ $findAsset(principalToken).symbol }}</p>
                                 <IconArrowDown />
                                 <div class="drop_down" v-show="dropDown">
-                                    <div class="drop_item" v-for="asset in otherAssets()" :key="asset.id"
+                                    <div class="drop_item" v-for="asset in $otherAssets(principalToken)" :key="asset.id"
                                         v-on:click="selectedPrincipal(asset.address)">
                                         <img :src="`/images/${asset.image}.png`" alt="">
                                         <p>{{ asset.symbol }}</p>
@@ -43,7 +43,7 @@
                             <p><span>{{ collateralTokens.length }}</span>/3</p>
                         </div>
                         <div class="tokens">
-                            <div v-for="asset in conjugates()"
+                            <div v-for="asset in $findConjugates(principalToken)"
                                 :class="collateralTokens.includes(asset.address) ? 'active border' : 'border'"
                                 :key="asset.id" v-on:click="toggleToken(asset.address)">
                                 <div class="token">
@@ -132,12 +132,9 @@ import IconChecked from '../../icons/IconChecked.vue'
 </script>
 
 <script>
-import { fromWei, toWei } from 'web3-utils';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
 import Authentication from '../../../scripts/Authentication';
-import AssetLibrary from '../../../utils/AssetLibrary';
 import CovalentAPI from '../../../utils/CovalentAPI'
-import Converter from '../../../utils/Converter';
 import Approval from '../../../scripts/Approval';
 export default {
     data() {
@@ -182,9 +179,6 @@ export default {
         this.getTokenBalances()
     },
     methods: {
-        findAsset: function (address) {
-            return AssetLibrary.findAsset(address)
-        },
         toggleToken: function (address) {
             if (this.collateralTokens.includes(address)) {
                 const index = this.collateralTokens.indexOf(address);
@@ -197,13 +191,6 @@ export default {
             if (this.principalAmount == '') return '0'
             return this.principalAmount.toString()
         },
-        otherAssets: function () {
-            return AssetLibrary.otherAssets(this.principalToken)
-        },
-        conjugates: function () {
-            let type = AssetLibrary.findAsset(this.principalToken).type
-            return AssetLibrary.findConjugates(type)
-        },
         findTokenBalance: function () {
             let address = this.principalToken
             if (address == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
@@ -211,20 +198,16 @@ export default {
             }
             let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase())
             if (!token) return '0.00'
-            return Converter.toMoney(fromWei(token.balance))
+            return this.$toMoney(this.$fromWei(token.balance))
         },
         selectedPrincipal: function (address) {
             this.principalToken = address
             this.collateralTokens = []
         },
-        getUserAddress: async function () {
-            if (this.userAddress != null) return this.userAddress
-            this.userAddress = await Authentication.userAddress()
-            return this.userAddress
-        },
         getTokenBalances: async function () {
-            let userAddress = await this.getUserAddress()
-            let response = await CovalentAPI.getTokenBalances(userAddress)
+            let response = await CovalentAPI.getTokenBalances(
+                await Authentication.userAddress()
+            )
             if (!response) return
             this.tokenBalances = response.data.items
         },
@@ -239,7 +222,7 @@ export default {
         approve: async function() {
             await Approval.approve(
                 await Authentication.userAddress(),
-                this.principalAmount,
+                this.$toWei(this.principalAmount.toString()),
                 this.principalToken,
                 LendingPoolAPI.address
             )
@@ -250,15 +233,14 @@ export default {
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (this.principalAmount * targetDurationInSecs);
-            let userAddress = await this.getUserAddress();
             const trx = await LendingPoolAPI.createLendingOffer(
                 this.principalToken,
-                toWei(this.principalAmount.toString()),
-                toWei(calcInterest.toFixed(18).toString()),
+                this.$toWei(this.principalAmount),
+                this.$toWei(calcInterest),
                 this.daysToMaturity,
                 this.daysToExpire,
                 this.collateralTokens,
-                userAddress
+                await Authentication.userAddress()
             );
             if (!trx) {
                 console.error("Create Offer Failed");
@@ -332,7 +314,7 @@ export default {
 
 .toolbar p,
 .toolbar span {
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 14px;
 }
@@ -355,7 +337,7 @@ export default {
 }
 
 .create_form>h3 {
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -372,8 +354,8 @@ export default {
 }
 
 .option>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -458,11 +440,11 @@ export default {
 }
 
 .option>div:nth-child(2) input {
-    font-family: 'Axiforma';
+    
     background: transparent;
     border: none;
     outline: none;
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -470,12 +452,13 @@ export default {
 
 .option>div:nth-child(2) .input span {
     color: var(--textdimmed);
+    font-size: 25px;
 }
 
 .option>div:nth-child(2)>div>p,
 .drop_item p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -489,8 +472,8 @@ export default {
 }
 
 .option>div:nth-child(3) p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -516,7 +499,7 @@ export default {
 
 .choose_col>div>p,
 .option>div:first-child p {
-    font-style: normal;
+    
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
@@ -563,14 +546,14 @@ export default {
 }
 
 .token .symbol {
-    font-style: normal;
+    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
 
 .token .name {
-    font-style: normal;
+    
     font-weight: 400;
     font-size: 12px;
     color: var(--textdimmed);

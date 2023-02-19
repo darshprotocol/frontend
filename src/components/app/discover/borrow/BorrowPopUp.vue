@@ -3,17 +3,17 @@
         <div class="box">
             <div class="title">
                 <h3>Borrow</h3>
-                <div class="close" v-on:click="$emit('close')">
+                <div class="close" v-if="!borrowing" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
             <div>
                 <p>Borrow Amount</p>
                 <div>
-                    <p>{{ toMoney(fromWei(getPrincipal())) }}</p>
+                    <p>{{ $toMoney($fromWei(getPrincipal())) }}</p>
                     <div>
-                        <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
-                        <p>{{ findAsset(offer.principalToken).symbol }}</p>
+                        <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                        <p>{{ $findAsset(offer.principalToken).symbol }}</p>
                     </div>
                 </div>
             </div>
@@ -23,16 +23,16 @@
             <div>
                 <p>Collateral Amount</p>
                 <div>
-                    <p>{{ toMoney(fromWei(collateralAmount)) }}</p>
+                    <p>{{ $toMoney($fromWei(collateralAmount)) }}</p>
                     <div class="click_1" v-on:click="dropDown = !dropDown">
-                        <img :src="`/images/${findAsset(collateralToken).image}.png`" alt="">
-                        <p>{{ findAsset(collateralToken).symbol }}</p>
+                        <img :src="`/images/${$findAsset(collateralToken).image}.png`" alt="">
+                        <p>{{ $findAsset(collateralToken).symbol }}</p>
                         <IconArrowDown />
                         <div class="drop_down" v-show="dropDown">
                             <div class="drop_item" v-for="address in collateralTokens()" :key="address"
                                 v-on:click="collateralToken = address">
-                                <img :src="`/images/${findAsset(address).image}.png`" alt="">
-                                <p>{{ findAsset(address).symbol }}</p>
+                                <img :src="`/images/${$findAsset(address).image}.png`" alt="">
+                                <p>{{ $findAsset(address).symbol }}</p>
                             </div>
                         </div>
                     </div>
@@ -43,15 +43,15 @@
                 </div>
             </div>
             <div>
-                <PrimaryButton v-if="fromWei(allowance) >= fromWei(collateralAmount)" v-on:click="borrowLoan()" :text="'Borrow'" />
-                <PrimaryButton v-else v-on:click="approve()" :text="'Approve & Borrow'" />
+                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(collateralAmount)" v-on:click="borrowLoan()"
+                    :text="'Borrow'" />
+                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" />
             </div>
         </div>
-    </main>
+</main>
 </template>
 
 <script setup>
-import { fromWei } from 'web3-utils';
 import Slider from '@vueform/slider'
 import IconClose from '../../../icons/IconClose.vue';
 import PrimaryButton from '../../../PrimaryButton.vue';
@@ -59,12 +59,9 @@ import IconArrowDown from '../../../icons/IconArrowDown.vue';
 </script>
 
 <script>
-import Converter from '../../../../utils/Converter';
-import AssetLibrary from '../../../../utils/AssetLibrary';
 import LtvAPI from '../../../../scripts/LtvAPI';
 import Authentication from '../../../../scripts/Authentication'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
-import Approval from '../../../../scripts/Approval'
 export default {
     props: ['offer'],
     data() {
@@ -73,6 +70,7 @@ export default {
             collateralToken: this.offer.collateralTokens[0],
             collateralAmount: '0',
             allowance: '0',
+            borrowing: false,
             dropDown: false
         }
     },
@@ -85,12 +83,6 @@ export default {
         }
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id);
-        },
-        toMoney: function (value, mF = 2) {
-            return Converter.toMoney(value, mF)
-        },
         max: function () {
             return (this.offer.currentPrincipal / this.offer.initialPrincipal) * 100
         },
@@ -107,14 +99,6 @@ export default {
             })
             return tokens
         },
-        getAllowance: async function() {
-            let amount = await Approval.getAllocationOf(
-                await Authentication.userAddress(),
-                this.collateralToken,
-                LendingPoolAPI.address
-            )
-            this.allowance = amount
-        },
         getCollateralAmount: async function () {
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.offer.principalToken,
@@ -122,12 +106,20 @@ export default {
                 this.getPrincipal(),
                 await Authentication.userAddress()
             )
-            this.collateralAmount = collateralAmount.toString()
+            this.collateralAmount = collateralAmount
 
             this.getAllowance()
         },
-        approve: async function() {
-            await Approval.approve(
+        getAllowance: async function () {
+            let amount = await this.$allowanceOf(
+                await Authentication.userAddress(),
+                this.collateralToken,
+                LendingPoolAPI.address
+            )
+            this.allowance = amount
+        },
+        approve: async function () {
+            await this.$approve(
                 await Authentication.userAddress(),
                 this.collateralAmount,
                 this.collateralToken,
@@ -135,7 +127,8 @@ export default {
             )
             this.getAllowance()
         },
-        borrowLoan: async function() {
+        borrowLoan: async function () {
+            this.borrowing = true
             await LendingPoolAPI.acceptLendingOffer(
                 this.offer.offerId,
                 this.percentage,
@@ -143,7 +136,10 @@ export default {
                 this.collateralAmount,
                 await Authentication.userAddress()
             )
-        }     
+
+            this.borrowing = false
+            this.$emit('borrowed')
+        }
     },
     mounted() {
         this.getCollateralAmount()
@@ -155,9 +151,7 @@ export default {
 }
 </script>
 
-<style src="@vueform/slider/themes/default.css">
-
-</style>
+<style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 main {
     width: 100%;
@@ -193,8 +187,8 @@ main {
 }
 
 .title h3 {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -219,8 +213,8 @@ main {
 }
 
 .box>div:nth-child(2)>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -250,16 +244,16 @@ main {
 }
 
 .box>div:nth-child(2)>div p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 20px;
     color: var(--textnormal);
 }
 
 .box>div:nth-child(2)>div>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -277,8 +271,8 @@ main {
 }
 
 .box>div:nth-child(4)>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -309,16 +303,16 @@ main {
 }
 
 .box>div:nth-child(4)>div:nth-child(2) p:first-child {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 20px;
     color: var(--textnormal);
 }
 
 .box>div:nth-child(4)>div:nth-child(2)>div>p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -332,8 +326,8 @@ main {
 }
 
 .box>div:nth-child(4)>div:nth-child(3) p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -392,8 +386,8 @@ main {
 }
 
 .drop_item p {
-    font-family: 'Axiforma';
-    font-style: normal;
+    
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
