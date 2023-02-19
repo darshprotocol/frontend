@@ -14,14 +14,11 @@
         <table class="request_table">
             <thead>
                 <tr>
-                    <td>Principal</td>
-                    <td>Duration</td>
-                    <td>Payback</td>
-                    <td>Interest</td>
-                    <td>Collateral %</td>
-                    <td>Expires in</td>
-                    <td>Actions</td>
-                    <td></td>
+                    <td>User</td>
+                    <td>Action</td>
+                    <td>Type</td>
+                    <td>Date</td>
+                    <td>Amount</td>
                     <td></td>
                 </tr>
             </thead>
@@ -31,46 +28,37 @@
                         <td>
                             <div>
                                 <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <p>You</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconClock />
-                                <p>30 days</p>
+                                <p>Claims</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <!-- <img src="/images/usdc.png" alt=""> -->
+                                <p>Principal</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <!-- <IconInterest /> -->
+                                <p>Mar 22, <span>00:52</span></p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <p>5,374 USDC</p>
                             </div>
-                        </td>
-                        <td>
-                            <div>
-                                <IconInterest />
-                                <p>8.50 %</p>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <p><span>110%</span> in</p>
-                                <img src="/images/usdc.png" alt="">
-                            </div>
-                        </td>
-                        <td>
-                            <p>2 days</p>
-                        </td>
-                        <td>
-                            <div class="action accept">Accept</div>
-                        </td>
-                        <td>
-                            <div class="action reject">Reject</div>
                         </td>
                         <td>
                             <RouterLink :to="''">
                                 <div class="link">
-                                    <p>Owner</p>
+                                    <p>View Txn</p>
                                     <IconOut />
                                 </div>
                             </RouterLink>
@@ -79,9 +67,9 @@
                 </tbody>
             </div>
             <!-- <div class="t_empty" v-if="offer.requests.length == 0">
-                <img src="../../../assets/images/receipt-text.png" alt="">
-                <p>No Borrow Requests found.</p>
-            </div> -->
+                    <img src="../../../assets/images/receipt-text.png" alt="">
+                    <p>No Borrow Requests found.</p>
+                </div> -->
         </table>
     </div>
 </template>
@@ -148,14 +136,14 @@ export default {
 }
 
 .request_table td {
-    width: calc(100% / 9);
+    width: calc(100% / 6);
 }
 
 .request_table thead {
     height: 54px;
     width: 100%;
     display: table;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .request_table thead td {
@@ -173,7 +161,7 @@ export default {
     background: var(--bglight);
     width: 100%;
     display: table;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .request_table tbody:nth-child(even) {
@@ -219,10 +207,8 @@ export default {
     background: rgba(233, 71, 3, 0.08);
 }
 
-.overlay_1 .link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.link {
+    justify-content: center !important;
 }
 
 .link p {

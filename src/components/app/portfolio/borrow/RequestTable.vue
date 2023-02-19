@@ -150,7 +150,7 @@ export default {
     height: 54px;
     width: 100%;
     display: table;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .request_table thead td {
@@ -168,7 +168,7 @@ export default {
     background: var(--bglight);
     width: 100%;
     display: table;
-    padding: 0 20px;
+    padding: 0 30px;
 }
 
 .request_table tbody:nth-child(even) {
