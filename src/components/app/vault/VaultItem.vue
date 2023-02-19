@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="emission_grid_label">Principal's</p>
+                            <p class="emission_grid_label">Collateral's</p>
                             <div class="emission_grid_token">
                                 <p>~0.79 USD</p>
                             </div>
@@ -87,6 +87,8 @@
                 </div>
             </div>
         </div>
+
+        <HistoryTable class="table" />
     </main>
 </template>
 
@@ -96,6 +98,7 @@ import IconClock from '../../icons/IconClock.vue';
 import IconInfo from '../../icons/IconInfo.vue';
 import IconOut from '../../icons/IconOut.vue';
 import PrimaryButton from '../../PrimaryButton.vue';
+import HistoryTable from './HistoryTable.vue'
 </script>
 
 <style scoped>
@@ -334,5 +337,53 @@ main {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     border-bottom: 2px solid var(--background);
+}
+
+.emission_grid>div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 40px;
+}
+
+.emission_grid>div:first-child {
+    padding-right: 4px;
+}
+
+.emission_grid>div:last-child {
+    align-items: flex-end;
+    border-left: 2px solid var(--background);
+}
+
+.emission_grid_label {
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.emission_grid_token {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.emission_grid_token img {
+    height: 24px;
+    width: 24px;
+}
+
+.emission_grid_token p {
+    font-size: 16px;
+    color: var(--textnormal);
+}
+
+.emission_action {
+    padding: 30px;
+    background-color: var(--bglighter);
+    background-image: url('/images/subtle_gradient.png');
+}
+
+.table {
+    margin-top: 60px;
 }
 </style>
