@@ -27,32 +27,22 @@
                         <td>
                             <div>
                                 <img :src="`/images/user1.png`" alt="">
-                                <p v-if="transfer.from == offer.creator">You</p>
-                                <p v-else>Borrower 1</p>
+                                <p v-if="transfer.from == userAddress">You</p>
+                                <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Borrower 1</p>
+                                <p v-else-if="transfer.from != userAddress && offer.offerType == 1">Lender 1</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <IconAddCircle
-                                    v-if="transfer.from == offer.creator && transfer.token == offer.principalToken" />
-                                <p v-if="transfer.from == offer.creator && transfer.token == offer.principalToken">Adds</p>
+                                <IconAddCircle v-if="transfer.type == 0" />
+                                <IconLock v-if="transfer.type == 1" />
+                                <IconCoin v-if="transfer.type == 2" />
+                                <IconMinusCircle v-if="transfer.type == 3" />
 
-                                <IconLock
-                                    v-if="transfer.from != offer.creator && offer.collateralTokens.includes(transfer.token)" />
-                                <p
-                                    v-if="transfer.from != offer.creator && offer.collateralTokens.includes(transfer.token)">
-                                    Locks</p>
-
-                                <IconCoin
-                                    v-if="transfer.from == offer.creator && offer.collateralTokens.includes(transfer.token)" />
-                                <p v-if="transfer.from == offer.creator && offer.collateralTokens.includes(transfer.token)">Claims
-                                </p>
-
-                                <IconMinusCircle
-                                    v-if="transfer.from != offer.creator && transfer.token == offer.principalToken" />
-                                <p
-                                    v-if="transfer.from != offer.creator && transfer.token == offer.principalToken">
-                                    Removes</p>
+                                <p v-if="transfer.type == 0">Adds</p>
+                                <p v-if="transfer.type == 1">Claims</p>
+                                <p v-if="transfer.type == 2">Locks</p>
+                                <p v-if="transfer.type == 3">Removes</p>
                             </div>
                         </td>
                         <td>
@@ -63,8 +53,9 @@
                         </td>
                         <td>
                             <div>
-                                <!-- <IconInterest /> -->
-                                <p>Mar 22, <span>00:52</span></p>
+                                <p>{{ $toDate(transfer.timestamp).month + ' ' + $toDate(transfer.timestamp).date }}, <span>
+                                    {{ $toDate(transfer.timestamp).hour + ':' + $toDate(transfer.timestamp).min }}
+                                </span></p>
                             </div>
                         </td>
                         <td>
@@ -276,4 +267,5 @@ export default {
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
-}</style>
+}
+</style>

@@ -6,6 +6,8 @@ import DiscoverView from '../views/DiscoverView.vue'
 import PortfolioView from '../views/PortfolioView.vue'
 import VaultView from '../views/VaultView.vue'
 
+import FaucetPage from '../components/app/FaucetPage.vue'
+
 import DiscoverLend from '../components/app/discover/lend/DiscoverLend.vue'
 import DiscoverBorrow from '../components/app/discover/borrow/DiscoverBorrow.vue'
 import DiscoverStake from '../components/app/discover/stake/DiscoverStake.vue'
@@ -128,7 +130,11 @@ const router = createRouter({
           path: '/portfolio/borrow/:id',
           name: 'portfolio-borrow-id',
           component: PortfolioBorrowItem
-        }
+        },{
+          path: '/faucet',
+          name: 'faucet',
+          component: FaucetPage
+        },
       ]
     }
   ]

@@ -32,6 +32,36 @@ const Approval = {
             console.error(error);
             return '0'
         }
+    },
+    addToMetamask: async function (asset) {
+        try {
+            await ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: asset.address,
+                        symbol: asset.symbol,
+                        decimals: '18',
+                        image: 'https://darshprotocol.netlify.app/images/' + asset.image + '.png',
+                    },
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    faucetMint: async function (asset, userAddress) {
+        try {
+            const web3 = new Web3(ethereum)
+            const contract = new web3.eth.Contract(ERC20.abi, asset.address)
+
+            await contract.methods.faucetMint(asset.faucetAmount).send({ from: userAddress })
+            return true
+
+        } catch (error) {
+            console.error(error);
+        }
     }
 }
 

@@ -99,14 +99,17 @@
                         </div>
                     </div>
                     <div>
-                        <PrimaryButton v-on:click="approve()" :text="'Approve'"
+                        <PrimaryButton :progress="fetchingPrice" :state="fetchingPrice ? 'disable' : ''"
+                            v-on:click="!fetchingPrice ? approve() : null" :text="'Approve'"
                             v-if="$fromWei(allowance) < $fromWei(collateralAmount)" />
-                        <PrimaryButton v-else v-on:click="createRequest()" :text="'Make Request'" />
+
+                        <PrimaryButton :progress="fetchingPrice" :state="fetchingPrice ? 'disable' : ''" v-else
+                            v-on:click="!fetchingPrice ? createRequest() : null" :text="'Make Request'" />
                     </div>
                 </div>
             </div>
         </div>
-</main>
+    </main>
 </template>
 
 <script setup>
@@ -133,6 +136,7 @@ export default {
             interest: 0,
             daysToMaturity: this.offer.daysToMaturity,
             hoursToExpire: 24,
+            fetchingPrice: false,
             dropDown: false
         }
     },
@@ -183,6 +187,7 @@ export default {
             this.allowance = amount
         },
         getCollateralAmount: async function () {
+            this.fetchingPrice = true
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.offer.principalToken,
                 this.collateralToken,
@@ -191,6 +196,7 @@ export default {
             )
             this.collateralAmount = collateralAmount.toString()
 
+            this.fetchingPrice = false
             this.getAllowance()
         },
         approve: async function () {
@@ -329,8 +335,8 @@ main {
 }
 
 .title h3 {
-    
-    
+
+
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -372,11 +378,11 @@ main {
 }
 
 .option>div:nth-child(2) input {
-    
+
     background: transparent;
     border: none;
     outline: none;
-    
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -388,8 +394,8 @@ main {
 }
 
 .option>p {
-    
-    
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -441,8 +447,8 @@ main {
 }
 
 .option>div:nth-child(2) p:first-child {
-    
-    
+
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -453,8 +459,8 @@ main {
 }
 
 .option>div:nth-child(2)>div>p {
-    
-    
+
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -468,8 +474,8 @@ main {
 }
 
 .option>div:nth-child(3) p {
-    
-    
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -526,8 +532,8 @@ main {
 }
 
 .drop_item p {
-    
-    
+
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
