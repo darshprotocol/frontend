@@ -15,7 +15,7 @@ const AssetLibrary = {
             name: 'Bitcoin',
             image: 'btc',
             type: 'native',
-            address: '0x493663b03Cf7C9A0758C91600e05849002c2c6ea',
+            address: '0x12cEef63C446f0ed1C89558d2D391358dF4f7b4B',
             maxDecimal: 10
         }, {
             id: 2,
@@ -23,7 +23,7 @@ const AssetLibrary = {
             name: 'Ethereum',
             image: 'eth',
             type: 'native',
-            address: '0x4717a19FE301E93a34fa218A06353fb32B12844F',
+            address: '0x949b0DAefEBEBD82Da725c5237529CBc0f3a7A19',
             maxDecimal: 5
         }, {
             id: 3,
@@ -31,7 +31,7 @@ const AssetLibrary = {
             name: 'USDT',
             image: 'usdt',
             type: 'stable',
-            address: '0x10772d4Fa03c2ee747c2fbBe7bD7B240799EbC62',
+            address: '0x642eaECe1868844aaa25fF1Faef7Fd7765a7c93f',
             maxDecimal: 2
         }, {
             id: 4,
@@ -39,7 +39,7 @@ const AssetLibrary = {
             name: 'USDC',
             image: 'usdc',
             type: 'stable',
-            address: '0x7B53b438671c7f42F5a0C2F4F0cdD4ef37F6C28E',
+            address: '0x2ee75386c3EC42F0eeb2663278afF929c90CD5C9',
             maxDecimal: 2
         }, {
             id: 5,
@@ -47,7 +47,7 @@ const AssetLibrary = {
             name: 'DAI',
             image: 'dai',
             type: 'stable',
-            address: '0x47275Ef69Ef25Cb95474177e3b056B5Ca5019EFE',
+            address: '0x1af942B51bED831d66C81b96d80F1B39E6c751f5',
             maxDecimal: 2
         },
     ],

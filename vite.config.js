@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [vue()],
   define: {
     'process.env': {},
-    'global': {}
+    // 'global': {}
   },
   resolve: {
     alias: {

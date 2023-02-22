@@ -279,7 +279,7 @@ const LendingPoolAPI = {
         }
     },
 
-
+    //////////////////// CANCEL / ACCEPT REQUESTS
 
     // @rejectRequest
     rejectRequest: async function (
@@ -302,6 +302,28 @@ const LendingPoolAPI = {
         }
     },
 
+
+    cancelRequest: async function (
+        requestId,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            await instance.cancelRequest(
+                requestId,
+                {
+                    from: userAddress
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    /////////////////////// REPAYMENT
 
     // @repayment
     repayLoan: async function (
@@ -331,6 +353,8 @@ const LendingPoolAPI = {
         }
     },
 
+    /////////////////// CLAIM
+
     // @claim
     claimPrincipal: async function (
         loanId,
@@ -341,6 +365,66 @@ const LendingPoolAPI = {
 
         try {
             await instance.claimPrincipal(
+                loanId,
+                {
+                    from: userAddress
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    claimCollateral: async function (
+        loanId,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            await instance.claimCollateral(
+                loanId,
+                {
+                    from: userAddress
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    claimDefaultCollateral: async function (
+        loanId,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            await instance.claimDefaultCollateral(
+                loanId,
+                {
+                    from: userAddress
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    claimBorrowedPrincipal: async function (
+        loanId,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            await instance.claimBorrowedPrincipal(
                 loanId,
                 {
                     from: userAddress
