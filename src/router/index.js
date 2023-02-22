@@ -96,7 +96,7 @@ const router = createRouter({
           children: [
             {
               path: '/vault/:id',
-              name: 'vault-id',
+              name: 'portfolio-vault-id',
               component: VaultItem
             }
           ]

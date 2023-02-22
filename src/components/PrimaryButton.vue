@@ -1,12 +1,17 @@
 <template>
     <div :class="`button ${state}`" :style="`width: ${width}; background: ${bg};`">
-        <p>{{ text }}</p>
+        <ProgressBoxWhite class="progress" v-if="progress" />
+        <p v-else>{{ text }}</p>
     </div>
 </template>
 
+<script setup>
+import ProgressBoxWhite from './ProgressBoxWhite.vue';
+</script >
+
 <script>
 export default {
-    props: ['text', 'state', 'width', 'bg']
+    props: ["text", "state", "width", "bg", "progress"]
 }
 </script>
 
@@ -52,5 +57,9 @@ p {
 
 .disable p {
     color: var(--textdimmed);
+}
+
+.progress {
+    transform: scale(0.4, 0.4);
 }
 </style>

@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import contract from 'truffle-contract'
-import TrustScoreABI from '../contracts/TrustScore.json'
+import DarshScoreABI from '../contracts/DarshScore.json'
 import Web3 from 'web3'
 
 const LtvAPI = {
@@ -8,12 +8,12 @@ const LtvAPI = {
     getInstance: async function () {
         if (this.instance != null) return this.instance
 
-        const TrustScore = contract(TrustScoreABI)
+        const HealthScore = contract(DarshScoreABI)
         const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
-        TrustScore.setProvider(web3.currentProvider)
+        HealthScore.setProvider(web3.currentProvider)
 
         try {
-            this.instance = await TrustScore.deployed()
+            this.instance = await HealthScore.deployed()
             console.log(this.instance);
             return this.instance
         } catch (error) {
@@ -21,7 +21,7 @@ const LtvAPI = {
             return null
         }
     },
-    getTrustScore: async function (userAddress) {
+    getHealthScore: async function (userAddress) {
         const instance = await this.getInstance()
         if (instance == null) return null
         let score = await instance.getScore(userAddress)

@@ -34,9 +34,7 @@
                 <p>My Collateral</p>
                 <div>
                     <img :src="`/images/${$findAsset(borrowerLoan.collateralToken).image}.png`" alt="">
-                    <p>{{ $toMoney($fromWei(borrowerLoan.currentCollateral)) }} {{
-                        $findAsset(borrowerLoan.collateralToken).symbol
-                    }}</p>
+                    <p>{{ $toMoney($fromWei(borrowerLoan.currentCollateral)) }}</p>
                     <IconOut />
                 </div>
             </div>
@@ -44,9 +42,7 @@
                 <p>My Collateral</p>
                 <div>
                     <img :src="`/images/${$findAsset(borrowerLoan.collateralToken).image}.png`" alt="">
-                    <p class="strike">{{ $toMoney($fromWei(borrowerLoan.currentCollateral)) }} {{
-                        $findAsset(borrowerLoan.collateralToken).symbol
-                    }}</p>
+                    <p class="strike">{{ $toMoney($fromWei(borrowerLoan.currentCollateral)) }}</p>
                     <IconOut />
                 </div>
             </div>
@@ -170,7 +166,7 @@
                 <div class="claim_asset">
                     <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
                     <h3>
-                        {{ $toMoney($fromWei(offer.loans[loanIndex].currentPrincipal)) }} 
+                        {{ $toMoney($fromWei(unClaimedPrincipal)) }} 
                         {{ $findAsset(offer.loans[loanIndex].principalToken).symbol }}
                     </h3>
                 </div>
@@ -185,7 +181,14 @@
     </div>
 
     <!---->
-    <div class="open_loans" v-if="offer.loans.length == 0 || (userType == 'borrower' & !borrowerLoan)">
+    <div class="open_loans" v-if="(!borrowerLoan || offer.loans.length == 0) && userType != 'lender'">
+        <h3>Open Loans</h3>
+        <div class="box">
+            <IconReceipt />
+            <p>No open loan Found on <br> this Borrow offer.</p>
+        </div>
+    </div>
+    <div class="open_loans" v-if="offer.loans.length == 0 && userType == 'lender'">
         <h3>Open Loans</h3>
         <div class="box">
             <IconReceipt />
@@ -200,19 +203,20 @@ import IconOut from '../../../icons/IconOut.vue'
 import IconCalendar from '../../../icons/IconCalendar.vue'
 import PrimaryButton from '../../../PrimaryButton.vue';
 import LoanState from '../../../LoanState.vue';
+import IconArrowLeft from '../../../icons/IconArrowLeft.vue';
+import IconArrowRight from '../../../icons/IconArrowRight.vue';
+import IconClock from '../../../icons/IconClock.vue';
 </script>
 
 <script>
 import Countdown from '../../../../utils/Countdown';
-import IconArrowLeft from '../../../icons/IconArrowLeft.vue';
-import IconArrowRight from '../../../icons/IconArrowRight.vue';
-import IconClock from '../../../icons/IconClock.vue';
 export default {
     props: ["offer", "borrowerLoan", "userType"],
     data() {
         return {
             dueDate: 0,
-            loanIndex: 0
+            loanIndex: 0,
+            unClaimedPrincipal: 0
         };
     },
     methods: {
@@ -267,7 +271,7 @@ export default {
         }
     },
     mounted() {
-        this.getDueDate();
+        this.getDueDate()
     }
 }
 </script>

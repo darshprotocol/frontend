@@ -3,8 +3,7 @@
         <div class="table_head">
             <div class="title">
                 <p>Vault Actvities</p>
-                <span>0</span>
-                <!-- <span>{{ offer.requests.length }}</span> -->
+                <span>{{ offer.transfers.length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -23,24 +22,43 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="index in 5" :key="index">
+                <tbody v-for="transfer in offer.transfers" :key="transfer._id">
                     <tr>
                         <td>
                             <div>
-                                <img class="photo" src="/images/usdc.png" alt="">
-                                <p >You</p>
+                                <img :src="`/images/user1.png`" alt="">
+                                <p v-if="transfer.from == offer.creator">You</p>
+                                <p v-else>Borrower 1</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <IconClock />
-                                <p>Claims</p>
+                                <IconAddCircle
+                                    v-if="transfer.from == offer.creator && transfer.token == offer.principalToken" />
+                                <p v-if="transfer.from == offer.creator && transfer.token == offer.principalToken">Adds</p>
+
+                                <IconLock
+                                    v-if="transfer.from != offer.creator && offer.collateralTokens.includes(transfer.token)" />
+                                <p
+                                    v-if="transfer.from != offer.creator && offer.collateralTokens.includes(transfer.token)">
+                                    Locks</p>
+
+                                <IconCoin
+                                    v-if="transfer.from == offer.creator && offer.collateralTokens.includes(transfer.token)" />
+                                <p v-if="transfer.from == offer.creator && offer.collateralTokens.includes(transfer.token)">Claims
+                                </p>
+
+                                <IconMinusCircle
+                                    v-if="transfer.from != offer.creator && transfer.token == offer.principalToken" />
+                                <p
+                                    v-if="transfer.from != offer.creator && transfer.token == offer.principalToken">
+                                    Removes</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <!-- <img src="/images/usdc.png" alt=""> -->
-                                <p>Principal</p>
+                                <p v-if="transfer.token == offer.principalToken">Principal</p>
+                                <p v-else>Collateral</p>
                             </div>
                         </td>
                         <td>
@@ -51,25 +69,28 @@
                         </td>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>5,374 USDC</p>
+                                <img :src="`/images/${$findAsset(transfer.token).image}.png`" alt="">
+                                <p>
+                                    {{ $toMoney($fromWei(transfer.amount)) }}
+                                    {{ $findAsset(transfer.token).symbol }}
+                                </p>
                             </div>
                         </td>
                         <td>
-                            <RouterLink :to="''">
+                            <a target="_blank" :href="`https://testnet.ftmscan.com/tx/${transfer.hash}`">
                                 <div class="link">
                                     <p>View Txn</p>
                                     <IconOut />
                                 </div>
-                            </RouterLink>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
             </div>
-            <!-- <div class="t_empty" v-if="offer.requests.length == 0">
-                    <img src="../../../assets/images/receipt-text.png" alt="">
-                    <p>No Borrow Requests found.</p>
-                </div> -->
+            <div class="t_empty" v-if="offer.transfers.length == 0">
+                <img src="../../../assets/images/receipt-text.png" alt="">
+                <p>No activity.</p>
+            </div>
         </table>
     </div>
 </template>
@@ -77,11 +98,16 @@
 <script setup>
 import IconOut from '../../icons/IconOut.vue';
 import IconSort from '../../icons/IconSort.vue';
+import IconAddCircle from '../../icons/IconAddCircle.vue'
+import IconMinusCircle from '../../icons/IconMinusCircle.vue'
+import IconCoin from '../../icons/IconCoin.vue';
+import IconLock from '../../icons/IconLock.vue';
 </script >
 
 <script>
 export default {
-    props: ["offer"]
+    props: ["offer", "userAddress"],
+    components: { IconCoin, IconLock }
 }
 </script>
 
@@ -155,6 +181,8 @@ export default {
 .tbody {
     border-radius: 6px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .request_table tbody {
@@ -248,5 +276,4 @@ export default {
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
-}
-</style>
+}</style>

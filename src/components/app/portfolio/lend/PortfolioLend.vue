@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="expire" v-if="index % 2 == 0">
+                    <div class="expire" v-if="offer.loans.length == 0">
                         <p>Offer expires in</p>
                         <p>{{ countdown(offer.expiresAt) }}</p>
                     </div>
@@ -59,7 +59,10 @@
 
                         <div class="needed">
                             <div class="label">
-                                <p>14.2 <span>/ 24.2 WETH</span></p>
+                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} <span>/ {{
+                                $toMoney($fromWei(offer.initialPrincipal)) }} {{
+        $findAsset(offer.principalToken).symbol
+    }}</span></p>
                                 <IconInfo />
                             </div>
                             <div class="bar">
@@ -98,11 +101,13 @@ export default {
         this.fetchLendingOffers();
     },
     methods: {
-        countdown: function (to) {
-            let from = Math.floor(Date.now() / 1000)
-            Countdown.start(from, to, function (text) {
-                console.log(text);
+        countdown: function (expiresAt) {
+            let txt = ''
+            let due = expiresAt * 1000
+            Countdown.start(due, function (text) {
+                txt = text
             })
+            return txt
         },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60

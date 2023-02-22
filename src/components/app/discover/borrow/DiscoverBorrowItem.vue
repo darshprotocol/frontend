@@ -86,8 +86,8 @@
                                 <IconSort />
                                 <p>Sort By</p>
                             </div>
-                            <div class="request_button" v-if="!borrowerLoan && userType == 'borrower'"
-                                v-on:click="borrowRequest = true">
+                            <div class="request_button" v-if="!borrowerLoan && userType == 'borrower' && !borrowerRequest"
+                                v-on:click="request = true">
                                 <IconAdd />
                                 <p>Request</p>
                             </div>
@@ -97,8 +97,8 @@
                             </div>
                         </div>
                     </div>
-                    <RequestTable :requests="offer.requests" />
-                    <div class="t_empty" v-if="offer.requests.length == 0">
+                    <RequestTable :offer="offer" />
+                    <div class="t_empty" v-if="offer.requests.filter(off => off.state == 0).length == 0">
                         <img src="../../../../assets/images/receipt-text.png" alt="">
                         <p>No Borrow Requests found.</p>
                     </div>
@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <BorrowRequestPopUp :offer="offer" v-if="borrowRequest" v-on:close="borrowRequest = false" />
+        <BorrowRequestPopUp :offer="offer" v-if="request" v-on:close="request = false" />
         <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:close="payback = false" />
         <BorrowPopUp v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
@@ -157,7 +157,7 @@ import IconInformation from '../../../icons/IconInformation.vue';
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import LoanBoxes from './LoanBoxes.vue';
-import TrustScore from '../../../../scripts/TrustScore'
+import HealthScore from '../../../../scripts/DarshScore'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
 export default {
     data() {
@@ -167,12 +167,13 @@ export default {
             fetching: true,
             userType: "none",
             borrowerLoan: null,
+            borrowerRequest: null,
             userAddress: null,
             loanInfo: null,
             lenderScore: "•••",
             borrow: false,
             payback: false,
-            borrowRequest: false
+            request: false
         };
     },
     async created() {
@@ -198,6 +199,7 @@ export default {
             try {
                 let response = await this.axios.get(`https://darshprotocol.onrender.com/offers/${id}`);
                 this.offer = response.data;
+
                 if (this.userAddress) {
                     if (this.offer.creator != this.userAddress) {
                         this.userType = "borrower";
@@ -205,12 +207,19 @@ export default {
                     else {
                         this.userType = "lender";
                     }
+
                     this.offer.loans.forEach(loan => {
                         if (loan.borrower.toLowerCase() == this.userAddress) {
                             this.borrowerLoan = loan;
                             return;
                         }
                     });
+                    this.offer.requests.forEach(request => {
+                        if (request.creator.toLowerCase() == this.userAddress) {
+                            this.borrowerRequest = request
+                            return
+                        }
+                    })
                 }
                 else {
                     this.userType = "none";
@@ -232,7 +241,7 @@ export default {
             this.payback = true;
         },
         getLenderScore: async function (address) {
-            this.lenderScore = await TrustScore.getTrustScore(address);
+            this.lenderScore = await HealthScore.getHealthScore(address);
         },
         claimpayback: async function (loan) {
             this.loanInfo = null

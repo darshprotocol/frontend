@@ -82,7 +82,6 @@ export default {
         approve: async function () {
             await this.$approve(
                 await Authentication.userAddress(),
-                this.getPaybackAmount().toFixed(0),
                 this.loan.principalToken,
                 LendingPoolAPI.address
             )

@@ -82,7 +82,7 @@
                 <div class="grid_2" v-if="loanState != 'defaulted'">
                     <p>My Collateral</p>
                     <div>
-                        <p>{{ $toMoney($fromWei(loan.currentCollateral)) + ' ' + $findAsset(loan.collateralToken).symbol }}
+                        <p>{{ $toMoney($fromWei(loan.currentCollateral)) }}
                         </p>
                         <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                     </div>
@@ -90,7 +90,7 @@
                 <div class="grid_2" v-if="loanState == 'defaulted'">
                     <p>My Collateral</p>
                     <div>
-                        <p class="strike">{{ $toMoney($fromWei(loan.currentCollateral)) + ' ' + $findAsset(loan.collateralToken).symbol }}
+                        <p class="strike">{{ $toMoney($fromWei(loan.currentCollateral)) }}
                         </p>
                         <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                     </div>

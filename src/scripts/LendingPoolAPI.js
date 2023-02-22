@@ -90,20 +90,18 @@ const LendingPoolAPI = {
     // @lenders
     acceptBorrowingRequest: async function (
         requestId,
-        isNative,
         userAddress
     ) {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let amount = isNative ? 1 : 0
+        console.log(requestId);
 
         try {
             await instance.acceptBorrowingRequest(
                 requestId,
                 {
-                    from: userAddress,
-                    value: amount
+                    from: userAddress
                 }
             )
         } catch (error) {
@@ -280,6 +278,30 @@ const LendingPoolAPI = {
             return null
         }
     },
+
+
+
+    // @rejectRequest
+    rejectRequest: async function (
+        requestId,
+        userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            await instance.rejectRequest(
+                requestId,
+                {
+                    from: userAddress
+                }
+            )
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
 
     // @repayment
     repayLoan: async function (

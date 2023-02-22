@@ -12,10 +12,10 @@
                     <div class="option">
                         <p>Principal needed</p>
                         <div>
-                            <p>{{ toMoney(getPrincipal() / 1e18) }}</p>
+                            <p>{{ $toMoney($fromWei(getPrincipal())) }}</p>
                             <div class="click_1">
-                                <img :src="`/images/${findAsset(offer.principalToken).image}.png`" alt="">
-                                <p>{{ findAsset(offer.principalToken).symbol }}</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $findAsset(offer.principalToken).symbol }}</p>
                             </div>
                         </div>
                     </div>
@@ -61,16 +61,16 @@
                     <div class="option">
                         <p>Collateral Amount</p>
                         <div>
-                            <p>{{ toMoney(collateralAmount / 1e18) }}</p>
+                            <p>{{ $toMoney(collateralAmount / 1e18) }}</p>
                             <div class="click_1" v-on:click="dropDown = !dropDown">
-                                <img :src="`/images/${findAsset(collateralToken).image}.png`" alt="">
-                                <p>{{ findAsset(collateralToken).symbol }}</p>
+                                <img :src="`/images/${$findAsset(collateralToken).image}.png`" alt="">
+                                <p>{{ $findAsset(collateralToken).symbol }}</p>
                                 <IconArrowDown />
                                 <div class="drop_down" v-show="dropDown">
                                     <div class="drop_item" v-for="address in collateralTokens()" :key="address"
                                         v-on:click="collateralToken = address">
-                                        <img :src="`/images/${findAsset(address).image}.png`" alt="">
-                                        <p>{{ findAsset(address).symbol }}</p>
+                                        <img :src="`/images/${$findAsset(address).image}.png`" alt="">
+                                        <p>{{ $findAsset(address).symbol }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
                     </div>
                     <div>
                         <PrimaryButton v-on:click="approve()" :text="'Approve'"
-                            v-if="fromWei(allowance) < (collateralAmount / 1e18)" />
+                            v-if="$fromWei(allowance) < $fromWei(collateralAmount)" />
                         <PrimaryButton v-else v-on:click="createRequest()" :text="'Make Request'" />
                     </div>
                 </div>
@@ -119,12 +119,9 @@ import IconArrowDown from '../../../icons/IconArrowDown.vue';
 </script>
 
 <script>
-import Converter from '../../../../utils/Converter';
-import AssetLibrary from '../../../../utils/AssetLibrary';
 import LtvAPI from '../../../../scripts/LtvAPI';
 import Authentication from '../../../../scripts/Authentication'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
-import Approval from '../../../../scripts/Approval'
 export default {
     props: ['offer'],
     data() {
@@ -163,18 +160,6 @@ export default {
         }
     },
     methods: {
-        findAsset: function (id) {
-            return AssetLibrary.findAsset(id);
-        },
-        toMoney: function (value, mF = 2) {
-            return Converter.toMoney(value, mF)
-        },
-        fromWei: function(value) {
-            return Converter.fromWei(value)
-        },
-        toWei: function(value) {
-            return Converter.toWei(value)
-        },
         collateralTokens: function () {
             let tokens = []
             this.offer.collateralTokens.forEach(token => {
@@ -186,11 +171,11 @@ export default {
         },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60
-            let interest = this.fromWei(result.toString())
-            return Converter.toMoney(interest)
+            let interest = this.$fromWei(result.toString())
+            return this.$toMoney(interest)
         },
         getAllowance: async function () {
-            let amount = await Approval.getAllocationOf(
+            let amount = await this.$allowanceOf(
                 await Authentication.userAddress(),
                 this.collateralToken,
                 LendingPoolAPI.address
@@ -209,9 +194,8 @@ export default {
             this.getAllowance()
         },
         approve: async function () {
-            await Approval.approve(
+            await this.$approve(
                 await Authentication.userAddress(),
-                this.collateralAmount,
                 this.collateralToken,
                 LendingPoolAPI.address
             )
@@ -225,18 +209,17 @@ export default {
             return principal.toString()
         },
         createRequest: async function () {
-            let principalAmount = Converter.fromWei(this.getPrincipal())
+            let principalAmount = this.$fromWei(this.getPrincipal())
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (principalAmount * targetDurationInSecs)
             let userAddress = await Authentication.userAddress()
-            console.log(Converter.toWei(calcInterest));
             const trx = await LendingPoolAPI.createBorrowingRequest(
                 this.offer.offerId,
                 this.percentage,
                 this.collateralToken,
                 this.collateralAmount,
-                Converter.toWei(calcInterest),
+                this.$toWei(calcInterest),
                 this.daysToMaturity,
                 this.hoursToExpire,
                 userAddress

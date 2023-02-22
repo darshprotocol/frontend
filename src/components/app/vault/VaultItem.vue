@@ -1,25 +1,34 @@
 <template>
-    <main>
+    <p v-if="!userAddress">Connect Wallet</p>
+
+    <div class="progress_box" v-if="fetching && userAddress != null">
+        <ProgressBox />
+    </div>
+
+    <main v-if="!fetching && userAddress != null">
         <div class="dashboard">
             <div class="first_box">
                 <div class="principal">
                     <p class="label">Principal Locked</p>
                     <div>
-                        <img src="/images/usdc.png" alt="">
-                        <p>10,000 USDC</p>
+                        <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                        <p>
+                            {{ $toMoney($fromWei(offer.initialPrincipal)) }}
+                            {{ $findAsset(offer.principalToken).symbol }}
+                        </p>
                     </div>
                 </div>
                 <div class="apy">
                     <p class="label">APY</p>
                     <div>
-                        <p>12.10%</p>
+                        <p>0.00%</p>
                         <IconInfo />
                     </div>
                 </div>
             </div>
             <div class="second_box">
                 <div class="buttons">
-                    <RouterLink :to="`/vault/`">
+                    <RouterLink :to="`/discover/${offer.offerType == 0 ? 'borrow' : 'lend'}/${$route.params.id}`">
                         <div class="go_to_vault">
                             <p>Go to Vault's Loan</p>
                             <IconOut :color="'var(--textnormal)'" />
@@ -34,12 +43,20 @@
                     <div class="first_row">
                         <div>
                             <IconClock />
-                            <p class="deep_text">22 Days <span>ago</span></p>
+                            <p class="deep_text">{{ daysAgo }} Days <span>ago</span></p>
                             <p class="light_text">Time Locked</p>
                         </div>
                         <div>
                             <IconChart />
-                            <p class="deep_text">0k<span>/10k USDC</span></p>
+                            <p class="deep_text">{{
+                                $nFormat(
+                                    ($fromWei(offer.initialPrincipal)) -
+                                    ($fromWei(offer.currentPrincipal))
+                                )
+                            }}<span>/{{
+    $nFormat($fromWei(offer.initialPrincipal)) }}
+                                    {{ $findAsset(offer.principalToken).symbol }}
+                                </span></p>
                             <p class="light_text">Amount Locked</p>
                         </div>
                     </div>
@@ -47,17 +64,18 @@
                         <div class="total_emitted">
                             <div class="total_emitted_tokens">
                                 <div class="images">
-                                    <img src="/images/btc.png" v-for="index in 3" :key="index" alt="">
+                                    <img v-for="address in offer.collateralTokens" :key="address"
+                                        :src="`/images/${$findAsset(address).image}.png`" alt="">
                                 </div>
-                                <p>~ $34.25</p>
+                                <p>~ $0.00</p>
                             </div>
                             <div class="total_emitted_label">
                                 <p>Total Emitted</p>
-                                <IconInfo />
+                                <IconInformation :color="'var(--primary)'" />
                             </div>
                         </div>
                         <div class="collateral_info">
-                            <IconInfo />
+                            <IconInformation :color="'var(--primary)'" />
                             <p>Collaterals Info</p>
                         </div>
                     </div>
@@ -70,25 +88,25 @@
                         <div>
                             <p class="emission_grid_label">Principal's</p>
                             <div class="emission_grid_token">
-                                <img src="/images/usdc.png" alt="">
-                                <p>0.51 USDC</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>0.00 {{ $findAsset(offer.principalToken).symbol }}</p>
                             </div>
                         </div>
                         <div>
                             <p class="emission_grid_label">Collateral's</p>
                             <div class="emission_grid_token">
-                                <p>~0.79 USD</p>
+                                <p>~0.00 USD</p>
                             </div>
                         </div>
                     </div>
                     <div class="emission_action">
-                        <PrimaryButton :text="'Claim All'" />
+                        <PrimaryButton :state="'disable'" :text="'Claim All'" />
                     </div>
                 </div>
             </div>
         </div>
 
-        <HistoryTable class="table" />
+        <HistoryTable class="table" :offer="offer" :userAddress="userAddress" />
     </main>
 </template>
 
@@ -96,12 +114,66 @@
 import IconChart from '../../icons/IconChart.vue';
 import IconClock from '../../icons/IconClock.vue';
 import IconInfo from '../../icons/IconInfo.vue';
+import IconInformation from '../../icons/IconInformation.vue';
 import IconOut from '../../icons/IconOut.vue';
 import PrimaryButton from '../../PrimaryButton.vue';
 import HistoryTable from './HistoryTable.vue'
+import ProgressBox from '../../ProgressBox.vue';
+</script>
+
+<script>
+import Authentication from '../../../scripts/Authentication';
+export default {
+    data() {
+        return {
+            userAddress: null,
+            fetching: true,
+            offer: null,
+            daysAgo: '',
+            transfers: []
+        };
+    },
+    methods: {
+        fetchOffer: async function () {
+            let id = this.$route.params.id;
+            this.fetching = true;
+            if (this.userAddress == null) {
+                return;
+            }
+            this.axios.get(`https://darshprotocol.onrender.com/offers/${id}?creator=${this.userAddress.toLowerCase()}`).then(response => {
+                this.offer = response.data;
+                this.getDaysAgo(this.offer.createdAt)
+                this.fetching = false;
+            }).catch(error => {
+                console.error(error);
+            });
+        },
+        getDaysAgo: function (createdAt) {
+            let now = Date.now() / 1000
+            let elapsed = now - createdAt
+            let daysAgo = elapsed / 24 / 60 / 60
+            if (daysAgo < 1) {
+                daysAgo = 1
+            }
+            this.daysAgo = daysAgo.toFixed(0)
+        }
+    },
+    async created() {
+        this.userAddress = await Authentication.userAddress();
+        this.fetchOffer();
+    },
+    components: { ProgressBox }
+}
 </script>
 
 <style scoped>
+.progress_box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 200px;
+}
+
 main {
     margin-top: 60px;
     padding: 0 60px;

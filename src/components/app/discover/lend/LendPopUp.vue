@@ -91,7 +91,6 @@ export default {
         approve: async function () {
             await this.$approve(
                 await Authentication.userAddress(),
-                this.getPrincipal(),
                 this.offer.principalToken,
                 LendingPoolAPI.address
             )

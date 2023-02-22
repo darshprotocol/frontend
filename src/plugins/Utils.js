@@ -28,7 +28,7 @@ export default {
         app.config.globalProperties.$toWei = (value) => {
             return Converter.toWei(value)
         },
-        app.config.globalProperties.$approve = async (userAddress, amount, tokenAddress, spender) => {
+        app.config.globalProperties.$approve = async (userAddress, tokenAddress, spender) => {
             return await Approval.approve(userAddress, '1000000000000000000000000000', tokenAddress, spender)
         },
         app.config.globalProperties.$allowanceOf = async (userAddress, tokenAddress, spender) => {

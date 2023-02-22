@@ -154,12 +154,12 @@ import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import LendRequestPopUp from './LendRequestPopUp.vue';
 import LoanBoxes from './LoanBoxes.vue';
 import BorrowerStats from './LenderStats.vue';
-</script >
-
-<script>
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
-import TrustScore from '../../../../scripts/TrustScore'
+import HealthScore from '../../../../scripts/DarshScore'
+</script>
+
+<script>
 export default {
     data() {
         return {
@@ -241,7 +241,7 @@ export default {
             this.payback = true
         },
         getBorrowerScore: async function (address) {
-            this.lenderScore = await TrustScore.getTrustScore(address)
+            this.lenderScore = await HealthScore.getHealthScore(address)
         }
     }
 }

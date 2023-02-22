@@ -5,7 +5,7 @@ const AssetLibrary = {
             symbol: 'FTM',
             name: 'Fantom',
             image: 'ftm',
-            type: 'variable',
+            type: 'native',
             address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             maxDecimal: 6
         },
@@ -14,16 +14,16 @@ const AssetLibrary = {
             symbol: 'WBTC',
             name: 'Bitcoin',
             image: 'btc',
-            type: 'variable',
-            address: '0xdC512b00b170FEC68f4826dEbaC04bA643972A1a',
+            type: 'native',
+            address: '0x493663b03Cf7C9A0758C91600e05849002c2c6ea',
             maxDecimal: 10
         }, {
             id: 2,
             symbol: 'WETH',
             name: 'Ethereum',
             image: 'eth',
-            type: 'variable',
-            address: '0x66250246902e541Fd9B16F7C47F1d4563Fa13073',
+            type: 'native',
+            address: '0x4717a19FE301E93a34fa218A06353fb32B12844F',
             maxDecimal: 5
         }, {
             id: 3,
@@ -31,7 +31,7 @@ const AssetLibrary = {
             name: 'USDT',
             image: 'usdt',
             type: 'stable',
-            address: '0x48577d503A8357DCCD866a7Cb33529809aE89B28',
+            address: '0x10772d4Fa03c2ee747c2fbBe7bD7B240799EbC62',
             maxDecimal: 2
         }, {
             id: 4,
@@ -39,7 +39,7 @@ const AssetLibrary = {
             name: 'USDC',
             image: 'usdc',
             type: 'stable',
-            address: '0x148B2A8c93bc3e8e066B822f11e524Bfb861C686',
+            address: '0x7B53b438671c7f42F5a0C2F4F0cdD4ef37F6C28E',
             maxDecimal: 2
         }, {
             id: 5,
@@ -47,7 +47,7 @@ const AssetLibrary = {
             name: 'DAI',
             image: 'dai',
             type: 'stable',
-            address: '0x445A8A85664A048C2c36b8E50F0e71cEfeCD17A2',
+            address: '0x47275Ef69Ef25Cb95474177e3b056B5Ca5019EFE',
             maxDecimal: 2
         },
     ],

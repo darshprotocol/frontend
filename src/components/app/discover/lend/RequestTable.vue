@@ -189,6 +189,11 @@ tbody:nth-child(even) {
     background: var(--bglighter);
 }
 
+.request_table tbody td img {
+    width: 14px;
+    height: 14px;
+}
+
 .request_table tbody td {
     height: 62px;
 }

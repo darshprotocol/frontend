@@ -21,11 +21,13 @@
                         <IconMenu :color="'var(--textnormal)'" />
                         <div class="edit_options" v-if="editOptions">
                             <div class="edit_option">Close Offer</div>
-                            <div class="edit_option">Loan's Vault</div>
+                            <RouterLink :to="`/vault/${offer._id}`">
+                                <div class="edit_option">Loan's Vault</div>
+                            </RouterLink>
                         </div>
                     </div>
                 </div>
-                <div class="buttons">
+                <div class="buttons" v-else>
                     <RouterLink :to="`/vault/${offer._id}`">
                         <div class="go_to_vault">
                             <p>Go to Loan's Vault</p>
@@ -34,9 +36,9 @@
                     </RouterLink>
                 </div>
                 <!-- <PrimaryButton v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()"
-                                                                        :text="'Create'" /> -->
+                                                                                :text="'Create'" /> -->
                 <!-- <PrimaryButton v-else :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()"
-                                                                        :width="'220px'" /> -->
+                                                                                :width="'220px'" /> -->
             </div>
         </div>
         <div class="dashboard">
@@ -84,7 +86,7 @@
                         <div class="img" v-for="index in 4" :key="index"></div>
                         <div class="extra_user">0 <span>Borrowers</span></div>
                     </div>
-                    <div class="borrowers">
+                    <div class="borrowers" v-else>
                         <img v-for="loan in offer.loans" :key="loan.loanId" src="/images/user1.png" />
                         <div class="extra_user">{{ offer.loans.length }} <span>Borrowers</span></div>
                     </div>
@@ -158,6 +160,10 @@ export default {
             this.axios.get(`https://darshprotocol.onrender.com/offers/${id}?creator=${this.userAddress.toLowerCase()}`).then(response => {
                 this.offer = response.data;
                 this.fetching = false;
+
+                if (this.offer) {
+                    this.getDueDate();
+                }
             }).catch(error => {
                 console.error(error);
                 // this.fetching = false;
@@ -167,7 +173,6 @@ export default {
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchBorrowingOffer();
-        this.getDueDate();
     }
 }
 </script>
@@ -422,7 +427,7 @@ export default {
     font-size: 12px;
     margin-top: 8px;
     color: var(--textdimmed);
-} 
+}
 
 .borrowers {
     display: flex;

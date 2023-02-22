@@ -1,6 +1,7 @@
 <script setup>
 import AppHeader from '../components/app/AppHeader.vue';
 import SideBar from '../components/app/SideBar.vue';
+import SnackBar from '../components/SnackBar.vue';
 </script>
 
 <template>
@@ -11,10 +12,12 @@ import SideBar from '../components/app/SideBar.vue';
                 <SideBar class="sidebar" />
                 <div></div>
                 <div class="sandbox">
-                    <RouterView :userAddress="userAddress" />
+                    <RouterView />
                 </div>
             </div>
         </div>
+
+        <SnackBar />
     </div>
 </template>
 
@@ -23,7 +26,7 @@ export default {
     data() {
         return {
             userAddress: null
-        }
+        };
     }
 }
 </script>

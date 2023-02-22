@@ -95,11 +95,13 @@ export default {
         this.fetchLendingOffers()
     },
     methods: {
-        countdown: function (to) {
-            let from = Math.floor(Date.now() / 1000)
-            Countdown.start(from, to, function (text) {
-                console.log(text);
+        countdown: function (expiresAt) {
+            let txt = ''
+            let due = expiresAt * 1000
+            Countdown.start(due, function (text) {
+                txt = text
             })
+            return txt
         },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60

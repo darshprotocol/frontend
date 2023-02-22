@@ -121,7 +121,6 @@ export default {
         approve: async function () {
             await this.$approve(
                 await Authentication.userAddress(),
-                this.collateralAmount,
                 this.collateralToken,
                 LendingPoolAPI.address
             )
@@ -152,6 +151,7 @@ export default {
 </script>
 
 <style src="@vueform/slider/themes/default.css"></style>
+
 <style scoped>
 main {
     width: 100%;
@@ -187,8 +187,6 @@ main {
 }
 
 .title h3 {
-    
-
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);

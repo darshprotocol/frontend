@@ -10,8 +10,10 @@
                     <p class="cr">Create Lend Offer</p>
                 </div>
                 <PrimaryButton v-if="principalAmount == ''" :text="'Create'" :state="'disable'" />
-                <PrimaryButton v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()" :text="'Create'" />
-                <PrimaryButton v-else :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()" :width="'220px'" />
+                <PrimaryButton :progress="creating" v-else-if="$fromWei(allowance) >= safePrincipal()"
+                    v-on:click="createOffer()" :text="'Create'" />
+                <PrimaryButton v-else :progress="approving" :text="`Approve ${$findAsset(principalToken).symbol}`"
+                    v-on:click="approve()" :width="'220px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -62,8 +64,8 @@
                         <p>Duration</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0"
-                                    min="5" max="60" v-model="daysToMaturity">
+                                <input type="number" disabled :style="getInputWidth(daysToMaturity)" placeholder="0" min="5"
+                                    max="60" v-model="daysToMaturity">
                                 <span>days</span>
                             </div>
                             <div class="clicks">
@@ -80,7 +82,7 @@
                         <p>Interest</p>
                         <div>
                             <div class="input">
-                                <input type="number" :style="getInputWidth(interest)" placeholder="0" min="0"
+                                <input type="number" disabled :style="getInputWidth(interest)" placeholder="0" min="0"
                                     v-model="interest">
                                 <span>%</span>
                             </div>
@@ -98,8 +100,8 @@
                         <p>Offer expires in</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0"
-                                    min="0" v-model="daysToExpire">
+                                <input type="number" disabled :style="getInputWidth(daysToExpire)" placeholder="0" min="0"
+                                    v-model="daysToExpire">
                                 <span>days</span>
                             </div>
                             <div class="clicks">
@@ -132,10 +134,10 @@ import IconChecked from '../../icons/IconChecked.vue'
 </script>
 
 <script>
+import { messages } from '../../../reactives/messages';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
 import Authentication from '../../../scripts/Authentication';
 import CovalentAPI from '../../../utils/CovalentAPI'
-import Approval from '../../../scripts/Approval';
 export default {
     data() {
         return {
@@ -149,6 +151,7 @@ export default {
             daysToExpire: 7,
             userAddress: null,
             creating: false,
+            approving: false,
             dropDown: false
         };
     },
@@ -168,7 +171,7 @@ export default {
                 this.interest = 50;
             }
         },
-        principalToken: function() {
+        principalToken: function () {
             this.getAllowance()
         },
         principalAmount: function () {
@@ -187,7 +190,7 @@ export default {
             }
             this.collateralTokens.push(address)
         },
-        safePrincipal: function() {
+        safePrincipal: function () {
             if (this.principalAmount == '') return '0'
             return this.principalAmount.toString()
         },
@@ -211,24 +214,27 @@ export default {
             if (!response) return
             this.tokenBalances = response.data.items
         },
-        getAllowance: async function() {
-            let amount = await Approval.getAllocationOf(
+        getAllowance: async function () {
+            let amount = await this.$allowanceOf(
                 await Authentication.userAddress(),
                 this.principalToken,
                 LendingPoolAPI.address
             )
             this.allowance = amount
         },
-        approve: async function() {
-            await Approval.approve(
+        approve: async function () {
+            if (this.approving) return
+            this.approving = true
+            await this.$approve(
                 await Authentication.userAddress(),
-                this.$toWei(this.principalAmount.toString()),
                 this.principalToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
         createOffer: async function () {
+            if (this.creating) return
             this.creating = true;
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
@@ -242,9 +248,28 @@ export default {
                 this.collateralTokens,
                 await Authentication.userAddress()
             );
-            if (!trx) {
-                console.error("Create Offer Failed");
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Offer created',
+                    description: 'Lending offer successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+
+                this.principalAmount = '0'
+                this.collateralTokens = []
+                this.interest = 2
+                this.daysToMaturity = 15
+                this.daysToExpire = 7
+            } else {
+                messages.insertMessage({
+                    title: 'Offer not created',
+                    description: 'Lending was not successfully created.',
+                    type: 'failed'
+                })
             }
+
             this.creating = false;
         },
         incrementDuration: function () {
@@ -269,12 +294,12 @@ export default {
         },
         incrementInterest: function () {
             if (this.interest < 50) {
-                this.interest += 1;
+                this.interest += 0.5;
             }
         },
         decrementInterest: function () {
             if (this.interest > 1) {
-                this.interest -= 1;
+                this.interest -= 0.5;
             }
         },
         getInputWidth: function (value) {
@@ -314,7 +339,7 @@ export default {
 
 .toolbar p,
 .toolbar span {
-    
+
     font-weight: 500;
     font-size: 14px;
 }
@@ -337,7 +362,7 @@ export default {
 }
 
 .create_form>h3 {
-    
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -354,8 +379,8 @@ export default {
 }
 
 .option>p {
-    
-    
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -440,11 +465,11 @@ export default {
 }
 
 .option>div:nth-child(2) input {
-    
+
     background: transparent;
     border: none;
     outline: none;
-    
+
     font-weight: 500;
     font-size: 25px;
     color: var(--textnormal);
@@ -457,8 +482,8 @@ export default {
 
 .option>div:nth-child(2)>div>p,
 .drop_item p {
-    
-    
+
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);
@@ -472,8 +497,8 @@ export default {
 }
 
 .option>div:nth-child(3) p {
-    
-    
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -499,7 +524,7 @@ export default {
 
 .choose_col>div>p,
 .option>div:first-child p {
-    
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
@@ -546,14 +571,14 @@ export default {
 }
 
 .token .symbol {
-    
+
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
 
 .token .name {
-    
+
     font-weight: 400;
     font-size: 12px;
     color: var(--textdimmed);

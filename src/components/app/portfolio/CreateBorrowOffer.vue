@@ -233,7 +233,6 @@ export default {
         approve: async function () {
             await this.$approve(
                 await Authentication.userAddress(),
-                this.collateralAmount,
                 this.collateralToken,
                 LendingPoolAPI.address
             )

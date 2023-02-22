@@ -36,7 +36,7 @@
                         <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows</div>
                     </RouterLink>
                     <RouterLink to="/portfolio/stake">
-                        <div :class="$route.name == 'portfolio-stake' ? 'tab tab_active' : 'tab'">Vaults</div>
+                        <div :class="$route.name.startsWith('portfolio-vault') ? 'tab tab_active' : 'tab'">Vaults</div>
                     </RouterLink>
                 </div>
             </div>
