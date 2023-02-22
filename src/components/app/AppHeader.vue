@@ -15,8 +15,8 @@
                 <div class="connect_wallet" v-on:click="authenticate">
                     <IconMetamask />
                     <p v-if="userAddress">{{ userAddress.substring(0, 5) }}•••{{
-                        userAddress.substring(userAddress.length - 6,
-                            userAddress.length - 1)
+                        userAddress.substring(userAddress.length - 5,
+                            userAddress.length)
                     }}</p>
                     <p v-else>Connect Wallet</p>
                 </div>
