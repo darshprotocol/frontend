@@ -99,12 +99,13 @@
                         </div>
                     </div>
                     <div>
-                        <PrimaryButton :progress="fetchingPrice" :state="fetchingPrice ? 'disable' : ''"
-                            v-on:click="!fetchingPrice ? approve() : null" :text="'Approve'"
+                        <PrimaryButton :progress="fetchingPrice || approving" :state="(fetchingPrice || approving) ? 'disable' : ''"
+                            v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'"
                             v-if="$fromWei(allowance) < $fromWei(collateralAmount)" />
 
-                        <PrimaryButton :progress="fetchingPrice" :state="fetchingPrice ? 'disable' : ''" v-else
-                            v-on:click="!fetchingPrice ? createRequest() : null" :text="'Make Request'" />
+                        <PrimaryButton :progress="fetchingPrice || requesting" :state="(fetchingPrice || requesting) ? 'disable' : ''"
+                            v-else v-on:click="!(fetchingPrice || requesting) ? createRequest() : null"
+                            :text="'Make Request'" />
                     </div>
                 </div>
             </div>
@@ -125,6 +126,7 @@ import IconArrowDown from '../../../icons/IconArrowDown.vue';
 import LtvAPI from '../../../../scripts/LtvAPI';
 import Authentication from '../../../../scripts/Authentication'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
+import { messages } from '../../../../reactives/messages';
 export default {
     props: ['offer'],
     data() {
@@ -137,6 +139,8 @@ export default {
             daysToMaturity: this.offer.daysToMaturity,
             hoursToExpire: 24,
             fetchingPrice: false,
+            approving: false,
+            requesting: false,
             dropDown: false
         }
     },
@@ -200,11 +204,13 @@ export default {
             this.getAllowance()
         },
         approve: async function () {
+            this.approving = true
             await this.$approve(
                 await Authentication.userAddress(),
                 this.collateralToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
         max: function () {
@@ -215,6 +221,7 @@ export default {
             return principal.toString()
         },
         createRequest: async function () {
+            this.requesting = true
             let principalAmount = this.$fromWei(this.getPrincipal())
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
@@ -230,7 +237,25 @@ export default {
                 this.hoursToExpire,
                 userAddress
             )
-            console.log(trx);
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Request placed',
+                    description: 'Borrow request successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Request failed',
+                    description: 'Borrow failed to create.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('close')
         },
         incrementDuration: function () {
             if (this.daysToMaturity < 60) {

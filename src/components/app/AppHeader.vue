@@ -6,6 +6,7 @@
                 <RouterLink to="/">Home</RouterLink>
                 <a href="https://darshprotocol.gitbook.io/product-docs" target="_blank">Docs</a>
                 <a href="">Governance</a>
+                <RouterLink to="/faucet">Faucet</RouterLink>
             </div>
             <div class="actions">
                 <div class="notifications icon_badge">

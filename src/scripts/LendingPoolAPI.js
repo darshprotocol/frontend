@@ -73,7 +73,7 @@ const LendingPoolAPI = {
         let isNative = principalToken == nativeAddress
 
         try {
-            await instance.acceptBorrowingOffer(
+            const trx = await instance.acceptBorrowingOffer(
                 offerId,
                 percentage,
                 {
@@ -81,6 +81,7 @@ const LendingPoolAPI = {
                     value: isNative ? principalAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -98,12 +99,13 @@ const LendingPoolAPI = {
         console.log(requestId);
 
         try {
-            await instance.acceptBorrowingRequest(
+            const trx = await instance.acceptBorrowingRequest(
                 requestId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -127,7 +129,7 @@ const LendingPoolAPI = {
         let isNative = principalToken == nativeAddress
 
         try {
-            await instance.createLendingRequest(
+            const trx = await instance.createLendingRequest(
                 offerId,
                 percentage,
                 daysToMaturity,
@@ -138,6 +140,7 @@ const LendingPoolAPI = {
                     value: isNative ? principalAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -174,7 +177,7 @@ const LendingPoolAPI = {
         let isNative = collateralToken == nativeAddress
 
         try {
-            await instance.createBorrowingOffer(
+            const trx = await instance.createBorrowingOffer(
                 principalToken,
                 principalAmount,
                 collateralToken,
@@ -186,6 +189,7 @@ const LendingPoolAPI = {
                     value: isNative ? collateralAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -206,7 +210,7 @@ const LendingPoolAPI = {
         let isNative = collateralToken == nativeAddress
 
         try {
-            await instance.acceptLendingOffer(
+            const trx = await instance.acceptLendingOffer(
                 offerId,
                 percentage,
                 collateralToken,
@@ -215,6 +219,7 @@ const LendingPoolAPI = {
                     value: isNative ? collateralAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -231,13 +236,14 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.acceptLendingRequest(
+            const trx = await instance.acceptLendingRequest(
                 requestId,
                 {
                     from: userAddress,
                     value: isNative ? 1 : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -261,7 +267,7 @@ const LendingPoolAPI = {
         let isNative = collateralToken == nativeAddress
 
         try {
-            await instance.createBorrowingRequest(
+            const trx = await instance.createBorrowingRequest(
                 offerId,
                 percentage,
                 collateralToken,
@@ -273,6 +279,7 @@ const LendingPoolAPI = {
                     value: isNative ? collateralAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -290,12 +297,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.rejectRequest(
+            const trx = await instance.rejectRequest(
                 requestId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -311,12 +319,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.cancelRequest(
+            const trx = await instance.cancelRequest(
                 requestId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -339,7 +348,7 @@ const LendingPoolAPI = {
         let isNative = principalToken == nativeAddress
 
         try {
-            await instance.repayLoan(
+            const trx = await instance.repayLoan(
                 loanId,
                 percentage,
                 {
@@ -347,6 +356,7 @@ const LendingPoolAPI = {
                     value: isNative ? principalAmount : 0
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -364,12 +374,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.claimPrincipal(
+            const trx = await instance.claimPrincipal(
                 loanId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -384,12 +395,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.claimCollateral(
+            const trx = await instance.claimCollateral(
                 loanId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -404,12 +416,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.claimDefaultCollateral(
+            const trx = await instance.claimDefaultCollateral(
                 loanId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null
@@ -424,12 +437,13 @@ const LendingPoolAPI = {
         if (instance == null) return null
 
         try {
-            await instance.claimBorrowedPrincipal(
+            const trx = await instance.claimBorrowedPrincipal(
                 loanId,
                 {
                     from: userAddress
                 }
             )
+            return trx
         } catch (error) {
             console.error(error);
             return null

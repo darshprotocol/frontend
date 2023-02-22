@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        <BorrowRequestPopUp :offer="offer" v-if="request" v-on:close="request = false" />
+        <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
         <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:close="payback = false" />
         <BorrowPopUp v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
