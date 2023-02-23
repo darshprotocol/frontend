@@ -27,6 +27,8 @@ import PortfolioBorrowItem from '../components/app/portfolio/borrow/PortfolioBor
 
 import VaultItem from '../components/app/vault/VaultItem.vue'
 
+import DashBoardItem from '../components/app/dashboard/DashBoardItem.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
@@ -61,11 +63,6 @@ const router = createRouter({
               path: '/discover/borrow',
               name: 'discover-borrow',
               component: DiscoverBorrow
-            },
-            {
-              path: '/discover/stake',
-              name: 'discover-stake',
-              component: DiscoverStake
             }
           ]
         },
@@ -122,19 +119,32 @@ const router = createRouter({
           path: '/portfolio/lend/create',
           name: 'portfolio-lend-create',
           component: CreateLendOffer
-        },{
+        },
+        {
           path: '/portfolio/lend/:id',
           name: 'portfolio-lend-id',
           component: PortfolioLendItem
-        },{
+        },
+        {
           path: '/portfolio/borrow/:id',
           name: 'portfolio-borrow-id',
           component: PortfolioBorrowItem
-        },{
+        },
+        {
           path: '/faucet',
           name: 'faucet',
           component: FaucetPage
         },
+        {
+          path: '/darshboard',
+          name: 'darshboard',
+          component: DashBoardItem
+        },
+        {
+          path: '/stake',
+          name: 'stake',
+          component: DiscoverStake
+        }
       ]
     }
   ]

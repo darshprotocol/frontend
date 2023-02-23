@@ -1,0 +1,443 @@
+<template>
+    <main>
+        <div class="header">
+            <h3 class="title">My Darshboard</h3>
+            <div class="total_loans">
+                <div class="total_loans_joined">
+                    <p>Total Loans Joined</p>
+                    <p>1,884</p>
+                </div>
+                <div class="total_loans_volume">
+                    <p>Total Loans Volume</p>
+                    <p>$141,324</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="chart">
+                <div class="toolbar">
+                    <div class="toolbar_label">
+                        <p>Total Value Locked</p>
+                        <p>$19,582 <span>
+                                <IconArrowDown :color="'var(--accentgreen)'" /> +10%
+                            </span></p>
+                    </div>
+                    <div class="dates">
+                        <div>1D</div>
+                        <div class="active">1W</div>
+                        <div>1M</div>
+                        <div>1Y</div>
+                    </div>
+                </div>
+                <div class="chart_box">
+                    <div class="chart_grid">
+                        <div class="chart_box_row" v-for="index in 6" :key="index"></div>
+                    </div>
+                    <div class="chart_grid_2">
+                        <div class="chart_box_column" v-for="index in 11" :key="index"></div>
+                    </div>
+                    <div id="chart"></div>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="tabs">
+                    <div class="tab active">Lends</div>
+                    <div class="tab">Borrows</div>
+                </div>
+                <div class="stat_detail">
+                    <p class="tag">Total Value Lent</p>
+                    <p class="amount">$19,582</p>
+
+                    <div class="natives">
+                        <div class="tokens">
+                            <div class="images">
+                                <img src="/images/ftm.png" alt="">
+                                <img src="/images/btc.png" alt="">
+                                <img src="/images/eth.png" alt="">
+                                <p>Natives</p>
+                            </div>
+                            <div class="percent">60%</div>
+                        </div>
+                        <div class="progress_bar">
+                            <div class="progress"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+
+                    <div class="stables">
+                        <div class="tokens">
+                            <div class="images">
+                                <img src="/images/usdc.png" alt="">
+                                <img src="/images/usdt.png" alt="">
+                                <img src="/images/dai.png" alt="">
+                                <p>Stables</p>
+                            </div>
+                            <div class="percent">60%</div>
+                        </div>
+                        <div class="progress_bar">
+                            <div class="progress"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ActivityTable class="activity" />
+    </main>
+</template>
+
+<script setup>
+import IconArrowDown from '../../icons/IconArrowDown.vue';
+import ActivityTable from './ActivityTable.vue';
+</script>
+
+<script>
+import ApexCharts from 'apexcharts'
+export default {
+    mounted() {
+        var options = {
+            stroke: {
+                curve: 'smooth',
+                width: 2,
+                colors: ['#6936F5']
+            },
+            grid: {
+                xaxis: {
+                    lines: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false
+                    }
+                },
+                padding: {
+                    top: -28,
+                    right: 0,
+                    bottom: 0,
+                    left: -9
+                }
+            },
+            chart: {
+                type: 'area',
+                toolbar: { show: false },
+                height: 205,
+                width: '100%',
+                zoom: { enabled: false }
+            },
+            tooltip: {
+                x: { show: false },
+                marker: { show: false },
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Axiforma'
+                }
+            },
+            markers: {
+                strokeColors: '#6936F5',
+                colors: ['#EEF1F8'],
+                strokeWidth: 4,
+                radius: 2
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    type: "vertical",
+                    gradientToColors: ['#6936F5', '#6936F5'],
+                    inverseColors: true,
+                    opacityFrom: 0.5,
+                    opacityTo: 0.05
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            series: [{
+                name: 'Score',
+                data: [30, 50, 31, 20, 49, 60, 40, 91, 125, 30, 21],
+            }],
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                labels: { show: false },
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                tooltip: {
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Axiforma'
+                    }
+                }
+            },
+            yaxis: {
+                labels: { show: false },
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+            },
+            legend: { show: false }
+        }
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+        chart.render();
+    }
+}
+</script>
+
+<style scoped>
+main {
+    padding: 0 60px;
+    padding-top: 60px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .title {
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--textnormal);
+}
+
+.total_loans {
+    display: flex;
+    align-items: center;
+}
+
+.total_loans>div {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-width: 0px 1px;
+    border-style: solid;
+    border-color: var(--bglightest);
+    gap: 8px;
+}
+
+.total_loans p:first-child {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.total_loans p:last-child {
+    font-size: 14px;
+    color: var(--textnormal);
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 60px;
+}
+
+.chart {
+    width: 679px;
+    background: var(--bglight);
+    border-radius: 6px;
+    padding: 30px;
+}
+
+.chart .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chart .dates {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    border-bottom: 1px solid var(--bglightest);
+}
+
+.chart .dates div {
+    width: 43px;
+    height: 30px;
+    background: var(--bglighter);
+    border-radius: 2px 2px 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.chart .dates .active {
+    background: var(--primary);
+    color: var(--textnormal);
+}
+
+.chart .toolbar_label p:first-child {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.chart .toolbar_label p:last-child {
+    margin-top: 16px;
+    font-size: 20px;
+    color: var(--textnormal);
+}
+
+.chart .toolbar_label svg {
+    width: 16px;
+    height: 16px;
+    margin-bottom: -4px;
+    transform: rotate(180deg);
+}
+
+.chart .toolbar_label p:last-child span {
+    font-size: 12px;
+    color: var(--accentgreen);
+}
+
+.chart_box {
+    margin-top: 30px;
+    position: relative;
+    height: 190px;
+}
+
+.chart_grid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chart_box_row {
+    height: 1px;
+    background: var(--bglightest);
+}
+
+.chart_grid_2 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;
+    justify-content: space-between;
+}
+
+.chart_box_column {
+    width: 1px;
+    background: var(--bglightest);
+}
+
+/*  */
+
+.stats {
+    width: 350px;
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: 60px;
+    border-bottom: 2px solid var(--background);
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--textdimmed);
+}
+
+.tabs .active {
+    border-radius: 6px 6px 0px 0px;
+    background: var(--bglight);
+    color: var(--textnormal);
+}
+
+.stat_detail {
+    background: var(--bglight);
+    border-radius: 0px 0px 6px 6px;
+    padding: 30px;
+}
+
+.stat_detail .tag {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.stat_detail .amount {
+    font-size: 20px;
+    color: var(--textnormal);
+    margin-top: 18px;
+    font-weight: 500;
+}
+
+.stat_detail .tokens {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 31px;
+}
+
+.stat_detail .images {
+    display: flex;
+    align-items: center;
+}
+
+.stat_detail .images img {
+    width: 20px;
+    height: 20px;
+    margin-left: -4px;
+}
+
+.stat_detail .images img:first-child {
+    margin: 0;
+}
+
+.stat_detail .images p {
+    font-size: 12px;
+    margin-left: 10px;
+    color: var(--textnormal);
+}
+
+.stat_detail .percent {
+    font-size: 12px;
+    color: var(--primary);
+}
+
+.progress_bar {
+    background: var(--background);
+    height: 4px;
+    border-radius: 5px;
+    margin-top: 24px;
+    position: relative;
+}
+
+.progress {
+    position: absolute;
+    height: 4px;
+    border-radius: 5px;
+    background: var(--primary);
+    width: 50%;
+}
+
+.progress_bar .dot {
+    position: absolute;
+    border: 4px solid var(--primary);
+    width: 14px;
+    height: 14px;
+    background: var(--textnormal);
+    border-radius: 5px;
+    left: 50%;
+    transform: translate(-50%, -5px);
+}
+
+/*  */
+
+.activity {
+    margin-top: 60px;
+}
+</style>

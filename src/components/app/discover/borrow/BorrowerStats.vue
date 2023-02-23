@@ -31,7 +31,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .stats {
     width: 100%;
     background: var(--bglight);

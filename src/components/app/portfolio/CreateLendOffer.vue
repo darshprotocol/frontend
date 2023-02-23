@@ -11,7 +11,8 @@
                 </div>
                 <PrimaryButton v-if="principalAmount == ''" :text="'Create'" :state="'disable'" />
                 <PrimaryButton :progress="creating" v-else-if="$fromWei(allowance) >= safePrincipal()"
-                    v-on:click="createOffer()" :text="'Create'" />
+                    v-on:click="createOffer()" :text="'Create'" :width="'220px'" />
+                    
                 <PrimaryButton v-else :progress="approving" :text="`Approve ${$findAsset(principalToken).symbol}`"
                     v-on:click="approve()" :width="'220px'" />
             </div>
