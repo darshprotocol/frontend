@@ -12,14 +12,18 @@
                 </div>
                 <div class="tabs">
                     <RouterLink to="/discover">
-                        <div :class="$route.name.startsWith('discover-lend') ? 'tab tab_active' : 'tab'">Lend</div>
+                        <div :class="$route.name.startsWith('discover-lend') ? 'tab tab_active' : 'tab'">Lenders</div>
                     </RouterLink>
                     <RouterLink to="/discover/borrow">
-                        <div :class="$route.name.startsWith('discover-borrow') ? 'tab tab_active' : 'tab'">Borrow</div>
+                        <div :class="$route.name.startsWith('discover-borrow') ? 'tab tab_active' : 'tab'">Borrowers</div>
                     </RouterLink>
-                    <RouterLink to="/discover/stake">
-                        <div :class="$route.name == 'discover-stake' ? 'tab tab_active' : 'tab'">Stake</div>
-                    </RouterLink>
+                </div>
+            </div>
+            <div class="tab_parent">
+                <div class="title">
+                    <IconStake />
+                    <h3>Stake</h3>
+                    <div :class="$route.name.startsWith('stake') ? 'indicator indicator_active' : 'indicator'"></div>
                 </div>
             </div>
             <div class="tab_parent">
@@ -83,6 +87,7 @@ import IconMedium from '../icons/IconMedium.vue';
 import IconTelegram from '../icons/IconTelegram.vue';
 import IconTwitter from '../icons/IconTwitter.vue';
 import IconSupport from '../icons/IconSupport.vue';
+import IconStake from '../icons/IconStake.vue';
 
 </script>
 
@@ -114,6 +119,7 @@ main {
     display: flex;
     margin-top: 60px;
     flex-direction: column;
+    gap: 36px;
     align-items: flex-end;
 }
 

@@ -122,15 +122,15 @@
                         </RouterLink>
                     </div>
                     <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
-                        :borrowerLoan="borrowerLoan" :userType="userType" v-on:claimpayback="claimpayback($event)" />
+                        :borrowerLoan="borrowerLoan" :userType="userType" v-on:done="fetchLendingOffer(false)" />
                     <BorrowerStats v-if="userType != 'lender'" :score="lenderScore" />
                 </div>
             </div>
         </div>
 
         <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
-        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:close="payback = false" />
-        <BorrowPopUp v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
+        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)" v-on:close="payback = false" />
+        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
             v-if="loanInfo && borrowerLoan" v-on:close="loanInfo = false" />
     </main>
@@ -158,7 +158,6 @@ import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import LoanBoxes from './LoanBoxes.vue';
 import HealthScore from '../../../../scripts/DarshScore'
-import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
 export default {
     data() {
         return {
@@ -232,23 +231,12 @@ export default {
                 console.error(error);
             }
         },
-        reloadPage: async function () {
-            this.borrow = false;
-            this.fetchLendingOffer(false);
-        },
         paybackCall: function () {
             this.loanInfo = null;
             this.payback = true;
         },
         getLenderScore: async function (address) {
             this.lenderScore = await HealthScore.getHealthScore(address);
-        },
-        claimpayback: async function (loan) {
-            this.loanInfo = null
-            await LendingPoolAPI.claimPrincipal(
-                loan.loanId,
-                await Authentication.userAddress()
-            )
         }
     }
 }

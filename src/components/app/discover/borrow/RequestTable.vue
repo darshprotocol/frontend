@@ -15,7 +15,8 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="request in offer.requests.filter(off => off.state == 0)" :key="request._id">
+                <tbody v-for="request in sortRequests(offer.requests)" :class="'state' + request.state"
+                    :key="request._id">
                     <tr>
                         <td>
                             <div>
@@ -95,7 +96,8 @@
         </table>
 
 
-        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction" v-on:close="requestAction = null" />
+        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+            v-on:close="requestAction = null" />
         <RequestPopUpInfo2 :offer="offer" :request="cancelRequest" v-if="cancelRequest" v-on:close="cancelRequest = null" />
     </main>
 </template>
@@ -121,7 +123,12 @@ export default {
         };
     },
     methods: {
-        setRequestAction: function(action, request) {
+        sortRequests: function (requests) {
+            return requests.sort(request => {
+                request.creator == this.userAddress.toLowerCase()
+            })
+        },
+        setRequestAction: function (action, request) {
             this.requestAction = {
                 action: action,
                 request: request
@@ -197,9 +204,14 @@ export default {
     visibility: hidden;
 }
 
-.tbody {
-    overflow: hidden;
-    border-radius: 6px;
+tbody:first-child {
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+}
+
+tbody:last-child {
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
 
 .request_table tbody {
@@ -351,5 +363,11 @@ tbody:nth-child(even) .overlay {
     background: var(--bglighter);
     border-radius: 2px;
     cursor: pointer;
+}
+
+
+/* state */
+.state2 {
+    border: 1px solid var(--accentred) !important;
 }
 </style>

@@ -13,11 +13,11 @@ const Approval = {
         if (tokenAddress == nativeAddress) return
 
         try {
-            await contract.methods.approve(spender, amount).send({ from: userAddress })
-            return true
+            const trx = await contract.methods.approve(spender, amount).send({ from: userAddress })
+            return trx
         } catch (error) {
             console.error(error);
-            return false
+            return null
         }
     },
     getAllocationOf: async function (userAddress, tokenAddress, spender) {
@@ -47,8 +47,10 @@ const Approval = {
                     },
                 },
             });
+            return true
         } catch (error) {
             console.error(error);
+            return false
         }
     },
     faucetMint: async function (asset, userAddress) {
@@ -56,11 +58,11 @@ const Approval = {
             const web3 = new Web3(ethereum)
             const contract = new web3.eth.Contract(ERC20.abi, asset.address)
 
-            await contract.methods.faucetMint(asset.faucetAmount).send({ from: userAddress })
-            return true
-
+            const trx = await contract.methods.faucetMint(asset.faucetAmount).send({ from: userAddress })
+            return trx
         } catch (error) {
             console.error(error);
+            return null
         }
     }
 }

@@ -26,10 +26,12 @@
                     <tr>
                         <td>
                             <div>
-                                <img :src="`/images/user1.png`" alt="">
+                                <img v-if="transfer.from == userAddress" :src="`/images/user1.png`" alt="">
+                                <img v-else :src="`/images/user2.png`" alt="">
+                                
                                 <p v-if="transfer.from == userAddress">You</p>
-                                <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Borrower 1</p>
-                                <p v-else-if="transfer.from != userAddress && offer.offerType == 1">Lender 1</p>
+                                <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Lender 1</p>
+                                <p v-else-if="transfer.from != userAddress && offer.offerType == 1">Borrower 1</p>
                             </div>
                         </td>
                         <td>

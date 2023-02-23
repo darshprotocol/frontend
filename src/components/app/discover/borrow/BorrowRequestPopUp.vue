@@ -250,7 +250,7 @@ export default {
             } else {
                 messages.insertMessage({
                     title: 'Request failed',
-                    description: 'Borrow failed to create.',
+                    description: 'Borrow request failed to create.',
                     type: 'failed'
                 })
             }

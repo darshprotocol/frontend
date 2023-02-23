@@ -43,12 +43,14 @@
                 </div>
             </div>
             <div>
-                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(collateralAmount)" v-on:click="borrowLoan()"
-                    :text="'Borrow'" />
-                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" />
+                <PrimaryButton :state="(fetchingPrice || borrowing) ? 'disable' : ''" v-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
+                   :progress="(fetchingPrice || borrowing)"  v-on:click="!(fetchingPrice || borrowing) ? borrowLoan(): null" :text="'Borrow'" />
+
+                <PrimaryButton v-else :progress="(fetchingPrice || approving)" :state="(fetchingPrice || approving) ? 'disable' : ''"
+                    v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
             </div>
         </div>
-</main>
+    </main>
 </template>
 
 <script setup>
@@ -60,6 +62,7 @@ import IconArrowDown from '../../../icons/IconArrowDown.vue';
 
 <script>
 import LtvAPI from '../../../../scripts/LtvAPI';
+import { messages } from '../../../../reactives/messages';
 import Authentication from '../../../../scripts/Authentication'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
 export default {
@@ -70,7 +73,9 @@ export default {
             collateralToken: this.offer.collateralTokens[0],
             collateralAmount: '0',
             allowance: '0',
+            fetchingPrice: false,
             borrowing: false,
+            approving: false,
             dropDown: false
         }
     },
@@ -100,12 +105,14 @@ export default {
             return tokens
         },
         getCollateralAmount: async function () {
+            this.fetchingPrice = true
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.offer.principalToken,
                 this.collateralToken,
                 this.getPrincipal(),
                 await Authentication.userAddress()
             )
+            this.fetchingPrice = false
             this.collateralAmount = collateralAmount
 
             this.getAllowance()
@@ -119,16 +126,18 @@ export default {
             this.allowance = amount
         },
         approve: async function () {
+            this.approving = true
             await this.$approve(
                 await Authentication.userAddress(),
                 this.collateralToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
         borrowLoan: async function () {
             this.borrowing = true
-            await LendingPoolAPI.acceptLendingOffer(
+            const trx = await LendingPoolAPI.acceptLendingOffer(
                 this.offer.offerId,
                 this.percentage,
                 this.collateralToken,
@@ -136,8 +145,27 @@ export default {
                 await Authentication.userAddress()
             )
 
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Loan borrowed',
+                    description: 'Loan was successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Borrow failed',
+                    description: 'Loan failed to create.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('done')
+            this.$emit('close')
+
             this.borrowing = false
-            this.$emit('borrowed')
         }
     },
     mounted() {
@@ -211,7 +239,7 @@ main {
 }
 
 .box>div:nth-child(2)>p {
-    
+
 
     font-weight: 500;
     font-size: 14px;
@@ -242,7 +270,7 @@ main {
 }
 
 .box>div:nth-child(2)>div p:first-child {
-    
+
 
     font-weight: 500;
     font-size: 20px;
@@ -250,7 +278,7 @@ main {
 }
 
 .box>div:nth-child(2)>div>div>p {
-    
+
 
     font-weight: 400;
     font-size: 14px;
@@ -269,7 +297,7 @@ main {
 }
 
 .box>div:nth-child(4)>p {
-    
+
 
     font-weight: 500;
     font-size: 14px;
@@ -301,7 +329,7 @@ main {
 }
 
 .box>div:nth-child(4)>div:nth-child(2) p:first-child {
-    
+
 
     font-weight: 500;
     font-size: 20px;
@@ -309,7 +337,7 @@ main {
 }
 
 .box>div:nth-child(4)>div:nth-child(2)>div>p {
-    
+
 
     font-weight: 400;
     font-size: 14px;
@@ -324,7 +352,7 @@ main {
 }
 
 .box>div:nth-child(4)>div:nth-child(3) p {
-    
+
 
     font-weight: 500;
     font-size: 14px;
@@ -384,7 +412,7 @@ main {
 }
 
 .drop_item p {
-    
+
 
     font-weight: 400;
     font-size: 14px;

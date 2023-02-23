@@ -21,9 +21,14 @@
                 <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
             </div>
             <div>
-                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(getPaybackAmount())" v-on:click="repayLoan()"
-                    :text="'Payback'" />
-                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" />
+                <PrimaryButton :progress="(fetchingPrice || payingback)"
+                    :state="(fetchingPrice || payingback) ? 'disable' : ''"
+                    v-if="$fromWei(allowance) >= $fromWei(getPaybackAmount())"
+                    v-on:click="!(fetchingPrice || payingback) ? repayLoan() : null" :text="'Payback'" />
+
+                <PrimaryButton :progress="(fetchingPrice || approving)"
+                    :state="(fetchingPrice || approving) ? 'disable' : ''" v-else
+                    v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
             </div>
         </div>
     </main>
@@ -38,22 +43,26 @@ import PrimaryButton from '../../PrimaryButton.vue';
 <script>
 import Authentication from '../../../scripts/Authentication';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
+import { messages } from '../../../reactives/messages';
 export default {
     props: ['loan'],
     data() {
         return {
             percentage: 25,
             allowance: '0',
+            approving: false,
+            payingback: false,
+            fetchingPrice: false
         }
     },
     methods: {
         max: function () {
             return (this.loan.currentPrincipal / this.loan.initialPrincipal) * 100
         },
-        getPaybackAmount: function() {
+        getPaybackAmount: function () {
             return ((this.loan.initialPrincipal * this.percentage) / 100) + this.getAccrued()
         },
-        getAccrued: function() {
+        getAccrued: function () {
             let now = Date.now() + (2 * 60 * 1000)
             let duration = (now / 1000) - (this.loan.startDate)
             let interest = this.$fromWei(this.loan.interest)
@@ -62,29 +71,54 @@ export default {
             return accrued
         },
         repayLoan: async function () {
-            await LendingPoolAPI.repayLoan(
+            this.payingback = true
+
+            const trx = await LendingPoolAPI.repayLoan(
                 this.loan.loanId,
                 this.percentage,
                 this.getPaybackAmount(),
                 this.loan.principalToken,
                 await Authentication.userAddress()
             )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Loan paid',
+                    description: 'Payback successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Payment failed',
+                    description: 'Payback failed to create.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('close')
         },
         getAllowance: async function () {
+            this.fetchingPrice = true
             let amount = await this.$allowanceOf(
                 await Authentication.userAddress(),
                 this.loan.principalToken,
                 LendingPoolAPI.address
             )
-            console.log(amount);
+            this.fetchingPrice = false
+
             this.allowance = amount
         },
         approve: async function () {
+            this.approving = true
             await this.$approve(
                 await Authentication.userAddress(),
                 this.loan.principalToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
     },
@@ -98,9 +132,7 @@ export default {
 }
 </script>
 
-<style src="@vueform/slider/themes/default.css">
-
-</style>
+<style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 main {
     width: 100%;
@@ -136,8 +168,8 @@ main {
 }
 
 .title h3 {
-    
-    
+
+
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -162,8 +194,8 @@ main {
 }
 
 .box>div:nth-child(2)>p {
-    
-    
+
+
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -193,16 +225,16 @@ main {
 }
 
 .box>div:nth-child(2)>div p:first-child {
-    
-    
+
+
     font-weight: 500;
     font-size: 20px;
     color: var(--textnormal);
 }
 
 .box>div:nth-child(2)>div>div>p {
-    
-    
+
+
     font-weight: 400;
     font-size: 14px;
     color: var(--textnormal);

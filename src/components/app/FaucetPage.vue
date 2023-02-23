@@ -39,6 +39,7 @@ import PrimaryButton from '../PrimaryButton.vue';
 import AssetLibrary from '../../utils/AssetLibrary';
 import Approval from '../../scripts/Approval';
 import Authentication from '../../scripts/Authentication';
+import { messages } from '../../reactives/messages';
 export default {
     data() {
         return {
@@ -47,13 +48,44 @@ export default {
     },
     methods: {
         mint: async function (asset) {
-            await Approval.faucetMint(
+           const trx = await Approval.faucetMint(
                 asset,
                 await Authentication.userAddress()
             )
+
+            if (trx && trx.transactionHash) {
+                messages.insertMessage({
+                    title: 'Token minted',
+                    description: 'Faucet token was successfully minted.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.transactionHash}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Mint failed',
+                    description: 'Faucet token failed to mint.',
+                    type: 'failed'
+                })
+            }
         },
         add: async function (asset) {
-            await Approval.addToMetamask(asset)
+           const added = await Approval.addToMetamask(asset)
+           if (added) {
+                messages.insertMessage({
+                    title: 'Token added',
+                    description: 'Token has been successfully added to metamask.',
+                    type: 'success'
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Adding failed',
+                    description: 'Token failed to add to metamask.',
+                    type: 'failed'
+                })
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-<template><!---->
+<template>
+    <!---->
     <div class="active_loans" v-if="userType == 'borrower' && borrowerLoan" :class="getState(borrowerLoan.loanId)">
         <h3>Borrow Loan</h3>
         <div>
@@ -107,7 +108,7 @@
                     <div>
                         <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
                         <h3>
-                            {{ $toMoney($fromWei(offer.loans[loanIndex].currentPrincipal)) }} 
+                            {{ $toMoney($fromWei(offer.loans[loanIndex].currentPrincipal)) }}
                             {{ $findAsset(offer.loans[loanIndex].principalToken).symbol }}
                         </h3>
                     </div>
@@ -166,15 +167,21 @@
                 <div class="claim_asset">
                     <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
                     <h3>
-                        {{ $toMoney($fromWei(unClaimedPrincipal)) }} 
+                        {{ $toMoney($fromWei(offer.loans[loanIndex].unClaimedPrincipal)) }}
                         {{ $findAsset(offer.loans[loanIndex].principalToken).symbol }}
                     </h3>
                 </div>
 
                 <!---->
                 <div class="borrower_action">
-                    <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
-                    <PrimaryButton v-on:click="$emit('claimpayback', offer.loans[loanIndex])" class="claim_button" :state="''" :text="'Claim'" />
+                    <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'"
+                        :bg="'rgba(108, 110, 115, 0.1)'" />
+
+                    <PrimaryButton
+                        :state="(offer.loans[loanIndex].unClaimedPrincipal == 0 || claimingPaybackOf == loanIndex) ? 'disable' : ''"
+                        :progress="claimingPaybackOf == loanIndex"
+                        v-on:click="offer.loans[loanIndex].unClaimedPrincipal > 0 ? claimPayback(loanIndex) : null"
+                        class="claim_button" :text="'Claim'" />
                 </div>
             </div>
         </div>
@@ -210,17 +217,20 @@ import IconClock from '../../../icons/IconClock.vue';
 
 <script>
 import Countdown from '../../../../utils/Countdown';
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
+import Authentication from '../../../../scripts/Authentication';
+import { messages } from '../../../../reactives/messages';
 export default {
     props: ["offer", "borrowerLoan", "userType"],
     data() {
         return {
             dueDate: 0,
             loanIndex: 0,
-            unClaimedPrincipal: 0
+            claimingPaybackOf: -1
         };
     },
     methods: {
-        emitLoan: function(loan) {
+        emitLoan: function (loan) {
             this.$emit('info', loan)
         },
         getDate: function (loan) {
@@ -268,6 +278,33 @@ export default {
             else if (loanState == 2 || now >= defaulted) {
                 return "defaulted";
             }
+        },
+        claimPayback: async function (index) {
+            this.claimingPaybackOf = index
+
+            const trx = await LendingPoolAPI.claimPrincipal(
+                this.offer.loans[index].loanId,
+                await Authentication.userAddress()
+            )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Repayment claimed',
+                    description: 'Repayment was successfully claimed.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Claimimg failed',
+                    description: 'Repayment claim failed.',
+                    type: 'failed'
+                })
+            }
+
+            this.claimingPaybackOf = -1
         }
     },
     mounted() {
@@ -517,6 +554,7 @@ export default {
     margin-top: 16px;
     gap: 10px;
 }
+
 .active_loans .claim_asset h3 {
     font-weight: 500;
     font-size: 16px;
