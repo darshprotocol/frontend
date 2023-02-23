@@ -3,7 +3,7 @@
         <div class="box">
             <div class="title">
                 <h3>Borrow Request</h3>
-                <div class="close" v-on:click="$emit('close')">
+                <div v-if="!(accepting || rejecting)" class="close" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
@@ -50,13 +50,15 @@
                 </div>
             </div>
             <div class="box_action" v-if="requestAction.action == 'reject'">
-                <PrimaryButton v-on:click="rejectRequest()" :text="'Reject Request'" :bg="'var(--accentred)'" />
+                <PrimaryButton :progress="rejecting" :state="rejecting ? 'disable' : ''"
+                    v-on:click="!rejecting ? rejectRequest() : null" :text="'Reject Request'" :bg="'var(--accentred)'" />
             </div>
             <div class="box_action" v-if="requestAction.action == 'accept'">
-                <PrimaryButton v-on:click="acceptRequest()" :text="'Accept Request'" :bg="'var(--accentgreen)'" />
-                </div>
+                <PrimaryButton :progress="accepting" :state="accepting ? 'disable' : ''"
+                    v-on:click="!accepting ? acceptRequest() : null" :text="'Accept Request'" :bg="'var(--accentgreen)'" />
             </div>
-        </main>
+        </div>
+    </main>
 </template>
 
 <script setup>
@@ -69,8 +71,15 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 
 <script>
 import Authentication from '../../../../scripts/Authentication';
+import { messages } from '../../../../reactives/messages';
 export default {
     props: ['requestAction', 'offer'],
+    data() {
+        return {
+            accepting: false,
+            rejecting: false
+        }
+    },
     methods: {
         getPrincipal: function (percentage) {
             let principal = this.offer.initialPrincipal * (percentage / 100);
@@ -82,16 +91,59 @@ export default {
             return this.$toMoney(interest);
         },
         acceptRequest: async function () {
-            await LendingPoolAPI.acceptBorrowingRequest(
+            this.accepting = true
+
+            const trx = await LendingPoolAPI.acceptBorrowingRequest(
                 this.requestAction.request.requestId,
                 await Authentication.userAddress()
             )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Request accept',
+                    description: 'Borrow request was successfully accepted.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Accept failed',
+                    description: 'Borrow request failed to accept.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('done')
+            this.$emit('close')
         },
         rejectRequest: async function () {
-            await LendingPoolAPI.rejectRequest(
+            this.rejecting = true
+            const trx = await LendingPoolAPI.rejectRequest(
                 this.requestAction.request.requestId,
                 await Authentication.userAddress()
             )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Request rejected',
+                    description: 'Borrow request was successfully rejected.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('done')
+            } else {
+                messages.insertMessage({
+                    title: 'Reject failed',
+                    description: 'Borrow request failed to reject.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('done')
+            this.$emit('close')
         }
     },
     mounted() {

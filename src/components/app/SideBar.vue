@@ -22,7 +22,7 @@
             <div class="tab_parent">
                 <div class="title">
                     <IconStake />
-                    <h3>Stake</h3>
+                    <h3>Stake <span>Coming</span></h3>
                     <div :class="$route.name.startsWith('stake') ? 'indicator indicator_active' : 'indicator'"></div>
                 </div>
             </div>
@@ -140,12 +140,20 @@ main {
 }
 
 .title h3 {
-    
-    
     font-weight: 500;
     font-size: 16px;
     line-height: 120%;
     color: #EEF1F8;
+}
+
+.title span {
+    padding: 4px 8px;
+    font-size: 10px;
+    margin-left: 12px;
+    color: var(--textdimmed);
+    height: 20px;
+    background: var(--primarydimmed);
+    border-radius: 2px;
 }
 
 .indicator {
@@ -173,8 +181,6 @@ main {
 
 .tab {
     height: 40px;
-    
-    
     font-weight: 500;
     font-size: 16px;
     display: flex;
@@ -207,8 +213,6 @@ main {
 }
 
 .support h3 {
-    
-    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);

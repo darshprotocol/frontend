@@ -27,7 +27,7 @@ const Converter = {
         return formatter.format(amount).replace('$', '')
     },
     nFormatter: function (num, digits) {
-        if (num < 1000) return num
+        if (num < 1000) return this.toMoney(num)
         const lookup = [
             { value: 1, symbol: "" },
             { value: 1e3, symbol: "k" },

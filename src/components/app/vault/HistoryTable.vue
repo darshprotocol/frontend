@@ -3,7 +3,7 @@
         <div class="table_head">
             <div class="title">
                 <p>Vault Actvities</p>
-                <span>{{ offer.transfers.length }}</span>
+                <span>{{ sortActivities(offer.transfers).length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="transfer in offer.transfers" :key="transfer._id">
+                <tbody v-for="transfer in sortActivities(offer.transfers)" :key="transfer._id">
                     <tr>
                         <td>
                             <div>
@@ -100,7 +100,15 @@ import IconLock from '../../icons/IconLock.vue';
 <script>
 export default {
     props: ["offer", "userAddress"],
-    components: { IconCoin, IconLock }
+    methods: {
+        sortActivities: function (activities) {
+            if (this.offer.creator == this.userAddress.toLowerCase()) {
+                return activities
+            } else {
+                return activities.filter(activity => activity.from == this.userAddress.toLowerCase())
+            }
+        },
+    }
 }
 </script>
 

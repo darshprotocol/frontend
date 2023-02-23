@@ -15,8 +15,7 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="request in sortRequests(offer.requests)" :class="'state' + request.state"
-                    :key="request._id">
+                <tbody v-for="request in sortRequests(offer.requests)" :class="'state' + request.state" :key="request._id">
                     <tr>
                         <td>
                             <div>
@@ -97,8 +96,10 @@
 
 
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
-            v-on:close="requestAction = null" />
-        <RequestPopUpInfo2 :offer="offer" :request="cancelRequest" v-if="cancelRequest" v-on:close="cancelRequest = null" />
+            v-on:close="requestAction = null" v-on:done="$emit(done)" />
+
+        <RequestPopUpInfo2 :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
+            v-on:close="cancelRequest = null" />
     </main>
 </template>
 
@@ -119,14 +120,21 @@ export default {
             activeRequest: '',
             userAddress: '',
             requestAction: null,
-            cancelRequest: null
+            cancelRequest: null,
+            accepting: -1
         };
     },
     methods: {
         sortRequests: function (requests) {
-            return requests.sort(request => {
-                request.creator == this.userAddress.toLowerCase()
-            })
+            if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
+                return requests.filter(request => request.state == 0)
+            }
+            else {
+                return requests.filter(request =>
+                    (request.creator == this.userAddress.toLowerCase() && 
+                    (request.state != 1 || request.state != 3)) || request.state == 0
+                )
+            }
         },
         setRequestAction: function (action, request) {
             this.requestAction = {
@@ -168,12 +176,11 @@ export default {
             let accrued = this.$fromWei(this.getAccrued(request));
             let principal = this.$fromWei(this.getPrincipal(request.percentage));
             return Number(accrued) + Number(principal);
-        },
+        }
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-    },
-    components: { RequestPopUpInfo }
+    }
 }
 </script>
 

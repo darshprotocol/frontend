@@ -50,13 +50,17 @@
                 </div>
             </div>
             <div class="box_action">
-                <PrimaryButton :text="'Cancel Request'" v-on:click="cancelRequest()" :bg="'rgba(108, 110, 115, 0.1)'" />
+                <PrimaryButton :text="'Cancel Request'" :progress="cancelling" :state="cancelling ? 'disable' : ''"
+                    v-on:click="!cancelling ? cancelRequest() : null" :bg="'rgba(108, 110, 115, 0.1)'" />
             </div>
         </div>
     </main>
 </template>
 
 <script setup>
+import { messages } from '../../../../reactives/messages';
+import Authentication from '../../../../scripts/Authentication';
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
 import IconClock from '../../../icons/IconClock.vue';
 import IconClose from '../../../icons/IconClose.vue';
 import IconInterest from '../../../icons/IconInterest.vue';
@@ -66,6 +70,11 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 <script>
 export default {
     props: ['request', 'offer'],
+    data() {
+        return {
+            cancelling: false
+        }
+    },
     methods: {
         getPrincipal: function (percentage) {
             let principal = this.offer.initialPrincipal * (percentage / 100);
@@ -77,7 +86,32 @@ export default {
             return this.$toMoney(interest);
         },
         cancelRequest: async function () {
+            this.cancelling = true
 
+            const trx = await LendingPoolAPI.cancelRequest(
+                this.request.requestId,
+                await Authentication.userAddress()
+            )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Request cancalled',
+                    description: 'Borrow request was successfully cancelled.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+                this.$emit('close')
+            } else {
+                messages.insertMessage({
+                    title: 'Cancelling failed',
+                    description: 'Borrow request failed to cancel.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('done')
+            this.cancelling = false
         }
     },
     mounted() {

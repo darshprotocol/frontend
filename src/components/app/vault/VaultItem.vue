@@ -6,19 +6,35 @@
     </div>
 
     <main v-if="!fetching && userAddress != null">
+        <!---->
         <div class="dashboard">
             <div class="first_box">
-                <div class="principal">
+                <!---->
+                <div class="principal" v-if="offer.creator == userAddress.toLowerCase()">
                     <p class="label">Principal Locked</p>
                     <div>
                         <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                         <p>
-                            {{ $toMoney($fromWei(offer.initialPrincipal)) }}
+                            {{ $toMoney($fromWei(offer.currentPrincipal)) }}
                             {{ $findAsset(offer.principalToken).symbol }}
                         </p>
                     </div>
                 </div>
-                <div class="apy">
+
+                <div class="principal" v-else-if="loan">
+                    <p class="label">Collateral Locked</p>
+                    <div>
+                        <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
+                        <p>
+                            {{ $toMoney($fromWei(loan.initialCollateral)) }}
+                            {{ $findAsset(loan.collateralToken).symbol }}
+                        </p>
+                    </div>
+                </div>
+
+
+                <!---->
+                <div class="apy" v-if="offer.creator == userAddress.toLowerCase()">
                     <p class="label">APY</p>
                     <div>
                         <p>0.00%</p>
@@ -26,6 +42,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="second_box">
                 <div class="buttons">
                     <RouterLink :to="`/discover/${offer.offerType == 0 ? 'borrow' : 'lend'}/${$route.params.id}`">
@@ -37,7 +54,10 @@
                 </div>
             </div>
         </div>
-        <div class="dashboard">
+
+        <!---->
+
+        <div class="dashboard" v-if="offer.creator == userAddress.toLowerCase()">
             <div class="firstbox">
                 <div class="offer">
                     <div class="first_row">
@@ -106,6 +126,52 @@
             </div>
         </div>
 
+        <!---->
+
+        <div class="dashboard dashboard2" v-else-if="loan">
+            <div class="firstbox">
+                <div class="offer">
+                    <div class="first_row">
+                        <div>
+                            <IconCalendar />
+                            <p class="deep_text">{{ daysAgo }} Days <span>ago</span></p>
+                            <p class="light_text">Unlocked on</p>
+                        </div>
+                        <div>
+                            <IconChart />
+                            <p class="deep_text">{{
+                                $nFormat($fromWei(loan.currentCollateral))
+                            }}<span>/{{ $nFormat($fromWei(loan.initialCollateral)) }}
+                                    {{ $findAsset(loan.collateralToken).symbol }}
+                                </span></p>
+                            <p class="light_text">Amount Locked</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="second_box">
+                <div class="emission">
+                    <h3 class="emission_title">Unlocked
+                        <IconInformation />
+                    </h3>
+                    <div class="emission_grid">
+                        <div>
+                            <p class="emission_grid_label">Collateral</p>
+                            <div class="emission_grid_token">
+                                <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(loan.unClaimedCollateral)) }} {{
+                                    $findAsset(loan.collateralToken).symbol }}</p>
+                            </div>
+                        </div>
+                        <div class="emission_action2">
+                            <PrimaryButton :progress="claimingCollateral" :state="(claimingCollateral || loan.unClaimedCollateral == 0) ? 'disable' : ''"
+                                v-on:click="!(claimingCollateral || loan.unClaimedCollateral == 0) ? claimCollateral() : null" :text="'Claim'" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <HistoryTable class="table" :offer="offer" :userAddress="userAddress" />
     </main>
 </template>
@@ -123,6 +189,9 @@ import ProgressBox from '../../ProgressBox.vue';
 
 <script>
 import Authentication from '../../../scripts/Authentication';
+import IconCalendar from '../../icons/IconCalendar.vue';
+import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
+import { messages } from '../../../reactives/messages';
 export default {
     data() {
         return {
@@ -130,13 +199,14 @@ export default {
             fetching: true,
             offer: null,
             daysAgo: '',
-            transfers: []
+            loan: null,
+            claimingCollateral: false
         };
     },
     methods: {
-        fetchOffer: async function () {
+        fetchOffer: async function (fetching) {
             let id = this.$route.params.id;
-            this.fetching = true;
+            this.fetching = fetching;
             if (this.userAddress == null) {
                 return;
             }
@@ -144,6 +214,15 @@ export default {
                 this.offer = response.data;
                 this.getDaysAgo(this.offer.createdAt)
                 this.fetching = false;
+
+                if (this.offer.creator != this.userAddress.toLowerCase()) {
+                    this.offer.loans.forEach(loan => {
+                        if (loan.borrower == this.userAddress.toLowerCase()) {
+                            this.loan = loan
+                        }
+                    })
+                }
+
             }).catch(error => {
                 console.error(error);
             });
@@ -156,13 +235,38 @@ export default {
                 daysAgo = 1
             }
             this.daysAgo = daysAgo.toFixed(0)
+        },
+        claimCollateral: async function () {
+            this.claimingCollateral = true
+            const trx = await LendingPoolAPI.claimCollateral(
+                this.loan.loanId,
+                await Authentication.userAddress()
+            )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Collateral claimed',
+                    description: 'Collateral was successfully claimed.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+            } else {
+                messages.insertMessage({
+                    title: 'Claim failed',
+                    description: 'Collateral failed to claim.',
+                    type: 'failed'
+                })
+            }
+
+            this.claimingCollateral = false
+            this.fetchOffer(false)
         }
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-        this.fetchOffer();
-    },
-    components: { ProgressBox }
+        this.fetchOffer(true);
+    }
 }
 </script>
 
@@ -307,6 +411,10 @@ main {
     text-align: center;
 }
 
+.dashboard2 .first_row {
+    border: none;
+}
+
 .offer .first_row svg {
     width: 25px;
     height: 25px;
@@ -401,6 +509,9 @@ main {
     padding: 30px;
     padding-bottom: 20px;
     font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     color: var(--textnormal);
     border-bottom: 2px solid var(--background);
 }
@@ -457,5 +568,19 @@ main {
 
 .table {
     margin-top: 60px;
+}
+
+.emission_action2 {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard2 .emission_grid {
+    grid-template-columns: auto 150px;
+    border: none;
+}
+
+.dashboard2 .emission_grid>div {
+    padding: 15px 30px;
 }
 </style>

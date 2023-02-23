@@ -310,7 +310,6 @@ const LendingPoolAPI = {
         }
     },
 
-
     cancelRequest: async function (
         requestId,
         userAddress

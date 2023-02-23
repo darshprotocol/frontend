@@ -51,7 +51,7 @@
                             <div class="extra_user">0</div>
                         </div>
                         <div class="users" v-else>
-                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
+                            <img v-for="(loan, index) in offer.loans" :src="`/images/user${index + 1}.png`"  :key="loan.loanId" alt="">
                             <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
 

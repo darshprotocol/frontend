@@ -17,7 +17,7 @@
                     <td>Duration</td>
                     <td>Payback</td>
                     <td>Interest</td>
-                    <td>Collateral %</td>
+                    <td>Collateral</td>
                     <td>Expires in</td>
                     <td>Actions</td>
                     <td></td>
@@ -29,39 +29,41 @@
                     <tr>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(getPrincipal(request.percentage))) }}</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconClock />
-                                <p>30 days</p>
+                                <p>{{ request.daysToMaturity }} days</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney(getPayback(request)) }}</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconInterest />
-                                <p>8.50 %</p>
+                                <p>{{ getInterest(request.interest, request.daysToMaturity) }} %</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <p><span>110%</span> in</p>
-                                <img src="/images/usdc.png" alt="">
+                                <img :src="`/images/${$findAsset(request.collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(request.collateralAmount), 3) }}</p>
                             </div>
                         </td>
                         <td>
-                            <p>2 days</p>
+                            <p>{{ getExpire(request) }} hours</p>
                         </td>
                         <td>
-                            <div class="action accept">Accept</div>
+                            <div v-if="accepting == request.requestId" class="action accept">•••</div>
+                            <div v-else v-on:click="accepting != -1 ? acceptRequest(request) : null" class="action accept">
+                                Accept</div>
                         </td>
                         <td>
                             <div class="action reject">Reject</div>
@@ -92,7 +94,38 @@ import IconSort from '../../../icons/IconSort.vue';
 
 <script>
 export default {
-    props: ["offer"]
+    props: ["offer"],
+    methods: {
+        getPrincipal: function (percentage) {
+            let principal = this.offer.initialPrincipal * (percentage / 100);
+            return principal.toString();
+        },
+        getPayback: function (request) {
+            let accrued = this.$fromWei(this.getAccrued(request));
+            let principal = this.$fromWei(this.getPrincipal(request.percentage));
+            return Number(accrued) + Number(principal);
+        },
+        getAccrued: function (request) {
+            let duration = request.daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(request.interest);
+            let principalAmount = (this.getPrincipal(request.percentage));
+            let accrued = (principalAmount * interest * duration) / 100;
+            return accrued;
+        },
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
+        },
+        getExpire: function (request) {
+            let expire = request.expiresAt;
+            let now = Date.now() / 1000;
+            let elasped = expire - now;
+            if (elasped <= 0)
+                return 0;
+            return (elasped / 60 / 60).toFixed(0);
+        }
+    }
 }
 </script>
 
@@ -181,6 +214,11 @@ export default {
 
 .request_table tbody td {
     height: 90px;
+}
+
+td img {
+    width: 20px;
+    height: 20px;
 }
 
 .request_table tbody td div {

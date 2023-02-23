@@ -58,7 +58,7 @@
                                     <div class="extra_user">0</div>
                                 </div>
                                 <div class="users" v-else>
-                                    <img v-for="index in offer.loans" :key="index" src="/images/user1.png" alt="">
+                                    <img v-for="(loan, index) in offer.loans" :key="index" :src="`/images/user${index + 1}.png`" alt="">
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
                                 <div class="date" v-if="offer.loans.length == 0">
@@ -97,8 +97,8 @@
                             </div>
                         </div>
                     </div>
-                    <RequestTable :offer="offer" />
-                    <div class="t_empty" v-if="offer.requests.filter(off => off.state == 0).length == 0">
+                    <RequestTable :offer="offer" v-on:done="fetchLendingOffer(false)" />
+                    <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
                         <img src="../../../../assets/images/receipt-text.png" alt="">
                         <p>No Borrow Requests found.</p>
                     </div>
@@ -237,6 +237,17 @@ export default {
         },
         getLenderScore: async function (address) {
             this.lenderScore = await HealthScore.getHealthScore(address);
+        },
+        sortRequests: function (requests) {
+            if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
+                return requests.filter(request => request.state == 0)
+            }
+            else {
+                return requests.filter(request =>
+                    (request.creator == this.userAddress.toLowerCase() && 
+                    (request.state != 1 || request.state != 3)) || request.state == 0
+                )
+            }
         }
     }
 }

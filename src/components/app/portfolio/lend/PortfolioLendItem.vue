@@ -35,10 +35,6 @@
                         </div>
                     </RouterLink>
                 </div>
-                <!-- <PrimaryButton v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()"
-                                                                                :text="'Create'" /> -->
-                <!-- <PrimaryButton v-else :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()"
-                                                                                :width="'220px'" /> -->
             </div>
         </div>
         <div class="dashboard">
@@ -87,7 +83,7 @@
                         <div class="extra_user">0 <span>Borrowers</span></div>
                     </div>
                     <div class="borrowers" v-else>
-                        <img v-for="loan in offer.loans" :key="loan.loanId" src="/images/user1.png" />
+                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId" :src="`/images/user${index + 1}.png`" />
                         <div class="extra_user">{{ offer.loans.length }} <span>Borrowers</span></div>
                     </div>
                     <div class="expires_at" v-if="offer.loans.length == 0">
@@ -112,6 +108,9 @@
         </div>
 
         <RequestTable class="table" :offer="offer" />
+
+        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+            v-on:close="requestAction = null" />
     </main>
 </template>
 
@@ -129,6 +128,7 @@ import ProgressBox from '../../../ProgressBox.vue';
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
 import IconOut from '../../../icons/IconOut.vue';
+import RequestPopUpInfo from '../../discover/borrow/RequestPopUpInfo.vue';
 export default {
     data() {
         return {
@@ -160,7 +160,6 @@ export default {
             this.axios.get(`https://darshprotocol.onrender.com/offers/${id}?creator=${this.userAddress.toLowerCase()}`).then(response => {
                 this.offer = response.data;
                 this.fetching = false;
-
                 if (this.offer) {
                     this.getDueDate();
                 }
@@ -173,7 +172,8 @@ export default {
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchBorrowingOffer();
-    }
+    },
+    components: { RequestPopUpInfo }
 }
 </script>
 
