@@ -19,10 +19,14 @@
                             <p>{{ asset.symbol }}</p>
                         </td>
                         <td>
-                            <PrimaryButton v-on:click="mint(asset)" :width="'fit-content'" :text="'Mint'" />
+                            <PrimaryButton :state="mintingFor != null ? 'disable' : ''"
+                                :progress="mintingFor == asset.address" v-on:click="mintingFor == null ? mint(asset) : null"
+                                :width="'fit-content'" :text="'Mint'" />
                         </td>
                         <td>
-                            <PrimaryButton v-on:click="add(asset)" :width="'fit-content'" :text="'Add to Metamask'" />
+                            <PrimaryButton :state="addingFor != null ? 'disable' : ''"
+                                :progress="addingFor == asset.address" v-on:click="addingFor == null ? add(asset) : null"
+                                :width="'fit-content'" :text="'Add to Metamask'" />
                         </td>
                     </tr>
                 </tbody>
@@ -43,12 +47,16 @@ import { messages } from '../../reactives/messages';
 export default {
     data() {
         return {
-            assets: AssetLibrary.assets
+            assets: AssetLibrary.assets,
+            mintingFor: null,
+            addingFor: null
         };
     },
     methods: {
         mint: async function (asset) {
-           const trx = await Approval.faucetMint(
+            this.mintingFor = asset.address
+
+            const trx = await Approval.faucetMint(
                 asset,
                 await Authentication.userAddress()
             )
@@ -61,7 +69,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.transactionHash}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Mint failed',
@@ -69,16 +76,19 @@ export default {
                     type: 'failed'
                 })
             }
+
+            this.mintingFor = null
         },
         add: async function (asset) {
-           const added = await Approval.addToMetamask(asset)
-           if (added) {
+            this.addingFor = asset.address
+
+            const added = await Approval.addToMetamask(asset)
+            if (added) {
                 messages.insertMessage({
                     title: 'Token added',
                     description: 'Token has been successfully added to metamask.',
                     type: 'success'
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Adding failed',
@@ -86,6 +96,8 @@ export default {
                     type: 'failed'
                 })
             }
+
+            this.addingFor = null
         }
     }
 }
