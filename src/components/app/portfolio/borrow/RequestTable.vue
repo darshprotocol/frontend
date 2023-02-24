@@ -2,8 +2,8 @@
     <main>
         <div class="table_head">
             <div class="title">
-                <p>Borrow Requests</p>
-                <span>10</span>
+                <p>Lend Requests</p>
+                <span>{{ offer.requests.length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -17,7 +17,7 @@
                     <td>Duration</td>
                     <td>Payback</td>
                     <td>Interest</td>
-                    <td>Collateral %</td>
+                    <td>Collateral</td>
                     <td>Expires in</td>
                     <td>Actions</td>
                     <td></td>
@@ -25,43 +25,45 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="index in 6" :key="index">
+                <tbody v-for="request in offer.requests" :key="request._id">
                     <tr>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(getPrincipal(request.percentage))) }}</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconClock />
-                                <p>30 days</p>
+                                <p>{{ request.daysToMaturity }} days</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <img src="/images/usdc.png" alt="">
-                                <p>60,000</p>
+                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney(getPayback(request)) }}</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconInterest />
-                                <p>8.50 %</p>
+                                <p>{{ getInterest(request.interest, request.daysToMaturity) }} %</p>
                             </div>
                         </td>
                         <td>
                             <div>
-                                <p><span>110%</span> in</p>
-                                <img src="/images/usdc.png" alt="">
+                                <img :src="`/images/${$findAsset(request.collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(request.collateralAmount), 3) }}</p>
                             </div>
                         </td>
                         <td>
-                            <p>2 days</p>
+                            <p>{{ getExpire(request) }} hours</p>
                         </td>
                         <td>
-                            <div class="action accept">Accept</div>
+                            <div v-if="accepting == request.requestId" class="action accept">•••</div>
+                            <div v-else v-on:click="accepting != -1 ? acceptRequest(request) : null" class="action accept">
+                                Accept</div>
                         </td>
                         <td>
                             <div class="action reject">Reject</div>
@@ -77,10 +79,13 @@
                     </tr>
                 </tbody>
             </div>
+            <div class="t_empty" v-if="offer.requests.length == 0">
+                <img src="../../../../assets/images/receipt-text.png" alt="">
+                <p>No Borrow Requests found.</p>
+            </div>
         </table>
     </main>
 </template>
-
 <script setup>
 import IconOut from '../../../icons/IconOut.vue';
 import IconSort from '../../../icons/IconSort.vue';
@@ -88,7 +93,7 @@ import IconSort from '../../../icons/IconSort.vue';
 
 <script>
 export default {
-    props: ["requests"]
+    props: ["offer"]
 }
 </script>
 
@@ -179,6 +184,11 @@ export default {
     height: 90px;
 }
 
+td img {
+    width: 20px;
+    height: 20px;
+}
+
 .request_table tbody td div {
     display: flex;
     align-items: center;
@@ -227,5 +237,21 @@ export default {
 .link svg {
     width: 14px;
     height: 14px;
+}
+
+.t_empty {
+    width: 100%;
+    height: 298px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.t_empty p {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 </style>

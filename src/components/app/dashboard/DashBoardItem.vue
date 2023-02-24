@@ -156,7 +156,7 @@ export default {
                 enabled: false
             },
             series: [{
-                name: 'Score',
+                name: 'TVL',
                 data: [30, 50, 31, 20, 49, 60, 40, 91, 125, 30, 21],
             }],
             xaxis: {

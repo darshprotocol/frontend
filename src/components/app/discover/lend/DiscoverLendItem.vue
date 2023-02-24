@@ -154,12 +154,12 @@ import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import LendRequestPopUp from './LendRequestPopUp.vue';
 import LoanBoxes from './LoanBoxes.vue';
 import BorrowerStats from './LenderStats.vue';
-import Countdown from '../../../../utils/Countdown';
-import Authentication from '../../../../scripts/Authentication';
-import HealthScore from '../../../../scripts/DarshScore'
 </script>
 
 <script>
+import Countdown from '../../../../utils/Countdown';
+import Authentication from '../../../../scripts/Authentication';
+import HealthScore from '../../../../scripts/DarshScore'
 export default {
     data() {
         return {

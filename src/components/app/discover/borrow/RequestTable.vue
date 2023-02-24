@@ -94,7 +94,6 @@
             </div>
         </table>
 
-
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
             v-on:close="requestAction = null" v-on:done="$emit(done)" />
 
@@ -120,8 +119,7 @@ export default {
             activeRequest: '',
             userAddress: '',
             requestAction: null,
-            cancelRequest: null,
-            accepting: -1
+            cancelRequest: null
         };
     },
     methods: {

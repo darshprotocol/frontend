@@ -10,68 +10,90 @@
             <div class="toolbar">
                 <div class="path">
                     <RouterLink :to="`/discover/lend/${this.$route.params.id}`">
-                        <p>My Lend Offer</p>
+                        <p>My Borrow Offer</p>
                     </RouterLink>
                     <span>/</span>
                     <p class="cr">Manage Offer</p>
                 </div>
-                <div class="buttons">
+                <div class="buttons" v-if="offer.loans.length == 0">
                     <PrimaryButton :text="'Edit'" :state="''" />
                     <div class="edit_icon" v-on:click="editOptions = !editOptions">
                         <IconMenu :color="'var(--textnormal)'" />
                         <div class="edit_options" v-if="editOptions">
                             <div class="edit_option">Close Offer</div>
-                            <div class="edit_option">Loan's Vault</div>
+                            <RouterLink :to="`/vault/${offer._id}`">
+                                <div class="edit_option">Loan's Vault</div>
+                            </RouterLink>
                         </div>
                     </div>
                 </div>
-                <!-- <PrimaryButton v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createOffer()"
-                                                                :text="'Create'" /> -->
-                <!-- <PrimaryButton v-else :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()"
-                                                                :width="'220px'" /> -->
+                <div class="buttons" v-else>
+                    <RouterLink :to="`/vault/${offer._id}`">
+                        <div class="go_to_vault">
+                            <p>Go to Loan's Vault</p>
+                            <IconOut :color="'var(--textnormal)'" />
+                        </div>
+                    </RouterLink>
+                </div>
             </div>
         </div>
         <div class="dashboard">
             <div class="first_row">
                 <div class="first_row_item">
-                    <img src="/images/usdc.png" alt="">
-                    <p class="deep_text">10,000 <span>USDC</span></p>
-                    <p class="light_text">My Principal</p>
+                    <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                    <p class="deep_text">{{ $toMoney($fromWei(offer.initialPrincipal)) }} <span>{{
+                        $findAsset(offer.principalToken).symbol }}</span></p>
+                    <p class="light_text">Principal needed</p>
                 </div>
                 <div class="first_row_item">
                     <div class="images">
-                        <img src="/images/btc.png" alt="">
-                        <img src="/images/ftm.png" alt="">
-                        <img src="/images/eth.png" alt="">
+                        <img :src="`/images/${$findAsset(offer.collateralToken).image}.png`" alt="">
                     </div>
-                    <p class="deep_text">3 <span>Natives</span></p>
-                    <p class="light_text">Collateral Types</p>
+                    <p class="deep_text">{{ $nFormat($fromWei(offer.initialCollateral)) }} <span>{{
+                        $findAsset(offer.collateralToken).symbol }}</span></p>
+                    <p class="light_text">My collateral</p>
                 </div>
                 <div class="first_row_item">
                     <IconClock />
-                    <p class="deep_text">25 <span>Days</span></p>
+                    <p class="deep_text">{{ offer.daysToMaturity }} <span>Days</span></p>
                     <p class="light_text">Duration</p>
                 </div>
                 <div class="first_row_item">
                     <IconInterest />
-                    <p class="deep_text">8.50 %</p>
-                    <p class="light_text">My Principal</p>
+                    <p class="deep_text">{{ getInterest(offer.interest, offer.daysToMaturity) }} %</p>
+                    <p class="light_text">Interest</p>
                 </div>
                 <div class="first_row_item">
                     <IconChart />
-                    <p class="deep_text">10k<span>/10k USDC</span></p>
-                    <p class="light_text">Remaining Principal</p>
+                    <p class="deep_text">{{ $nFormat($fromWei(offer.currentCollateral)) }}<span>/{{
+                        $nFormat($fromWei(offer.initialCollateral)) }} {{ $findAsset(offer.collateralToken).symbol
+    }}</span></p>
+                    <p class="light_text">Remaining collateral</p>
                 </div>
             </div>
             <div class="second_row">
                 <div class="second_row_item">
-                    <div class="borrowers">
+                    <div class="borrowers" v-if="offer.loans.length == 0">
                         <div class="img" v-for="index in 4" :key="index"></div>
-                        <div class="extra_user">0 <span>Borrowers</span></div>
+                        <div class="extra_user">0 <span>Lenders</span></div>
                     </div>
-                    <div class="expires_at">
+                    <div class="borrowers" v-else>
+                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId" :src="`/images/user${index + 1}.png`" />
+                        <div class="extra_user">{{ offer.loans.length }} <span>Lenders</span></div>
+                    </div>
+                    <div class="expires_at" v-if="offer.loans.length == 0">
                         <p>Offer expire in</p>
-                        <p>3d : 8h : 20min</p>
+                        <p>{{ dueDate }}</p>
+                    </div>
+                    <div class="total_borrowed" v-else>
+                        <div>
+                            <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
+                            <p>
+                                {{ $toMoney(($fromWei(offer.initialPrincipal) - $fromWei(offer.currentPrincipal))) }}
+                                {{ $findAsset(offer.principalToken).symbol }}
+                            </p>
+                        </div>
+                        <p>Total Principal Lent</p>
                     </div>
                 </div>
                 <div class="second_row_item">
@@ -80,7 +102,10 @@
             </div>
         </div>
 
-        <RequestTable class="table" />
+        <RequestTable class="table" :offer="offer" />
+
+        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+            v-on:close="requestAction = null" />
     </main>
 </template>
 
@@ -96,16 +121,30 @@ import ProgressBox from '../../../ProgressBox.vue';
 
 <script>
 import Authentication from '../../../../scripts/Authentication';
+import RequestPopUpInfo from '../../discover/borrow/RequestPopUpInfo.vue';
+import Countdown from '../../../../utils/Countdown';
 export default {
     data() {
         return {
             fetching: true,
             userAddress: null,
             editOptions: false,
-            offer: null
+            offer: null,
+            dueDate: ""
         };
     },
     methods: {
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
+        },
+        getDueDate: function () {
+            let due = this.offer.expiresAt * 1000;
+            Countdown.start(due, (text) => {
+                this.dueDate = text;
+            });
+        },
         fetchBorrowingOffer: async function () {
             let id = this.$route.params.id;
             this.fetching = true;
@@ -115,6 +154,9 @@ export default {
             this.axios.get(`https://darshprotocol.onrender.com/offers/${id}?creator=${this.userAddress.toLowerCase()}`).then(response => {
                 this.offer = response.data;
                 this.fetching = false;
+                if (this.offer) {
+                    this.getDueDate();
+                }
             }).catch(error => {
                 console.error(error);
                 // this.fetching = false;
@@ -123,8 +165,9 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-        this.fetchBorrowingOffer()
-    }
+        this.fetchBorrowingOffer();
+    },
+    components: { RequestPopUpInfo }
 }
 </script>
 
@@ -371,5 +414,4 @@ export default {
 .table {
     padding: 0 60px;
     margin-top: 60px;
-}
-</style>
+}</style>

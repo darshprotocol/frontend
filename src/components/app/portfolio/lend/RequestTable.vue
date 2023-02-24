@@ -3,7 +3,7 @@
         <div class="table_head">
             <div class="title">
                 <p>Borrow Requests</p>
-                <span>{{ offer.requests.length }}</span>
+                <span>{{ sortRequests(offer.requests).length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="request in offer.requests" :key="request._id">
+                <tbody v-for="request in sortRequests(offer.requests)" :key="request._id">
                     <tr>
                         <td>
                             <div>
@@ -61,12 +61,11 @@
                             <p>{{ getExpire(request) }} hours</p>
                         </td>
                         <td>
-                            <div v-if="accepting == request.requestId" class="action accept">•••</div>
-                            <div v-else v-on:click="accepting != -1 ? acceptRequest(request) : null" class="action accept">
+                            <div v-on:click="setRequestAction('accept', request)" class="action accept">
                                 Accept</div>
                         </td>
                         <td>
-                            <div class="action reject">Reject</div>
+                            <div v-on:click="setRequestAction('reject', request)" class="action reject">Reject</div>
                         </td>
                         <td>
                             <RouterLink :to="''">
@@ -79,23 +78,45 @@
                     </tr>
                 </tbody>
             </div>
-            <div class="t_empty" v-if="offer.requests.length == 0">
+            <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
                 <img src="../../../../assets/images/receipt-text.png" alt="">
                 <p>No Borrow Requests found.</p>
             </div>
         </table>
+
+        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+            v-on:close="requestAction = null" />
     </main>
 </template>
 
 <script setup>
+import Authentication from '../../../../scripts/Authentication';
 import IconOut from '../../../icons/IconOut.vue';
 import IconSort from '../../../icons/IconSort.vue';
+import RequestPopUpInfo from '../../discover/borrow/RequestPopUpInfo.vue';
 </script >
 
 <script>
 export default {
     props: ["offer"],
+    data() {
+        return {
+            activeRequest: '',
+            userAddress: '',
+            requestAction: null,
+            accepting: -1
+        };
+    },
     methods: {
+        sortRequests: function(requests) {
+            return requests.filter(request => request.state == 0)
+        },
+        setRequestAction: function (action, request) {
+            this.requestAction = {
+                action: action,
+                request: request
+            }
+        },
         getPrincipal: function (percentage) {
             let principal = this.offer.initialPrincipal * (percentage / 100);
             return principal.toString();
@@ -124,7 +145,10 @@ export default {
             if (elasped <= 0)
                 return 0;
             return (elasped / 60 / 60).toFixed(0);
-        }
+        },
+    },
+    async created() {
+        this.userAddress = await Authentication.userAddress();
     }
 }
 </script>

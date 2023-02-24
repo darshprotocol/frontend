@@ -9,8 +9,16 @@
                     <span>/</span>
                     <p class="cr">Create Borrow Offer</p>
                 </div>
-                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(collateralAmount)" v-on:click="createBorrowingOffer()" :text="'Create'" :width="'180px'" />
-                <PrimaryButton v-else v-on:click="approve()" :text="'Approve'" :width="'180px'" />
+                <PrimaryButton v-if="(collateralAmount <= 0 || !checkbox)" :width="'160px'" :text="'Create'"
+                    :state="'disable'" />
+
+                <PrimaryButton v-else-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
+                    :progress="(creating || fetchingPrice)" :state="(creating || fetchingPrice) ? 'disable' : ''"
+                    v-on:click="createBorrowingOffer()" :text="'Create'" :width="'160px'" />
+
+                <PrimaryButton v-else :progress="(approving || fetchingPrice)" v-on:click="approve()"
+                    :state="(approving || fetchingPrice) ? 'disable' : ''"
+                    :text="`Approve ${$findAsset(collateralToken).symbol}`" :width="'200px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -111,8 +119,8 @@
                             </div>
                         </div>
                         <div>
-                            <input type="checkbox" name="" id="">
-                            <p>Read and Agreed to our <a href="" target="_blank">Terms & Policy?</a></p>
+                            <input type="checkbox" v-model="checkbox">
+                            <p>Read and Agreed to our <a href="/terms" target="_blank">Terms & Policy?</a></p>
                         </div>
                     </div>
                 </div>
@@ -133,11 +141,12 @@ import LtvAPI from '../../../scripts/LtvAPI';
 import LendingPoolAPI from '../../../scripts/LendingPoolAPI'
 import Authentication from '../../../scripts/Authentication';
 import CovalentAPI from '../../../utils/CovalentAPI'
+import { messages } from '../../../reactives/messages';
 export default {
     data() {
         return {
             principalAmount: 0,
-            collateralAmount : '0',
+            collateralAmount: '0',
             principalToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             collateralToken: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             tokenBalances: [],
@@ -145,7 +154,10 @@ export default {
             daysToMaturity: 15,
             hoursToExpire: 24,
             allowance: '0',
+            checkbox: false,
             creating: false,
+            approving: false,
+            fetchingPrice: false,
             dropDown1: false,
             dropDown2: false
         };
@@ -231,25 +243,32 @@ export default {
             this.allowance = amount
         },
         approve: async function () {
+            if (this.approving) return
+            this.approving = true
             await this.$approve(
                 await Authentication.userAddress(),
                 this.collateralToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
         getCollateralAmount: async function () {
+            this.fetchingPrice = true
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.principalToken,
                 this.collateralToken,
                 this.$toWei(this.principalAmount),
                 await Authentication.userAddress()
             )
+            this.fetchingPrice = false
             this.collateralAmount = collateralAmount.toString()
 
             this.getAllowance()
         },
         createBorrowingOffer: async function () {
+            if (this.creating || this.fetchingPrice) return
+
             this.creating = true;
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
@@ -263,9 +282,29 @@ export default {
                 this.hoursToExpire,
                 await Authentication.userAddress()
             );
-            if (!trx) {
-                console.error("Create Offer Failed");
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Offer created',
+                    description: 'Borrowing offer successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+
+                this.principalAmount = '0'
+                this.collateralTokens = []
+                this.interest = 2
+                this.daysToMaturity = 15
+                this.daysToExpire = 7
+            } else {
+                messages.insertMessage({
+                    title: 'Offer not created',
+                    description: 'Borrowing offer was not successfully created.',
+                    type: 'failed'
+                })
             }
+
             this.creating = false;
         },
         incrementDuration: function () {
@@ -290,12 +329,12 @@ export default {
         },
         incrementInterest: function () {
             if (this.interest < 24) {
-                this.interest += 1;
+                this.interest += 0.5;
             }
         },
         decrementInterest: function () {
             if (this.interest > 1) {
-                this.interest -= 1;
+                this.interest -= 0.5;
             }
         },
         getInputWidth: function (value) {

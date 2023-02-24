@@ -53,7 +53,7 @@
                     </div>
                     <p class="deep_text">{{ offer.collateralTokens.length }}
                         <span v-if="$findAsset(offer.collateralTokens[0]).type == 'stable'">Stables</span>
-                        <span v-if="$findAsset(offer.collateralTokens[0]).type == 'variable'">Natives</span>
+                        <span v-if="$findAsset(offer.collateralTokens[0]).type == 'native'">Natives</span>
                     </p>
                     <p class="light_text">Collateral Types</p>
                 </div>
@@ -73,7 +73,7 @@
                         $nFormat($fromWei(offer.initialPrincipal)) }}
                             {{ $findAsset(offer.principalToken).symbol }}</span>
                     </p>
-                    <p class="light_text">Remaining Principal</p>
+                    <p class="light_text">Remaining principal</p>
                 </div>
             </div>
             <div class="second_row">
@@ -108,9 +108,6 @@
         </div>
 
         <RequestTable class="table" :offer="offer" />
-
-        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
-            v-on:close="requestAction = null" />
     </main>
 </template>
 
@@ -128,7 +125,6 @@ import ProgressBox from '../../../ProgressBox.vue';
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
 import IconOut from '../../../icons/IconOut.vue';
-import RequestPopUpInfo from '../../discover/borrow/RequestPopUpInfo.vue';
 export default {
     data() {
         return {
@@ -172,8 +168,7 @@ export default {
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchBorrowingOffer();
-    },
-    components: { RequestPopUpInfo }
+    }
 }
 </script>
 

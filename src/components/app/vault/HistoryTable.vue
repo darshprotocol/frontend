@@ -37,8 +37,8 @@
                         <td>
                             <div>
                                 <IconAddCircle v-if="transfer.type == 0" />
-                                <IconLock v-if="transfer.type == 1" />
-                                <IconCoin v-if="transfer.type == 2" />
+                                <IconCoin v-if="transfer.type == 1" />
+                                <IconLock v-if="transfer.type == 2" />
                                 <IconMinusCircle v-if="transfer.type == 3" />
 
                                 <p v-if="transfer.type == 0">Adds</p>

@@ -9,12 +9,14 @@
                     <span>/</span>
                     <p class="cr">Create Lend Offer</p>
                 </div>
-                <PrimaryButton v-if="principalAmount == ''" :text="'Create'" :state="'disable'" />
-                <PrimaryButton :progress="creating" v-else-if="$fromWei(allowance) >= safePrincipal()"
-                    v-on:click="createOffer()" :text="'Create'" :width="'220px'" />
-                    
-                <PrimaryButton v-else :progress="approving" :text="`Approve ${$findAsset(principalToken).symbol}`"
-                    v-on:click="approve()" :width="'220px'" />
+                <PrimaryButton v-if="(principalAmount <= 0 || !checkbox || collateralTokens.length == 0)" :width="'160px'" :text="'Create'"
+                    :state="'disable'" />
+
+                <PrimaryButton :state="creating ? 'disable' : ''" :progress="creating" v-else-if="$fromWei(allowance) >= safePrincipal()"
+                    v-on:click="createOffer()" :text="'Create'" :width="'160px'" />
+
+                <PrimaryButton v-else :progress="approving" :state="approving ? 'disable' : ''"
+                    :text="`Approve ${$findAsset(principalToken).symbol}`" v-on:click="approve()" :width="'200px'" />
             </div>
             <div class="create_form">
                 <h3>Create Offer</h3>
@@ -115,8 +117,8 @@
                             </div>
                         </div>
                         <div>
-                            <input type="checkbox" name="" id="">
-                            <p>Read and Agreed to our <a href="" target="_blank">Terms & Policy?</a></p>
+                            <input type="checkbox" v-model="checkbox">
+                            <p>Read and Agreed to our <a href="/terms" target="_blank">Terms & Policy?</a></p>
                         </div>
                     </div>
                 </div>
@@ -150,6 +152,7 @@ export default {
             interest: 2,
             daysToMaturity: 15,
             daysToExpire: 7,
+            checkbox: false,
             userAddress: null,
             creating: false,
             approving: false,
@@ -249,6 +252,7 @@ export default {
                 this.collateralTokens,
                 await Authentication.userAddress()
             );
+
             if (trx && trx.tx) {
                 messages.insertMessage({
                     title: 'Offer created',
@@ -266,7 +270,7 @@ export default {
             } else {
                 messages.insertMessage({
                     title: 'Offer not created',
-                    description: 'Lending was not successfully created.',
+                    description: 'Lending offer was not successfully created.',
                     type: 'failed'
                 })
             }
