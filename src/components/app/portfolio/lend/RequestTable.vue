@@ -93,7 +93,7 @@
 import Authentication from '../../../../scripts/Authentication';
 import IconOut from '../../../icons/IconOut.vue';
 import IconSort from '../../../icons/IconSort.vue';
-import RequestPopUpInfo from '../../discover/borrow/RequestPopUpInfo.vue';
+import RequestPopUpInfo from '../../discover/borrowers/RequestPopUpInfo.vue';
 </script >
 
 <script>

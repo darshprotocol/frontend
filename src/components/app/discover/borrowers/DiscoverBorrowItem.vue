@@ -8,8 +8,12 @@
             <div>
                 <div class="asset">
                     <div class="label">
-                        <p>Principal</p>
-                        <p>Collateral Types</p>
+                        <!---->
+                        <p>Principal needed</p>
+
+                        <!---->
+                        <p v-if="userType == 'borrower'">Total collateral</p>
+                        <p v-else>Borrower's collateral</p>
                     </div>
                     <div class="tokens">
                         <div>
@@ -19,8 +23,8 @@
                             }}</p>
                         </div>
                         <div>
-                            <img v-for="address in offer.collateralTokens" :src="`/images/${$findAsset(address).image}.png`"
-                                :key="address" alt="">
+                            <img :src="`/images/${$findAsset(offer.collateralToken).image}.png`" alt="">
+                            <p>{{ $toMoney($fromWei(offer.initialCollateral)) }}</p>
                         </div>
                     </div>
                 </div>
@@ -47,7 +51,7 @@
                                     {{
                                         $toMoney($fromWei(offer.initialPrincipal)) }}</p>
                             </div>
-                            <p>Borrowed</p>
+                            <p>Lent</p>
                         </div>
                     </div>
                     <div class="expire">
@@ -58,7 +62,7 @@
                                     <div class="extra_user">0</div>
                                 </div>
                                 <div class="users" v-else>
-                                    <img v-for="(loan, index) in offer.loans" :key="index" :src="`/images/user${index + 1}.png`" alt="">
+                                    <img v-for="index in offer.loans" :key="index" src="/images/user1.png" alt="">
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
                                 <div class="date" v-if="offer.loans.length == 0">
@@ -67,26 +71,25 @@
                                 </div>
                                 <div class="date2" v-else>
                                     <IconInformation :color="'var(--primary)'" />
-                                    <p class="b_info">Borrower's Info</p>
+                                    <p class="b_info">Lender's Info</p>
                                 </div>
                             </div>
                         </div>
                         <div class="borrow">
-                            <PrimaryButton v-if="borrowerLoan || userType != 'borrower'" :text="'Borrow'"
-                                :state="'disable'" />
-                            <PrimaryButton v-else v-on:click="borrow = true" :text="'Borrow'" />
+                            <PrimaryButton v-if="lenderLoan || userType != 'lender'" :text="'Lend'" :state="'disable'" />
+                            <PrimaryButton v-else v-on:click="lend = true" :text="'Lend'" />
                         </div>
                     </div>
                 </div>
                 <div class="request_section">
                     <div class="request_toolbar">
-                        <h3>Borrow Requests</h3>
+                        <h3>Lend Requests</h3>
                         <div>
                             <div class="sort">
                                 <IconSort />
                                 <p>Sort By</p>
                             </div>
-                            <div class="request_button" v-if="!borrowerLoan && userType == 'borrower' && !borrowerRequest"
+                            <div class="request_button" v-if="!lenderLoan && userType == 'lender' && !lenderRequest"
                                 v-on:click="request = true">
                                 <IconAdd />
                                 <p>Request</p>
@@ -97,8 +100,8 @@
                             </div>
                         </div>
                     </div>
-                    <RequestTable :offer="offer" v-on:done="fetchLendingOffer(false)" />
-                    <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
+                    <RequestTable :offer="offer" />
+                    <div class="t_empty" v-if="offer.requests.length == 0">
                         <img src="../../../../assets/images/receipt-text.png" alt="">
                         <p>No Borrow Requests found.</p>
                     </div>
@@ -106,7 +109,7 @@
             </div>
             <div>
                 <div class="sticky">
-                    <div class="created" v-if="userType != 'lender'">
+                    <div class="created" v-if="userType != 'borrower'">
                         <p>Owned by</p>
                         <div>
                             <div>
@@ -116,138 +119,132 @@
                             <img src="/images/user1.png" alt="">
                         </div>
                     </div>
-                    <div class="manage_offer" v-if="userType == 'lender'">
-                        <RouterLink :to="`/portfolio/lend/${offer._id}`">
+                    <div class="manage_offer" v-if="userType == 'borrower'">
+                        <RouterLink :to="`/portfolio/borrow/${offer._id}`">
                             <PrimaryButton class="manage_offer_button" :text="'Manage Offer'" />
                         </RouterLink>
                     </div>
                     <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
-                        :borrowerLoan="borrowerLoan" :userType="userType" v-on:done="fetchLendingOffer(false)" />
-                    <BorrowerStats v-if="userType != 'lender'" :score="lenderScore" />
+                        :lenderLoan="lenderLoan" :userType="userType" />
+                    <BorrowerStats v-if="userType != 'borrower'" :score="lenderScore" />
                 </div>
             </div>
         </div>
 
-        <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
-        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)" v-on:close="payback = false" />
-        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
-        <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
-            v-if="loanInfo && borrowerLoan" v-on:close="loanInfo = false" />
+        <LendRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
+        
+        <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="lenderLoan" v-if="payback && lenderLoan" v-on:close="payback = false" />
+        
+        <LendPopUp v-on:done="fetchLendingOffer(false)" v-if="lend" :offer="offer" v-on:close="lend = false" />
+        
+        <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo && lenderLoan"
+            v-on:close="loanInfo = false" />
     </main>
 </template>
 
 <script setup>
-import BorrowPopUp from '../borrow/BorrowPopUp.vue'
+import LendPopUp from './LendPopUp.vue'
 import LoanInfoPopUp from '../LoanInfoPopUp.vue'
 import IconClock from '../../../icons/IconClock.vue';
 import IconAdd from '../../../icons/IconAdd.vue'
 import IconChart from '../../../icons/IconChart.vue'
-import RequestTable from '../borrow/RequestTable.vue'
+import RequestTable from './RequestTable.vue'
 import PrimaryButton from '../../../PrimaryButton.vue';
 import IconInterest from '../../../icons/IconInterest.vue';
 import ProgressBox from '../../../ProgressBox.vue'
 import IconSort from '../../../icons/IconSort.vue';
 import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
-import BorrowRequestPopUp from './BorrowRequestPopUp.vue';
-import BorrowerStats from './BorrowerStats.vue';
-import IconInformation from '../../../icons/IconInformation.vue';
-</script >
+import LendRequestPopUp from './LendRequestPopUp.vue';
+import LoanBoxes from '../lenders/LoanBoxes.vue';
+import BorrowerStats from './LenderStats.vue';
+</script>
 
 <script>
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
-import LoanBoxes from './LoanBoxes.vue';
 import HealthScore from '../../../../scripts/DarshScore'
 export default {
     data() {
         return {
             offer: null,
-            countdown: "",
+            countdown: '',
             fetching: true,
-            userType: "none",
-            borrowerLoan: null,
-            borrowerRequest: null,
+            userType: 'none',
+            lenderLoan: null,
+            lenderRequest: null,
             userAddress: null,
             loanInfo: null,
-            lenderScore: "•••",
-            borrow: false,
+            lenderScore: '•••',
+            lend: false,
             payback: false,
             request: false
         };
     },
     async created() {
-        this.fetchLendingOffer();
-        this.userAddress = await Authentication.userAddress();
+        this.fetchLendingOffer()
+        this.userAddress = await Authentication.userAddress()
     },
     methods: {
         startCountdown: function () {
-            let to = this.offer.expiresAt * 1000;
-            let _this = this;
+            let to = this.offer.expiresAt * 1000
+            let _this = this
             Countdown.start(to, (countdown) => {
-                _this.countdown = countdown;
-            });
+                _this.countdown = countdown
+            })
         },
         getInterest: function (rate) {
-            let result = rate * this.offer.daysToMaturity * 24 * 60 * 60;
-            let interest = this.$fromWei(result.toString());
-            return this.$toMoney(interest);
+            let result = rate * this.offer.daysToMaturity * 24 * 60 * 60
+            let interest = this.$fromWei(result.toString())
+            return this.$toMoney(interest)
         },
         fetchLendingOffer: async function (fetching = true) {
             this.fetching = fetching;
             let id = this.$route.params.id;
             try {
-                let response = await this.axios.get(`https://darshprotocol.onrender.com/offers/${id}`);
-                this.offer = response.data;
+                let response = await this.axios.get(`https://darshprotocol.onrender.com/offers/${id}`)
+                this.offer = response.data
 
                 if (this.userAddress) {
-                    if (this.offer.creator != this.userAddress) {
-                        this.userType = "borrower";
-                    }
-                    else {
-                        this.userType = "lender";
+                    if (this.offer.creator.toLowerCase() == this.userAddress.toLowerCase()) {
+                        this.userType = 'borrower'
+                    } else {
+                        this.userType = 'lender'
                     }
 
                     this.offer.loans.forEach(loan => {
                         if (loan.borrower.toLowerCase() == this.userAddress) {
-                            this.borrowerLoan = loan;
-                            return;
-                        }
-                    });
-                    this.offer.requests.forEach(request => {
-                        if (request.creator.toLowerCase() == this.userAddress) {
-                            this.borrowerRequest = request
+                            this.lenderLoan = loan
                             return
                         }
                     })
+                    this.offer.requests.forEach(request => {
+                        if (request.creator.toLowerCase() == this.userAddress) {
+                            this.lenderRequest = request
+                            return
+                        }
+                    })
+                } else {
+                    this.userType = 'none'
                 }
-                else {
-                    this.userType = "none";
-                }
+
                 this.fetching = false;
-                this.startCountdown();
-                this.getLenderScore(this.offer.creator);
-            }
-            catch (error) {
+
+                this.startCountdown()
+                this.getBorrowerScore(this.offer.creator)
+            } catch (error) {
                 console.error(error);
             }
         },
+        reloadPage: async function () {
+            this.borrow = false
+            this.fetchLendingOffer(false)
+        },
         paybackCall: function () {
-            this.loanInfo = null;
-            this.payback = true;
+            this.loanInfo = null
+            this.payback = true
         },
-        getLenderScore: async function (address) {
-            this.lenderScore = await HealthScore.getHealthScore(address);
-        },
-        sortRequests: function (requests) {
-            if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
-                return requests.filter(request => request.state == 0)
-            }
-            else {
-                return requests.filter(request =>
-                    (request.creator == this.userAddress.toLowerCase() && 
-                    (request.state != 1 || request.state != 3)) || request.state == 0
-                )
-            }
+        getBorrowerScore: async function (address) {
+            this.lenderScore = await HealthScore.getHealthScore(address)
         }
     }
 }
@@ -305,21 +302,22 @@ export default {
 
 .asset .tokens>div:nth-child(2) img {
     width: 18px;
-    margin-left: -18px;
-}
-
-.asset .tokens>div:nth-child(2) img:first-child {
-    margin-left: 0;
 }
 
 .asset .tokens>div:nth-child(2) {
-    width: 58px;
+    padding: 0 8px;
+    gap: 8px;
     height: 30px;
     background: var(--bglighter);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
+}
+
+.asset .tokens>div:nth-child(2) p {
+    font-weight: 400;
+    font-size: 14px;
 }
 
 .info {
@@ -438,12 +436,6 @@ export default {
     margin-top: 6px;
 }
 
-.b_info {
-    font-size: 14px !important;
-    color: var(--textnormal) !important;
-    margin: 0 !important;
-}
-
 .users {
     display: flex;
     align-items: center;
@@ -476,9 +468,6 @@ export default {
     color: var(--textnormal);
     margin-left: -16px;
 }
-
-
-/* request_section */
 
 .request_section {
     width: 100%;
@@ -596,7 +585,40 @@ export default {
     margin-top: 2px;
 }
 
+.open_loans {
+    width: 100%;
+    padding: 30px;
+    background: var(--bglight);
+    border-radius: 6px;
+    margin-top: 40px;
+}
 
+.open_loans h3 {
+
+
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--textnormal);
+}
+
+.open_loans .box {
+    width: 100%;
+    height: 160px;
+    background: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.open_loans .box p {
+    font-weight: 500;
+    font-size: 12px;
+    text-align: center;
+    color: var(--textdimmed);
+}
 
 .t_empty {
     width: 100%;

@@ -16,12 +16,12 @@
             <div class="tab_items">
                 <RouterLink to="/discover">
                     <div :class="$route.name == 'discover-lend' ? 'tab tab_active' : 'tab'">
-                        <p>Lends</p>
+                        <p>Lenders</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/discover/borrow">
+                <RouterLink to="/discover/borrowers">
                     <div :class="$route.name == 'discover-borrow' ? 'tab tab_active' : 'tab'">
-                        <p>Borrows</p>
+                        <p>Borrowers</p>
                     </div>
                 </RouterLink>
             </div>

@@ -246,7 +246,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Request failed',
@@ -254,8 +253,11 @@ export default {
                     type: 'failed'
                 })
             }
-
+            
+            this.$emit('done')
             this.$emit('close')
+            
+            this.requesting = false
         },
         incrementDuration: function () {
             if (this.daysToMaturity < 60) {

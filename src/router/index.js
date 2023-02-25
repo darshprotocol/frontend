@@ -8,23 +8,24 @@ import VaultView from '../views/VaultView.vue'
 
 import FaucetPage from '../components/app/FaucetPage.vue'
 
-import DiscoverLend from '../components/app/discover/lend/DiscoverLend.vue'
-import DiscoverBorrow from '../components/app/discover/borrow/DiscoverBorrow.vue'
-import DiscoverStake from '../components/app/discover/stake/DiscoverStake.vue'
+import DiscoverLender from '../components/app/discover/lenders/DiscoverLender.vue'
+import DiscoverBorrower from '../components/app/discover/borrowers/DiscoverBorrower.vue'
+
+import StakePage from '../components/app/stake/StakePage.vue'
 
 import PortfolioLend from '../components/app/portfolio/lend/PortfolioLend.vue'
 import PortfolioBorrow from '../components/app/portfolio/borrow/PortfolioBorrow.vue'
-import PortfolioStake from '../components/app/portfolio/stake/PortfolioStake.vue'
 
-import DiscoverLendItem from '../components/app/discover/lend/DiscoverLendItem.vue'
-import DiscoverBorrowItem from '../components/app/discover/borrow/DiscoverBorrowItem.vue'
+import DiscoverLendItem from '../components/app/discover/lenders/DiscoverLendItem.vue'
+import DiscoverBorrowItem from '../components/app/discover/borrowers/DiscoverBorrowItem.vue'
 
-import CreateBorrowOffer from '../components/app/portfolio/CreateBorrowOffer.vue'
-import CreateLendOffer from '../components/app/portfolio/CreateLendOffer.vue'
+import CreateBorrowOffer from '../components/app/portfolio/borrow/CreateBorrowOffer.vue'
+import CreateLendOffer from '../components/app/portfolio/lend/CreateLendOffer.vue'
 
 import PortfolioLendItem from '../components/app/portfolio/lend/PortfolioLendItem.vue'
 import PortfolioBorrowItem from '../components/app/portfolio/borrow/PortfolioBorrowItem.vue'
 
+import PortfolioVault from '../components/app/portfolio/vault/PortfolioVault.vue'
 import VaultItem from '../components/app/vault/VaultItem.vue'
 
 import DashBoardItem from '../components/app/dashboard/DashBoardItem.vue'
@@ -57,12 +58,12 @@ const router = createRouter({
             {
               path: '/discover',
               name: 'discover-lend',
-              component: DiscoverLend
+              component: DiscoverLender
             },
             {
-              path: '/discover/borrow',
+              path: '/discover/borrowers',
               name: 'discover-borrow',
-              component: DiscoverBorrow
+              component: DiscoverBorrower
             }
           ]
         },
@@ -82,31 +83,31 @@ const router = createRouter({
               component: PortfolioBorrow
             },
             {
-              path: '/portfolio/stake',
-              name: 'portfolio-stake',
-              component: PortfolioStake
+              path: '/portfolio/vault/',
+              name: 'portfolio-vault',
+              component: PortfolioVault
             }
           ]
         },
         {
-          path: '/vault',
+          path: '/portfolio/vault',
           name: 'vault',
           component: VaultView,
           children: [
             {
-              path: '/vault/:id',
+              path: '/portfolio/vault/:id',
               name: 'portfolio-vault-id',
               component: VaultItem
             }
           ]
         },
         {
-          path: '/discover/lend/:id',
+          path: '/discover/lenders/:id',
           name: 'discover-lend-id',
           component: DiscoverLendItem
         },
         {
-          path: '/discover/borrow/:id',
+          path: '/discover/borrowers/:id',
           name: 'discover-borrow-id',
           component: DiscoverBorrowItem
         },
@@ -143,7 +144,7 @@ const router = createRouter({
         {
           path: '/stake',
           name: 'stake',
-          component: DiscoverStake
+          component: StakePage
         }
       ]
     }

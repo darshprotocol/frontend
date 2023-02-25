@@ -21,7 +21,7 @@
                         <IconMenu :color="'var(--textnormal)'" />
                         <div class="edit_options" v-if="editOptions">
                             <div class="edit_option">Close Offer</div>
-                            <RouterLink :to="`/vault/${offer._id}`">
+                            <RouterLink :to="`/portfolio/vault/${offer._id}`">
                                 <div class="edit_option">Loan's Vault</div>
                             </RouterLink>
                         </div>

@@ -3,63 +3,69 @@
         <div class="logo">
             <img src="../../assets/images/logo.png" alt="">
         </div>
-        <div class="tab_items">
-            <div class="tab_parent">
-                <RouterLink to="/discover">
-                    <div class="title">
-                        <IconDiscover />
-                        <h3>Discover</h3>
-                        <div :class="$route.name.startsWith('discover') ? 'indicator indicator_active' : 'indicator'"></div>
-                    </div>
-                </RouterLink>
-                <div class="tabs">
+        <div class="overflow">
+            <div class="tab_items">
+                <div class="tab_parent">
                     <RouterLink to="/discover">
-                        <div :class="$route.name.startsWith('discover-lend') ? 'tab tab_active' : 'tab'">Lenders</div>
+                        <div class="title">
+                            <IconDiscover />
+                            <h3>Discover</h3>
+                            <div :class="$route.name.startsWith('discover') ? 'indicator indicator_active' : 'indicator'">
+                            </div>
+                        </div>
                     </RouterLink>
-                    <RouterLink to="/discover/borrow">
-                        <div :class="$route.name.startsWith('discover-borrow') ? 'tab tab_active' : 'tab'">Borrowers</div>
+                    <div class="tabs">
+                        <RouterLink to="/discover">
+                            <div :class="$route.name.startsWith('discover-lend') ? 'tab tab_active' : 'tab'">Lenders</div>
+                        </RouterLink>
+                        <RouterLink to="/discover/borrowers">
+                            <div :class="$route.name.startsWith('discover-borrow') ? 'tab tab_active' : 'tab'">Borrowers
+                            </div>
+                        </RouterLink>
+                    </div>
+                </div>
+                <div class="tab_parent">
+                    <RouterLink to="/stake">
+                        <div class="title">
+                            <IconStake />
+                            <h3>Stake <span>Coming</span></h3>
+                            <div :class="$route.name.startsWith('stake') ? 'indicator indicator_active' : 'indicator'">
+                            </div>
+                        </div>
                     </RouterLink>
                 </div>
-            </div>
-            <div class="tab_parent">
-                <RouterLink to="/stake">
-                    <div class="title">
-                        <IconStake />
-                        <h3>Stake <span>Coming</span></h3>
-                        <div :class="$route.name.startsWith('stake') ? 'indicator indicator_active' : 'indicator'"></div>
-                    </div>
-                </RouterLink>
-            </div>
-            <div class="tab_parent">
-                <RouterLink to="/portfolio">
-                    <div class="title">
-                        <IconBriefcase />
-                        <h3>Portfolio</h3>
-                        <div :class="$route.name.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'">
-                        </div>
-                    </div>
-                </RouterLink>
-                <div class="tabs">
+                <div class="tab_parent">
                     <RouterLink to="/portfolio">
-                        <div :class="$route.name.startsWith('portfolio-lend') ? 'tab tab_active' : 'tab'">My Lends</div>
+                        <div class="title">
+                            <IconBriefcase />
+                            <h3>Portfolio</h3>
+                            <div :class="$route.name.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'">
+                            </div>
+                        </div>
                     </RouterLink>
-                    <RouterLink to="/portfolio/borrow">
-                        <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows</div>
-                    </RouterLink>
-                    <RouterLink to="/portfolio/stake">
-                        <div :class="$route.name.startsWith('portfolio-vault') ? 'tab tab_active' : 'tab'">Vaults</div>
+                    <div class="tabs">
+                        <RouterLink to="/portfolio">
+                            <div :class="$route.name.startsWith('portfolio-lend') ? 'tab tab_active' : 'tab'">My Lends</div>
+                        </RouterLink>
+                        <RouterLink to="/portfolio/borrow">
+                            <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows
+                            </div>
+                        </RouterLink>
+                        <RouterLink to="/portfolio/vault">
+                            <div :class="$route.name.startsWith('portfolio-vault') ? 'tab tab_active' : 'tab'">Vaults</div>
+                        </RouterLink>
+                    </div>
+                </div>
+                <div class="tab_parent">
+                    <RouterLink to="/darshboard">
+                        <div class="title">
+                            <IconCategory />
+                            <h3>Darshboard</h3>
+                            <div :class="$route.name.startsWith('darshboard') ? 'indicator indicator_active' : 'indicator'">
+                            </div>
+                        </div>
                     </RouterLink>
                 </div>
-            </div>
-            <div class="tab_parent">
-                <RouterLink to="/darshboard">
-                    <div class="title">
-                        <IconCategory />
-                        <h3>Darshboard</h3>
-                        <div :class="$route.name.startsWith('darshboard') ? 'indicator indicator_active' : 'indicator'">
-                        </div>
-                    </div>
-                </RouterLink>
             </div>
         </div>
         <div class="links">
@@ -125,12 +131,27 @@ main {
     height: 30px;
 }
 
+.overflow {
+    height: 70vh;
+    overflow-y: auto;
+}
+
+.overflow:hover::-webkit-scrollbar {
+    display: block;
+}
+
+.overflow::-webkit-scrollbar {
+    display: none;
+    width: 3px;
+}
+
 .tab_items {
     display: flex;
     margin-top: 60px;
     flex-direction: column;
     gap: 36px;
     align-items: flex-end;
+    padding-bottom: 10px;
 }
 
 .tab_parent {
@@ -210,6 +231,7 @@ main {
     left: 0;
     width: 100%;
     padding: 30px 40px;
+    background: var(--background);
 }
 
 .support {
@@ -237,5 +259,4 @@ main {
 .social_icon {
     width: 26px;
     height: 26px;
-}
-</style>
+}</style>

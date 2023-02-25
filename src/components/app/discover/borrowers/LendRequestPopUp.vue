@@ -91,9 +91,12 @@
                         </div>
                     </div>
                     <div>
-                        <PrimaryButton v-on:click="approve()" :text="'Approve'"
+                        <PrimaryButton :progress="approving" :state="approving ? 'disable' : ''"
+                            v-on:click="approving ? approve() : null" :text="'Approve'"
                             v-if="$fromWei(allowance) < $fromWei(getPrincipal())" />
-                        <PrimaryButton v-else v-on:click="createRequest()" :text="'Make Request'" />
+
+                        <PrimaryButton :progress="requesting" :state="requesting ? 'disable' : ''" v-else
+                            v-on:click="!requesting ? createRequest() : null" :text="'Make Request'" />
                     </div>
                 </div>
             </div>
@@ -113,6 +116,7 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 import Authentication from '../../../../scripts/Authentication'
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI'
 import Approval from '../../../../scripts/Approval'
+import { messages } from '../../../../reactives/messages';
 export default {
     props: ['offer'],
     data() {
@@ -122,7 +126,9 @@ export default {
             interest: 0,
             daysToMaturity: this.offer.daysToMaturity,
             hoursToExpire: 24,
-            dropDown: false
+            dropDown: false,
+            approving: false,
+            requesting: false
         }
     },
     watch: {
@@ -160,12 +166,13 @@ export default {
             this.allowance = amount
         },
         approve: async function () {
-            await Approval.approve(
+            this.approving = true
+            await this.$.approve(
                 await Authentication.userAddress(),
-                this.getPrincipal(),
                 this.offer.principalToken,
                 LendingPoolAPI.address
             )
+            this.approving = false
             this.getAllowance()
         },
         max: function () {
@@ -180,6 +187,7 @@ export default {
             return collateral.toString()
         },
         createRequest: async function () {
+            this.requesting = true
             let principalAmount = this.$fromWei(this.getPrincipal())
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
@@ -194,7 +202,27 @@ export default {
                 this.hoursToExpire,
                 await Authentication.userAddress()
             )
-            console.log(trx);
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Request placed',
+                    description: 'Lend request successfully created.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+            } else {
+                messages.insertMessage({
+                    title: 'Request failed',
+                    description: 'Lend request failed to create.',
+                    type: 'failed'
+                })
+            }
+            
+            this.$emit('done')
+            this.$emit('close')
+            
+            this.requesting = false
         },
         incrementDuration: function () {
             if (this.daysToMaturity < 60) {

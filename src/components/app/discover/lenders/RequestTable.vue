@@ -7,7 +7,6 @@
                     <td>Duration</td>
                     <td>Payback</td>
                     <td>Interest</td>
-                    <td>Collateral</td>
                     <td>Expires in</td>
                     <td>
                         <div class="menu"></div>
@@ -15,7 +14,9 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="request in sortRequests(offer.requests)" :class="'state' + request.state" :key="request._id">
+                <tbody v-for="request in sortRequests(offer.requests)"
+                    :class="(request.creator == userAddress.toLowerCase() ? 'owned ' : ' ') + ('state' + request.state)"
+                    :key="request._id">
                     <tr>
                         <td>
                             <div>
@@ -42,13 +43,7 @@
                             </div>
                         </td>
                         <td>
-                            <div>
-                                <img :src="`/images/${$findAsset(request.collateralToken).image}.png`" alt="">
-                                <p>{{ $toMoney($fromWei(request.collateralAmount), 3) }}</p>
-                            </div>
-                        </td>
-                        <td>
-                            <p>{{ getExpire(request) }} hours</p>
+                            <p>{{ getExpire(request) }} days</p>
                         </td>
                         <td v-if="isCreator()">
                             <div class="menu" v-on:click="activeRequest = request._id">
@@ -56,7 +51,7 @@
                             </div>
                         </td>
                         <td v-else>
-                            <div class="menu" v-if="isLender(request)" v-on:click="activeRequest = request._id">
+                            <div class="menu" v-if="isLender(request)" v-on:click="openMenu(request)">
                                 <IconMenu :color="'var(--textnormal)'" />
                             </div>
                             <div class="menu" v-else>
@@ -97,7 +92,7 @@
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
             v-on:close="requestAction = null" v-on:done="$emit(done)" />
 
-        <RequestPopUpInfo2 :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
+        <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
             v-on:close="cancelRequest = null" />
     </main>
 </template>
@@ -108,7 +103,7 @@ import IconClose from '../../../icons/IconClose.vue';
 import IconMenu from '../../../icons/IconMenu.vue'
 import IconOut from '../../../icons/IconOut.vue';
 import RequestPopUpInfo from './RequestPopUpInfo.vue';
-import RequestPopUpInfo2 from './RequestPopUpInfo2.vue';
+import RequestPopUpInfoCancel from './RequestPopUpInfoCancel.vue';
 </script>
 
 <script>
@@ -129,8 +124,8 @@ export default {
             }
             else {
                 return requests.filter(request =>
-                    (request.creator == this.userAddress.toLowerCase() && 
-                    (request.state != 1 || request.state != 3)) || request.state == 0
+                    (request.creator == this.userAddress.toLowerCase() &&
+                        (request.state != 1 || request.state != 3)) || request.state == 0
                 )
             }
         },
@@ -138,6 +133,13 @@ export default {
             this.requestAction = {
                 action: action,
                 request: request
+            }
+        },
+        openMenu: function (request) {
+            if (request.state == 0) {
+                this.activeRequest = request._id
+            } else if (request.state == 2) {
+                this.cancelRequest = request
             }
         },
         isCreator: function () {
@@ -168,13 +170,13 @@ export default {
             let elasped = expire - now;
             if (elasped <= 0)
                 return 0;
-            return (elasped / 60 / 60).toFixed(0);
+            return (elasped / 24 / 60 / 60).toFixed(0);
         },
         getPayback: function (request) {
             let accrued = this.$fromWei(this.getAccrued(request));
             let principal = this.$fromWei(this.getPrincipal(request.percentage));
             return Number(accrued) + Number(principal);
-        }
+        },
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
@@ -209,14 +211,9 @@ export default {
     visibility: hidden;
 }
 
-tbody:first-child {
-    border-top-right-radius: 6px;
-    border-top-left-radius: 6px;
-}
-
-tbody:last-child {
-    border-bottom-right-radius: 6px;
-    border-bottom-left-radius: 6px;
+.tbody {
+    overflow: hidden;
+    /* border-radius: 6px; */
 }
 
 .request_table tbody {
@@ -370,9 +367,27 @@ tbody:nth-child(even) .overlay {
     cursor: pointer;
 }
 
-
 /* state */
+.owned .menu {
+    background: var(--primary);
+}
+
+.state0 {
+    background: #1C172C !important;
+    border-bottom: 1px solid var(--primary);
+}
+
+.state0 .overlay {
+    background: #1C172C;
+}
+
+.state1 {
+    background: #202518 !important;
+    border-bottom: 1px solid var(--accentgreen);
+}
+
 .state2 {
-    border: 1px solid var(--accentred) !important;
+    background: #211715 !important;
+    border-bottom: 1px solid var(--accentred);
 }
 </style>
