@@ -2,13 +2,54 @@
     <main>
         <div class="header">
             <h3 class="title">Portfolio</h3>
-            <div class="tvl">
+            <div class="ratings">
                 <div class="label">
-                    <p>TVL</p>
-                    <IconInfo />
+                    <p>Ratings</p>
+                    <div class="ratings_item">
+                        <IconBadge />
+                        <p><span>80</span> of 100</p>
+                    </div>
                 </div>
-                <div class="value">
-                    <p>$50,252,145</p>
+                <div class="tag">
+                    <p>Good</p>
+                </div>
+            </div>
+        </div>
+        <div class="profile">
+            <div class="profile_info">
+                <img src="/images/user4.png" alt="">
+                <div class="profile_names">
+                    <h3>Ibro.ftm</h3>
+                    <p class="address">0xdf15a4....d2e2ds89
+                        <IconCopy />
+                    </p>
+                    <div class="profile_stats">
+                        <IconInfo />
+                        <p>Stats</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat_item">
+                        <p>Active Loans</p>
+                        <p>6</p>
+                    </div>
+                    <div class="stat_item">
+                        <p>Total Loans Joined</p>
+                        <p>129</p>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat_item">
+                        <p>Loans Defaulted</p>
+                        <p>6</p>
+                    </div>
+                    <div class="stat_item">
+                        <p>Total Loans Volume</p>
+                        <p>129</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -59,6 +100,8 @@
 import IconInfo from '../../icons/IconInfo.vue';
 import IconSort from '../../icons/IconSort.vue';
 import IconAdd from '../../icons/IconAdd.vue';
+import IconCopy from '../../icons/IconCopy.vue';
+import IconBadge from '../../icons/IconBadge.vue';
 </script>
 
 <style scoped>
@@ -69,15 +112,11 @@ main {
 }
 
 .header {
+    padding: 0 60px;
     height: 156px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 60px;
-}
-
-.tvl {
-    width: 140px;
 }
 
 .title {
@@ -86,38 +125,151 @@ main {
     color: var(--textnormal);
 }
 
-.label {
-    height: 30px;
-    background: var(--bglight);
-    border-radius: 4px 4px 0px 0px;
+
+.ratings {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
+    gap: 40px;
 }
 
-.label p {
-    font-weight: 500;
+.ratings .label>p {
     font-size: 12px;
-    line-height: 12px;
     color: var(--textdimmed);
 }
 
-.value {
-    height: 40px;
-    background: var(--bglighter);
-    border-radius: 0px 0px 4px 4px;
+.ratings_item {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
 }
 
-.value p {
-    font-weight: 500;
+.ratings_item p {
     font-size: 14px;
-    line-height: 14px;
+    color: var(--textdimmed);
+}
+
+.ratings_item span {
     color: var(--textnormal);
 }
+
+.ratings .tag {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background: rgba(139, 187, 37, 0.1);
+    border-radius: 2px;
+}
+
+
+.ratings .tag p {
+    font-size: 16px;
+    color: var(--accentgreen);
+}
+
+.profile {
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.profile_info {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.profile_info img {
+    width: 114px;
+height: 114px;
+border-radius: 10px;
+object-fit: cover;
+}
+
+.profile_names {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile_names h3 {
+    font-size: 20px;
+    color: var(--textnormal);
+}
+
+.profile_names .address {
+    font-size: 16px;
+    color: var(--textdimmed);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile_names .address svg {
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.profile_names .profile_stats {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 4px;
+    background: rgba(108, 110, 115, 0.1);
+    font-size: 14px;
+    color: var(--textnormal);
+    gap: 6px;
+    width: fit-content;
+}
+
+.profile_stats svg {
+    width: 18px;
+    height: 18px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 230px 230px;
+    border-left: 1px solid var(--bglighter);
+    border-right: 1px solid var(--bglighter);
+}
+
+.stat_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat_item:first-child {
+    padding: 0 20px;
+    padding-top: 26px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--bglighter);
+}
+
+.stat:first-child .stat_item {
+    border-right: 1px solid var(--bglighter);
+}
+
+
+.stat_item:last-child {
+    padding: 0 20px;
+    padding-top: 17px;
+    padding-bottom: 26px;
+}
+
+.stat_item p:first-child {
+    font-size: 12px;
+    color: var(--textdimmed);
+}
+
+.stat_item p:last-child {
+    font-size: 14px;
+    color: var(--textnormal);
+}
+
 
 .toolbar {
     width: 100%;
@@ -127,6 +279,7 @@ main {
     display: flex;
     justify-content: space-between;
     backdrop-filter: blur(8px);
+    margin-top: 80px;
 }
 
 .tab_items {

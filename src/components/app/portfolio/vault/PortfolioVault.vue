@@ -7,7 +7,7 @@
         </div>
 
         <div class="lends" v-if="!fetching && userAddress != null">
-            <RouterLink v-for="offer in offers" :to="`/portfolio/vault/${offer._id}`" :key="offer.offerId">
+            <RouterLink v-for="loan in loans" :to="`/portfolio/vault/${loan.offer[0]._id}`" :key="loan.loanId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
@@ -15,14 +15,24 @@
                             <p>Type</p>
                         </div>
                         <div class="tokens">
-                            <div>
-                                <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
-                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} {{
-                                    $findAsset(offer.principalToken).symbol
+                            <!---->
+                            <div v-if="loan.lender == userAddress.toLowerCase()">
+                                <img :src="`/images/${$findAsset(loan.principalToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(loan.currentPrincipal)) }} {{
+                                    $findAsset(loan.principalToken).symbol
                                 }}</p>
                             </div>
+                            <div v-else>
+                                <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(loan.currentCollateral)) }} {{
+                                    $findAsset(loan.collateralToken).symbol
+                                }}</p>
+                            </div>
+
+                            <!---->
                             <div>
-                                <p>Principal</p>
+                                <p v-if="loan.lender == userAddress.toLowerCase()">Principal</p>
+                                <p v-else>Collateral</p>
                             </div>
                         </div>
                     </div>
@@ -31,38 +41,46 @@
                             <p>Time Locked</p>
                             <div>
                                 <IconClock />
-                                <p>{{ offer.daysToMaturity }} Days</p>
+                                <p>{{ getLockTime(loan.startDate, loan.maturityDate) }} Days</p>
                             </div>
                         </div>
                         <div class="interest">
                             <p>Amount</p>
                             <div>
-                                <IconInterest />
-                                <p>{{ getInterest(offer.interest, offer.daysToMaturity) }} %</p>
+                                <IconChart />
+                                <p v-if="loan.lender == userAddress.toLowerCase()">
+                                    {{ $nFormat($fromWei(loan.initialPrincipal)) }}
+                                    <span>{{ $findAsset(loan.principalToken).symbol }}</span>
+                                </p>
+                                <p v-else>
+                                    {{ $nFormat($fromWei(loan.initialCollateral)) }}
+                                    <span>{{ $findAsset(loan.collateralToken).symbol }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="progress">
-                        <div class="users" v-if="offer.currentPrincipal == offer.initialPrincipal">
-                            <div class="img" v-for="index in 4" :key="index"></div>
-                            <div class="extra_user">0</div>
-                        </div>
-                        <div class="users" v-else>
-                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
-                            <div class="extra_user">{{ offer.loans.length }}</div>
-                        </div>
+                    <div class="emissions">
+                        <!---->
+                        <p class="label" v-if="loan.lender == userAddress.toLowerCase()">Emissions
+                            <IconInfo />
+                        </p>
+                        <p class="label" v-else>Unlocks
+                            <IconInfo />
+                        </p>
 
-                        <div class="needed">
-                            <div class="label">
-                                <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} <span>/ {{
-                                $toMoney($fromWei(offer.initialPrincipal)) }} {{
-        $findAsset(offer.principalToken).symbol
-    }}</span></p>
-                                <IconInfo />
+                        <!---->
+                        <div class="emission_token" v-if="loan.lender == userAddress.toLowerCase()">
+                            <p>~ $0.00</p>
+                            <div class="emission_token_image">
+                                <img v-for="address in loan.offer[0].collateralTokens" :key="address"
+                                    :src="`/images/${$findAsset(address).image}.png`" alt="">
                             </div>
-                            <div class="bar">
-                                <div class="percentage" :style="`width: ${$progress(offer)}%`"></div>
+                        </div>
+                        <div class="emission_token emission_token2" v-else>
+                            <div class="emission_token_image">
+                                <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                             </div>
+                            <p>{{ $toMoney(loan.unClaimedBorrowedPrincipal) }} {{ $findAsset(loan.principalToken).symbol }}</p>
                         </div>
                     </div>
                 </div>
@@ -76,17 +94,17 @@
 <script setup>
 import IconClock from '../../../icons/IconClock.vue';
 import IconInfo from '../../../icons/IconInfo.vue';
-import IconInterest from '../../../icons/IconInterest.vue';
 import ProgressBox from '../../../ProgressBox.vue'
 </script>
 
 <script>
 import Countdown from '../../../../utils/Countdown'
 import Authentication from '../../../../scripts/Authentication';
+import IconChart from '../../../icons/IconChart.vue';
 export default {
     data() {
         return {
-            offers: [],
+            loans: [],
             fetching: true,
             userAddress: null
         };
@@ -97,33 +115,38 @@ export default {
     },
     methods: {
         countdown: function (expiresAt) {
-            let txt = ''
-            let due = expiresAt * 1000
+            let txt = "";
+            let due = expiresAt * 1000;
             Countdown.start(due, function (text) {
-                txt = text
-            })
-            return txt
+                txt = text;
+            });
+            return txt;
+        },
+        getLockTime: function (start, end) {
+            let duration = (end - start)
+            return duration / 24 / 60 / 60
         },
         getInterest: function (rate, daysToMaturity) {
-            let result = rate * daysToMaturity * 24 * 60 * 60
-            let interest = this.$fromWei(result.toString())
-            return this.$toMoney(interest)
+            let result = rate * daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
         },
         fetchLendingOffers: async function () {
             this.fetching = true;
             if (this.userAddress == null) {
                 return;
             }
-            this.axios.get(`https://darshprotocol.onrender.com/offers?offerType=0&creator=${this.userAddress.toLowerCase()}`).then(response => {
+            this.axios.get(`https://darshprotocol.onrender.com/loans/vault?address=${this.userAddress.toLowerCase()}`).then(response => {
                 console.log(response.data);
-                this.offers = response.data;
+                this.loans = response.data;
                 this.fetching = false;
             }).catch(error => {
                 console.error(error);
                 this.fetching = false;
             });
         }
-    }
+    },
+    components: { IconChart }
 }
 </script>
 
@@ -157,7 +180,7 @@ export default {
 }
 
 .asset {
-    padding: 20px;
+    padding: 26px 20px;
     border-bottom: 1px solid var(--background);
 }
 
@@ -196,6 +219,7 @@ export default {
     width: 18px;
     margin-left: -18px;
 }
+
 .asset .tokens>div:nth-child(2) {
     padding: 0 10px;
     height: 30px;
@@ -216,6 +240,11 @@ export default {
     border-bottom: 1px solid var(--background);
 }
 
+.info svg {
+    width: 17px;
+    height: 17px;
+}
+
 .info .duration {
     border-right: 1px solid var(--background);
 }
@@ -234,7 +263,7 @@ export default {
 }
 
 .info>div {
-    padding: 20px;
+    padding: 26px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -246,106 +275,50 @@ export default {
     color: var(--textnormal);
 }
 
-.expire,
-.progress {
-    height: 72px;
-    background: var(--bglighter);
-    padding: 0 20px;
+
+.emissions {
     display: flex;
     align-items: center;
-}
-
-.progress {
     justify-content: space-between;
+    background: var(--bglighter);
+    padding: 26px 20px;
 }
 
-.users {
+.emissions .label {
+    font-size: 12px;
+    color: var(--textdimmed);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.emission_token {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.emission_token2 {
+    gap: 8px;
+}
+
+.emission_token>p {
+    font-size: 12px;
+    color: var(--textnormal);
+}
+
+.emission_token_image {
     display: flex;
     align-items: center;
 }
 
-.users img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+.emission_token_image img {
+    width: 20px;
+    height: 20px;
+    margin-left: -6px;
 }
 
-.users img {
-    margin-left: -16px;
-}
-
-.users img:first-child {
+.emission_token_image img:first-child {
     margin: 0;
-}
-
-.extra_user {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--background);
-    
-    
-    font-weight: 500;
-    font-size: 12px;
-    color: var(--textdimmed);
-    margin-left: -16px;
-}
-
-.needed>div {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.needed>div>p {
-    
-    
-    font-weight: 500;
-    font-size: 12px;
-    color: var(--textnormal);
-}
-
-.needed>div>p span {
-    color: var(--textdimmed);
-}
-
-.bar {
-    width: 120px;
-    height: 6px;
-    border-radius: 6px;
-    background: var(--background);
-    margin-top: 12px;
-}
-
-.percentage {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 6px;
-}
-
-.expire {
-    text-align: center;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.expire p:first-child {
-    
-    
-    font-weight: 500;
-    font-size: 12px;
-    color: var(--textdimmed);
-}
-
-.expire p:nth-child(2) {
-    
-    
-    font-weight: 500;
-    font-size: 12px;
-    color: var(--textnormal);
-    margin-top: 6px;
 }
 </style>

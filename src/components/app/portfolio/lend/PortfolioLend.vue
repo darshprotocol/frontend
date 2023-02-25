@@ -162,7 +162,7 @@ export default {
 }
 
 .asset {
-    padding: 20px;
+    padding: 26px 20px;
     border-bottom: 1px solid var(--background);
 }
 
@@ -173,8 +173,6 @@ export default {
 }
 
 .asset>.label>p {
-    
-    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -191,8 +189,6 @@ export default {
 }
 
 .asset .tokens>div p {
-    font-family: 'Axiforma SemiBold';
-    
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -232,8 +228,6 @@ export default {
 }
 
 .info>div>p {
-    
-    
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -247,15 +241,13 @@ export default {
 }
 
 .info>div {
-    padding: 20px;
+    padding: 26px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .info>div>div p {
-    
-    
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);
