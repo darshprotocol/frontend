@@ -51,14 +51,14 @@
                             </div>
                         </td>
                         <td v-else>
-                            <div class="menu" v-if="isLender(request)" v-on:click="openMenu(request)">
+                            <div class="menu" v-if="isBorrower(request)" v-on:click="openMenu(request)">
                                 <IconMenu :color="'var(--textnormal)'" />
                             </div>
                             <div class="menu" v-else>
                                 <IconMenu :color="'var(--textdimmed)'" />
                             </div>
                         </td>
-                        <div class="overlay" v-if="activeRequest == request._id && isLender(request)">
+                        <div class="overlay" v-if="activeRequest == request._id && isBorrower(request)">
                             <div>
                                 <div class="action" v-on:click="cancelRequest = request">Cancel</div>
                             </div>
@@ -146,7 +146,7 @@ export default {
         isCreator: function () {
             return this.userAddress && this.offer.creator.toLowerCase() == this.userAddress.toLowerCase();
         },
-        isLender: function (request) {
+        isBorrower: function (request) {
             return this.userAddress && request.creator.toLowerCase() == this.userAddress.toLowerCase();
         },
         getPrincipal: function (percentage) {

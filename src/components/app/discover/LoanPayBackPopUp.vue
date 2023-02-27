@@ -46,6 +46,11 @@ import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
 import { messages } from '../../../reactives/messages';
 export default {
     props: ['loan'],
+    components: {
+        Slider, 
+        IconClose, 
+        PrimaryButton
+    },
     data() {
         return {
             percentage: 25,

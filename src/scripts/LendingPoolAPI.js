@@ -227,7 +227,6 @@ const LendingPoolAPI = {
     // @borrower
     acceptLendingRequest: async function (
         requestId,
-        isNative,
         userAddress
     ) {
         const instance = await this.getInstance()
@@ -237,8 +236,7 @@ const LendingPoolAPI = {
             const trx = await instance.acceptLendingRequest(
                 requestId,
                 {
-                    from: userAddress,
-                    value: isNative ? 1 : 0
+                    from: userAddress
                 }
             )
             return trx

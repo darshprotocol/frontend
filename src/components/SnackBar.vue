@@ -11,7 +11,9 @@
                 </div>
                 <IconClose class="close" v-on:click="removeIndex(index)" />
 
-                <a :href="message.linkUrl" target="_blank" v-if="message.linkTitle && message.linkUrl.startsWith('http')" v-on:click="removeIndex(index)">
+                <a :href="message.linkUrl" target="_blank"
+                    v-if="message.linkUrl && message.linkUrl != '' && message.linkUrl.startsWith('http')"
+                    v-on:click="removeIndex(index)">
                     <div class="link">
                         <p>{{ message.linkTitle }}</p>
                         <IconOut />

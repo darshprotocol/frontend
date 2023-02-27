@@ -101,9 +101,9 @@
                         </div>
                     </div>
                     <RequestTable :offer="offer" />
-                    <div class="t_empty" v-if="offer.requests.length == 0">
+                    <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
                         <img src="../../../../assets/images/receipt-text.png" alt="">
-                        <p>No Borrow Requests found.</p>
+                        <p>No Lend Requests found.</p>
                     </div>
                 </div>
             </div>
@@ -124,19 +124,21 @@
                             <PrimaryButton class="manage_offer_button" :text="'Manage Offer'" />
                         </RouterLink>
                     </div>
-                    <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
+                    <LoanBoxes v-on:payback="payback = $event" v-on:info="loanInfo = $event" :offer="offer"
                         :lenderLoan="lenderLoan" :userType="userType" />
+
                     <BorrowerStats v-if="userType != 'borrower'" :score="lenderScore" />
                 </div>
             </div>
         </div>
 
         <LendRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
-        
-        <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="lenderLoan" v-if="payback && lenderLoan" v-on:close="payback = false" />
-        
+
+        <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="payback" v-if="payback && lenderLoan"
+            v-on:close="payback = false" />
+
         <LendPopUp v-on:done="fetchLendingOffer(false)" v-if="lend" :offer="offer" v-on:close="onLend()" />
-        
+
         <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo && lenderLoan"
             v-on:close="loanInfo = false" />
     </main>
@@ -155,7 +157,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 import IconSort from '../../../icons/IconSort.vue';
 import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import LendRequestPopUp from './LendRequestPopUp.vue';
-import LoanBoxes from '../lenders/LoanBoxes.vue';
+import LoanBoxes from './LoanBoxes.vue';
 import BorrowerStats from './LenderStats.vue';
 </script>
 
@@ -164,7 +166,25 @@ import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
 import { messages } from '../../../../reactives/messages';
+import IconInformation from '../../../icons/IconInformation.vue';
 export default {
+    components: {
+    LendPopUp,
+    LoanInfoPopUp,
+    IconClock,
+    IconAdd,
+    IconChart,
+    RequestTable,
+    PrimaryButton,
+    IconInterest,
+    ProgressBox,
+    IconSort,
+    LoanPayBackPopUp,
+    LendRequestPopUp,
+    LoanBoxes,
+    BorrowerStats,
+    IconInformation
+},
     data() {
         return {
             offer: null,
@@ -186,7 +206,7 @@ export default {
         this.userAddress = await Authentication.userAddress()
     },
     methods: {
-         onLend: function () {
+        onLend: function () {
             if (this.lenderRequest) {
                 messages.insertMessage({
                     title: 'Action failed',
@@ -224,7 +244,7 @@ export default {
                     }
 
                     this.offer.loans.forEach(loan => {
-                        if (loan.borrower.toLowerCase() == this.userAddress) {
+                        if (loan.lender.toLowerCase() == this.userAddress) {
                             this.lenderLoan = loan
                             return
                         }
@@ -247,16 +267,15 @@ export default {
                 console.error(error);
             }
         },
-        reloadPage: async function () {
-            this.borrow = false
-            this.fetchLendingOffer(false)
-        },
         paybackCall: function () {
             this.loanInfo = null
             this.payback = true
         },
         getBorrowerScore: async function (address) {
             this.lenderScore = await HealthScore.getHealthScore(address)
+        },
+        sortRequests: function (requests) {
+            return requests.filter(request => request.state == 0);
         }
     }
 }
@@ -446,6 +465,12 @@ export default {
     font-size: 12px;
     color: var(--textnormal);
     margin-top: 6px;
+}
+
+.b_info {
+    font-size: 14px !important;
+    color: var(--textnormal) !important;
+    margin: 0 !important;
 }
 
 .users {

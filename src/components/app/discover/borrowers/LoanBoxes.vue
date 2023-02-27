@@ -1,11 +1,11 @@
 <template>
     <!---->
     <div class="active_loans" v-if="userType == 'lender' && lenderLoan" :class="getState(lenderLoan.loanId)">
-        <h3>Borrow Loan</h3>
+        <h3>Lend Loan</h3>
         <div>
             <!---->
             <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) != 'repaid'">
-                <p>Outstanding</p>
+                <p>Borrower's Outstanding</p>
                 <div>
                     <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
                     <h3>{{ $toMoney($fromWei(lenderLoan.currentPrincipal)) }} {{
@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) == 'repaid'">
-                <p>Total Paidback</p>
+                <p>Total Repaid</p>
                 <div>
                     <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
                     <h3>{{ $toMoney($fromWei(lenderLoan.initialPrincipal)) }} {{
@@ -32,12 +32,10 @@
         <div>
             <!---->
             <div v-if="getState(lenderLoan.loanId) != 'defaulted'">
-                <p>My Collateral</p>
+                <p>Borrower's Collateral</p>
                 <div>
                     <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
-                    <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }} {{
-                        $findAsset(lenderLoan.collateralToken).symbol
-                    }}</p>
+                    <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }}</p>
                     <IconOut />
                 </div>
             </div>
@@ -82,22 +80,38 @@
                 </div>
             </div>
         </div>
-        <div class="borrower_action" v-if="getState(lenderLoan.loanId) != 'repaid'">
-            <PrimaryButton v-on:click="$emit('info', lenderLoan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
-            <PrimaryButton v-on:click="$emit('payback')" :state="''" :text="'Payback'" />
-        </div>
-        <div class="borrower_action" v-if="getState(lenderLoan.loanId) == 'repaid'">
-            <PrimaryButton v-on:click="$emit('info', lenderLoan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
-            <PrimaryButton :state="'disable'" :text="'Payback'" />
+
+        <!---->
+        <div class="claim">
+            <p v-if="lenderLoan.unClaimedPrincipal > 0">Repayments</p>
+            <div class="claim_asset" v-if="lenderLoan.unClaimedPrincipal > 0">
+                <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
+                <h3>
+                    {{ $toMoney($fromWei(lenderLoan.unClaimedPrincipal)) }}
+                    {{ $findAsset(lenderLoan.principalToken).symbol }}
+                </h3>
+            </div>
+
+            <!---->
+            <div class="borrower_action">
+                <PrimaryButton v-on:click="emitLoan(lenderLoan)" :text="'Loan Info'"
+                    :bg="'rgba(108, 110, 115, 0.1)'" />
+
+                <PrimaryButton
+                    :state="(lenderLoan.unClaimedPrincipal == 0 || claimingPayback) ? 'disable' : ''"
+                    :progress="claimingPayback"
+                    v-on:click="claimPayback()"
+                    class="claim_button" :text="'Claim'" />
+            </div>
         </div>
     </div>
 
     <!---->
     <div class="mySwiper" v-if="userType == 'borrower' && offer.loans.length > 0">
         <div class="navigate">
-            <h3>Lend Loans</h3>
+            <h3>Borrow Loans</h3>
             <div>
-                <IconArrowLeft />
+                <IconArrowLeft v-on:click="prevLoan()" />
                 <p>{{ loanIndex + 1 }} <span>of {{ offer.loans.length }}</span></p>
                 <IconArrowRight v-on:click="nextLoan()" />
             </div>
@@ -106,10 +120,11 @@
             <h3></h3>
             <div>
                 <div class="amount_borrowed">
-                    <p>Amount Borrowed</p>
+                    <p>Outstanding</p>
                     <div>
-                        <img src="/images/usdc.png" alt="">
-                        <h3>{{ $toMoney($fromWei('0')) }} USDC</h3>
+                        <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
+                        <h3>{{ $toMoney($fromWei(offer.loans[loanIndex].currentPrincipal)) }} {{
+                            $findAsset(offer.loans[loanIndex].principalToken).symbol }}</h3>
                     </div>
                 </div>
 
@@ -120,38 +135,88 @@
                 </div>
             </div>
             <div>
-                <div>
+                <!---->
+                <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
                     <p>My Collateral</p>
-                    <div>
-                        <img src="/images/btc.png" alt="">
-                        <p>0.72 WBTC</p>
-                        <IconOut />
-                    </div>
+                    <RouterLink :to="`/portfolio/vault/${$route.params.id}`">
+                        <div style="border: none;">
+                            <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
+                            <p>{{ $toMoney($fromWei(offer.loans[loanIndex].initialCollateral)) }} </p>
+                            <IconOut />
+                        </div>
+                    </RouterLink>
                 </div>
-                <div>
+                <div v-else>
+                    <p>My Collateral</p>
+                    <RouterLink :to="`/portfolio/vault/${$route.params.id}`">
+                        <div style="border: none;">
+                            <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
+                            <p>{{ $toMoney($fromWei(offer.loans[loanIndex].currentCollateral)) }} </p>
+                            <IconOut />
+                        </div>
+                    </RouterLink>
+                </div>
+
+
+                <!----->
+                <div v-if="getState(offer.loans[loanIndex].loanId) == 'open'">
                     <p>Due in</p>
                     <div>
                         <IconClock />
-                        <p>30 days</p>
+                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
+                    </div>
+                </div>
+                <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
+                    <p>Repaid on</p>
+                    <div>
+                        <IconCalendar />
+                        <p>
+                            {{ $toDate(offer.loans[loanIndex].repaidOn).month }}
+                            {{ $toDate(offer.loans[loanIndex].repaidOn).date }}
+                        </p>
+                    </div>
+                </div>
+                <div v-if="getState(offer.loans[loanIndex].loanId) == 'defaulting'">
+                    <p>Default in</p>
+                    <div>
+                        <IconCalendar />
+                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
+                    </div>
+                </div>
+                <div v-if="getState(offer.loans[loanIndex].loanId) == 'defaulted'">
+                    <p>Defaulted on</p>
+                    <div>
+                        <IconCalendar />
+                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
                     </div>
                 </div>
             </div>
+
+
+            <!---->
             <div class="claim">
-                <p>Borrower's payback</p>
-                <div>
-                    <img src="/images/usdc.png" alt="">
-                    <h3>10,000 USDC</h3>
-                </div>
+                <!---->
                 <div class="borrower_action">
-                    <PrimaryButton v-on:click="$emit('info', loan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
-                    <PrimaryButton class="claim_button" :state="''" :text="'Claim'" />
+                    <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'"
+                        :bg="'rgba(108, 110, 115, 0.1)'" />
+
+                    <PrimaryButton :state="(offer.loans[loanIndex].currentPrincipal < 100) ? 'disable' : ''"
+                        v-on:click="(offer.loans[loanIndex].currentPrincipal < 100) ? null : $emit('payback', offer.loans[loanIndex])"
+                        class="claim_button" :text="'Payback'" />
                 </div>
             </div>
         </div>
     </div>
 
     <!---->
-    <div class="open_loans" v-if="offer.loans.length == 0">
+    <div class="open_loans" v-if="(!lenderLoan || offer.loans.length == 0) && userType != 'borrower'">
+        <h3>Open Loans</h3>
+        <div class="box">
+            <IconReceipt />
+            <p>No open loan Found on <br> this Borrow offer.</p>
+        </div>
+    </div>
+    <div class="open_loans" v-if="offer.loans.length == 0 && userType == 'borrower'">
         <h3>Open Loans</h3>
         <div class="box">
             <IconReceipt />
@@ -166,24 +231,56 @@ import IconOut from '../../../icons/IconOut.vue'
 import IconCalendar from '../../../icons/IconCalendar.vue'
 import PrimaryButton from '../../../PrimaryButton.vue';
 import LoanState from '../../../LoanState.vue';
+import IconArrowLeft from '../../../icons/IconArrowLeft.vue';
+import IconArrowRight from '../../../icons/IconArrowRight.vue';
 </script>
 
 <script>
 import Countdown from '../../../../utils/Countdown';
-import IconArrowLeft from '../../../icons/IconArrowLeft.vue';
-import IconArrowRight from '../../../icons/IconArrowRight.vue';
+import IconClock from '../../../icons/IconClock.vue';
+import { messages } from '../../../../reactives/messages';
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
+import Authentication from '../../../../scripts/Authentication';
 export default {
     props: ["offer", "lenderLoan", "userType"],
+    emits: ["payback", "info"],
+    components: {
+        IconReceipt,
+        IconOut,
+        IconCalendar,
+        PrimaryButton,
+        LoanState,
+        IconArrowLeft,
+        IconArrowRight,
+        IconClock
+    },
     data() {
         return {
             dueDate: 0,
-            loanIndex: 0
+            loanIndex: 0,
+            claimingPayback: false
         };
     },
     methods: {
+        emitLoan: function (loan) {
+            this.$emit('info', loan)
+        },
+        getDate: function (loan) {
+            let txt = "";
+            let due = loan.maturityDate * 1000;
+            Countdown.startOnlyDay(due, (text) => {
+                txt = text;
+            });
+            return txt;
+        },
         nextLoan: function () {
-            if (this.loanIndex < this.offer.loans.length) {
-                this.loanIndex++
+            if (this.loanIndex < this.offer.loans.length - 1) {
+                this.loanIndex++;
+            }
+        },
+        prevLoan: function () {
+            if (this.loanIndex > 0) {
+                this.loanIndex--;
             }
         },
         getDueDate: function () {
@@ -193,6 +290,9 @@ export default {
             Countdown.startOnlyDay(due, (text) => {
                 this.dueDate = text;
             });
+        },
+        payback: async function () {
+
         },
         getState: function (loanId) {
             let loan = this.offer.loans.find(loan => loan.loanId == loanId);
@@ -213,6 +313,34 @@ export default {
             else if (loanState == 2 || now >= defaulted) {
                 return "defaulted";
             }
+        },
+        claimPayback: async function () {
+            if (this.claimingPayback) return
+            this.claimingPayback = true
+
+            const trx = await LendingPoolAPI.claimPrincipal(
+                this.lenderLoan.loanId,
+                await Authentication.userAddress()
+            )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Repayment claimed',
+                    description: 'Repayment was successfully claimed.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+            } else {
+                messages.insertMessage({
+                    title: 'Claimimg failed',
+                    description: 'Repayment claim failed.',
+                    type: 'failed'
+                })
+            }
+            
+            this.$emit('done')
+            this.claimingPayback = false
         }
     },
     mounted() {
@@ -231,8 +359,6 @@ export default {
 }
 
 .open_loans h3 {
-
-
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
@@ -258,11 +384,11 @@ export default {
 }
 
 .navigate {
-    margin-top: 40px;
-    width: 380px;
+    width: 100%;
     height: 80px;
+    position: absolute;
     left: 0;
-    top: 0;
+    top: 80px;
     z-index: 1;
     padding: 0 30px;
     display: flex;
@@ -270,9 +396,15 @@ export default {
     justify-content: space-between;
 }
 
+.navigate svg {
+    cursor: pointer;
+}
+
+.mySwiper .active_loans>h3 {
+    height: 80px;
+}
 
 .navigate h3 {
-    font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
@@ -322,7 +454,7 @@ export default {
 }
 
 .active_loans>div:nth-child(2) {
-    padding: 20px 50px;
+    padding: 20px 40px;
     border-bottom: 1px solid var(--background);
     display: flex;
     align-items: center;
@@ -367,8 +499,8 @@ export default {
 }
 
 .active_loans>div:nth-child(3) {
-    border-bottom: 1px solid var(--background);
     display: grid;
+    border-bottom: 1px solid var(--background);
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -377,7 +509,7 @@ export default {
 }
 
 .active_loans>div:nth-child(3)>div {
-    padding: 20px;
+    padding: 20px 10px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -389,11 +521,6 @@ export default {
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
-}
-
-.active_loans>div:nth-child(3)>div:nth-child(2) {
-    align-items: flex-end;
-    padding-right: 50px;
 }
 
 .active_loans>div:nth-child(3)>div div {
@@ -429,7 +556,6 @@ export default {
 }
 
 .active_loans .claim {
-    padding: 30px;
     background-color: var(--bglighter);
     background-image: url('/images/subtle_gradient.png');
     background-size: cover;
@@ -438,7 +564,11 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0 !important;
+    padding: 20px 30px !important;
+    padding-bottom: 30px !important;
 }
+
 
 .active_loans .claim>p {
     font-weight: 500;
@@ -446,20 +576,41 @@ export default {
     color: var(--textdimmed);
 }
 
-.active_loans .claim div {
+
+.claim_asset {
     display: flex;
     align-items: center;
+    justify-content: center;
+    margin-top: 16px;
     gap: 10px;
-    margin-top: 18px;
+    margin-bottom: 20px;
 }
 
-.active_loans .claim div h3 {
+.active_loans .claim_asset h3 {
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);
 }
 
-.active_loans .claim div img {
+.active_loans .claim_asset img {
+    height: 24px;
+    width: 24px;
+}
+
+.active_loans .borrower_action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.active_loans .claim_asset h3 {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--textnormal);
+}
+
+.active_loans .claim_asset img {
     height: 24px;
     width: 24px;
 }

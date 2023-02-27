@@ -2,17 +2,17 @@
     <main>
         <div class="box">
             <div class="title">
-                <h3>Lend Request</h3>
-                <div v-if="!(accepting || rejecting)" class="close" v-on:click="$emit('close')">
+                <h3>Borrow Request</h3>
+                <div class="close" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
             <div class="principal_needed">
-                <p class="label">Principal</p>
+                <p class="label">Principal Needed</p>
                 <div class="principal_needed_token">
                     <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                     <p>
-                        {{ $toMoney($fromWei(getPrincipal(requestAction.request.percentage))) }}
+                        {{ $toMoney($fromWei(getPrincipal(request.percentage))) }}
                         {{ $findAsset(offer.principalToken).symbol }}
                     </p>
                 </div>
@@ -22,47 +22,46 @@
                     <div class="label">Interest</div>
                     <div class="box_grid_item">
                         <IconInterest />
-                        <p>{{ getInterest(requestAction.request.interest, requestAction.request.daysToMaturity) }} %</p>
+                        <p>{{ getInterest(request.interest, request.daysToMaturity) }} %</p>
                     </div>
                 </div>
                 <div>
                     <div class="label">Duration</div>
                     <div class="box_grid_item">
                         <IconClock />
-                        <p>{{ requestAction.request.daysToMaturity }} Days</p>
+                        <p>{{ request.daysToMaturity }} Days</p>
                     </div>
                 </div>
             </div>
             <div class="box_grid">
                 <div>
-                    <div class="label">Lender</div>
+                    <div class="label">Borrower</div>
                     <div class="box_grid_item">
-                        <img class="photo" src="/images/user1.png" />
-                        <p>Lender 01</p>
+                        <div id="img_borrower" class="photo"></div>
+                        <p>Borrower 01</p>
                     </div>
                 </div>
                 <div class="collateral">
-                    <div class="label">Collateral required</div>
+                    <div class="label">Borrower's Collateral</div>
                     <div class="box_grid_item">
-                        <p>{{ $toMoney($fromWei(getCollateral(requestAction.request.percentage))) }}</p>
-                        <img class="icon" :src="`/images/${$findAsset(offer.collateralToken).image}.png`" />
+                        <p>{{ $toMoney($fromWei(request.collateralAmount)) }}</p>
+                        <img class="icon" :src="`/images/${$findAsset(request.collateralToken).image}.png`" />
                     </div>
                 </div>
             </div>
-            <div class="box_action" v-if="requestAction.action == 'reject'">
-                <PrimaryButton :progress="rejecting" :state="rejecting ? 'disable' : ''"
-                    v-on:click="!rejecting ? rejectRequest() : null" :text="'Reject Request'" :bg="'var(--accentred)'" />
-            </div>
-            <div class="box_action" v-if="requestAction.action == 'accept'">
-                <PrimaryButton :progress="accepting" :state="accepting ? 'disable' : ''"
-                    v-on:click="!accepting ? acceptRequest() : null" :text="'Accept Request'" :bg="'var(--accentgreen)'" />
+            <div class="box_action">
+                <PrimaryButton :text="'Cancel Request'" :progress="cancelling" :state="cancelling ? 'disable' : ''"
+                    v-on:click="!cancelling ? cancelRequest() : null" :bg="'rgba(108, 110, 115, 0.1)'" />
             </div>
         </div>
     </main>
 </template>
 
 <script setup>
+import { messages } from '../../../../reactives/messages';
+import Authentication from '../../../../scripts/Authentication';
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
+import Profile from '../../../../scripts/Profile';
 import IconClock from '../../../icons/IconClock.vue';
 import IconClose from '../../../icons/IconClose.vue';
 import IconInterest from '../../../icons/IconInterest.vue';
@@ -70,14 +69,11 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 </script>
 
 <script>
-import Authentication from '../../../../scripts/Authentication';
-import { messages } from '../../../../reactives/messages';
 export default {
-    props: ['requestAction', 'offer'],
+    props: ['request', 'offer'],
     data() {
         return {
-            accepting: false,
-            rejecting: false
+            cancelling: false
         }
     },
     methods: {
@@ -85,75 +81,44 @@ export default {
             let principal = this.offer.initialPrincipal * (percentage / 100);
             return principal.toString();
         },
-        getCollateral: function (percentage) {
-            let collateral = this.offer.initialCollateral * (percentage / 100);
-            return collateral.toString();
-        },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60;
             let interest = this.$fromWei(result.toString());
             return this.$toMoney(interest);
         },
-        acceptRequest: async function () {
-            this.accepting = true
+        cancelRequest: async function () {
+            this.cancelling = true
 
-            const trx = await LendingPoolAPI.acceptLendingRequest(
-                this.requestAction.request.requestId,
+            const trx = await LendingPoolAPI.cancelRequest(
+                this.request.requestId,
                 await Authentication.userAddress()
             )
 
             if (trx && trx.tx) {
                 messages.insertMessage({
-                    title: 'Request accept',
-                    description: 'Borrow request was successfully accepted.',
+                    title: 'Request cancalled',
+                    description: 'Borrow request was successfully cancelled.',
                     type: 'success',
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
+                this.$emit('close')
             } else {
                 messages.insertMessage({
-                    title: 'Accept failed',
-                    description: 'Borrow request failed to accept.',
+                    title: 'Cancelling failed',
+                    description: 'Borrow request failed to cancel.',
                     type: 'failed'
                 })
             }
 
             this.$emit('done')
-            this.$emit('close')
-
-            this.accepting = false
-        },
-        rejectRequest: async function () {
-            this.rejecting = true
-            const trx = await LendingPoolAPI.rejectRequest(
-                this.requestAction.request.requestId,
-                await Authentication.userAddress()
-            )
-
-            if (trx && trx.tx) {
-                messages.insertMessage({
-                    title: 'Request rejected',
-                    description: 'Borrow request was successfully rejected.',
-                    type: 'success',
-                    linkTitle: 'View Trx',
-                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
-                })
-                this.$emit('done')
-            } else {
-                messages.insertMessage({
-                    title: 'Reject failed',
-                    description: 'Borrow request failed to reject.',
-                    type: 'failed'
-                })
-            }
-
-            this.$emit('done')
-            this.$emit('close')
-
-            this.rejecting = false
+            this.cancelling = false
         }
     },
     mounted() {
+        let el = Profile.generate(30, this.request.creator)
+        document.getElementById(`img_borrower`).appendChild(el)
+
         document.body.classList.add('modal')
     },
     unmounted() {
@@ -185,7 +150,6 @@ main {
     background-image: url('/images/request_gradient.png');
     border-radius: 6px;
     overflow: hidden;
-    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

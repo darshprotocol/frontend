@@ -92,7 +92,7 @@
                     </div>
                     <div>
                         <PrimaryButton :progress="approving" :state="approving ? 'disable' : ''"
-                            v-on:click="approving ? approve() : null" :text="'Approve'"
+                            v-on:click="!approving ? approve() : null" :text="'Approve'"
                             v-if="$fromWei(allowance) < $fromWei(getPrincipal())" />
 
                         <PrimaryButton :progress="requesting" :state="requesting ? 'disable' : ''" v-else
@@ -163,11 +163,11 @@ export default {
                 this.offer.principalToken,
                 LendingPoolAPI.address
             )
-            this.allowance = amount
+            this.allowance = amount.toString()
         },
         approve: async function () {
             this.approving = true
-            await this.$.approve(
+            await this.$approve(
                 await Authentication.userAddress(),
                 this.offer.principalToken,
                 LendingPoolAPI.address

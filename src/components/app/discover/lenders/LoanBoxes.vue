@@ -125,9 +125,10 @@
                 </div>
             </div>
             <div>
+                <!---->
                 <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
                     <p>Borrower's Collateral</p>
-                    <RouterLink :to="`/vault/${$route.params.id}`">
+                    <RouterLink :to="`/portfoilio/vault/${$route.params.id}`">
                         <div style="border: none;">
                             <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
                             <p>{{ $toMoney($fromWei(offer.loans[loanIndex].initialCollateral)) }}</p>
@@ -137,7 +138,7 @@
                 </div>
                 <div v-else>
                     <p>Borrower's Collateral</p>
-                    <RouterLink :to="`/vault/${$route.params.id}`">
+                    <RouterLink :to="`/portfoilo/vault/${$route.params.id}`">
                         <div style="border: none;">
                             <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
                             <p>{{ $toMoney($fromWei(offer.loans[loanIndex].currentCollateral)) }}</p>
@@ -314,7 +315,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Claimimg failed',
@@ -322,7 +322,8 @@ export default {
                     type: 'failed'
                 })
             }
-
+            
+            this.$emit('done')
             this.claimingPaybackOf = -1
         }
     },

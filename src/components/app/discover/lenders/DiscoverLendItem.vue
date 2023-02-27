@@ -138,8 +138,7 @@
         <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)"
             v-on:close="payback = false" />
 
-        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer"
-            v-on:close="borrow = false" />
+        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
 
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
             v-if="loanInfo && borrowerLoan" v-on:close="loanInfo = false" />
@@ -632,4 +631,5 @@ export default {
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
-}</style>
+}
+</style>

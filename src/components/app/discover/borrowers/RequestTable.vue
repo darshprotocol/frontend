@@ -58,7 +58,7 @@
                             </div>
                         </td>
                         <td v-else>
-                            <div class="menu" v-if="isLender(request)" v-on:click="activeRequest = request._id">
+                            <div class="menu" v-if="isLender(request)" v-on:click="openMenu(request)">
                                 <IconMenu :color="'var(--textnormal)'" />
                             </div>
                             <div class="menu" v-else>
@@ -97,16 +97,18 @@
         </table>
 
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
-            v-on:close="requestAction = null" v-on:done="$emit(done)" />
+            v-on:close="requestAction = null" v-on:done="$emit('done')" />
 
-        <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
+        <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit('done')" v-if="cancelRequest"
             v-on:close="cancelRequest = null" />
     </main>
 </template>
 
 <script setup>
 import Authentication from '../../../../scripts/Authentication';
+import IconClock from '../../../icons/IconClock.vue';
 import IconClose from '../../../icons/IconClose.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
 import IconMenu from '../../../icons/IconMenu.vue'
 import IconOut from '../../../icons/IconOut.vue';
 import RequestPopUpInfo from './RequestPopUpInfo.vue';
@@ -116,31 +118,39 @@ import RequestPopUpInfoCancel from './RequestPopUpInfoCancel.vue';
 <script>
 export default {
     props: ["offer"],
+    components: { IconClock, IconInterest },
     data() {
         return {
-            activeRequest: '',
-            userAddress: '',
+            activeRequest: "",
+            userAddress: "",
             requestAction: null,
-            cancelRequest: null
+            cancelRequest: null,
+            claimRequest: null
         };
     },
     methods: {
         sortRequests: function (requests) {
             if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
-                return requests.filter(request => request.state == 0)
+                return requests.filter(request => request.state == 0);
             }
             else {
-                const result = requests.filter(request =>
-                    (request.creator == this.userAddress.toLowerCase() &&
-                        (request.state != 1 || request.state != 3)) || request.state == 0
-                )
-                return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()))
+                const result = requests.filter(request => request.state == 0)
+                return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()));
             }
         },
         setRequestAction: function (action, request) {
             this.requestAction = {
                 action: action,
                 request: request
+            };
+        },
+        openMenu: function (request) {
+            if (request.state == 0) {
+                this.activeRequest = request._id
+            } else if (request.state == 2) {
+                this.cancelRequest = request
+            } else if (request.state == 1) {
+                this.claimRequest = request
             }
         },
         isCreator: function () {
@@ -185,7 +195,7 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-    }
+    },
 }
 </script>
 
