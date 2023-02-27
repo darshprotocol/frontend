@@ -15,7 +15,7 @@
             </thead>
             <div class="tbody">
                 <tbody v-for="request in sortRequests(offer.requests)"
-                    :class="(request.creator == userAddress.toLowerCase() ? 'owned ' : ' ') + ('state' + request.state)"
+                    :class="(request.creator == userAddress.toLowerCase() ? 'owned ' + ('state' + request.state) : '')"
                     :key="request._id">
                     <tr>
                         <td>
@@ -123,10 +123,11 @@ export default {
                 return requests.filter(request => request.state == 0)
             }
             else {
-                return requests.filter(request =>
+                const result = requests.filter(request =>
                     (request.creator == this.userAddress.toLowerCase() &&
                         (request.state != 1 || request.state != 3)) || request.state == 0
                 )
+                return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()))
             }
         },
         setRequestAction: function (action, request) {

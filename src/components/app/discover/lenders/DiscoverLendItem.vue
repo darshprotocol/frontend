@@ -58,7 +58,8 @@
                                     <div class="extra_user">0</div>
                                 </div>
                                 <div class="users" v-else>
-                                    <img v-for="(loan, index) in offer.loans" :key="index" :src="`/images/user${index + 1}.png`" alt="">
+                                    <img v-for="(loan, index) in offer.loans" :key="index"
+                                        :src="`/images/user${index + 1}.png`" alt="">
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
                                 <div class="date" v-if="offer.loans.length == 0">
@@ -74,7 +75,7 @@
                         <div class="borrow">
                             <PrimaryButton v-if="borrowerLoan || userType != 'borrower'" :text="'Borrow'"
                                 :state="'disable'" />
-                            <PrimaryButton v-else v-on:click="borrow = true" :text="'Borrow'" />
+                            <PrimaryButton v-else v-on:click="onBorrow()" :text="'Borrow'" />
                         </div>
                     </div>
                 </div>
@@ -123,20 +124,23 @@
                     </div>
                     <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
                         :borrowerLoan="borrowerLoan" :userType="userType" v-on:done="fetchLendingOffer(false)" />
-                    
+
                     <BorrowerStats v-on:profile="profile = true" v-if="userType != 'lender'" :score="lenderScore" />
                 </div>
             </div>
         </div>
-        
+
         <ProfilePopUp v-if="profile" v-on:close="profile = false" />
 
-        <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
-        
-        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)" v-on:close="payback = false" />
-        
-        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
-        
+        <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request"
+            v-on:close="request = false" />
+
+        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)"
+            v-on:close="payback = false" />
+
+        <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-on:borrowed="reloadPage()" v-if="borrow" :offer="offer"
+            v-on:close="borrow = false" />
+
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
             v-if="loanInfo && borrowerLoan" v-on:close="loanInfo = false" />
     </main>
@@ -165,6 +169,7 @@ import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
 import ProfilePopUp from '../ProfilePopUp.vue';
+import { messages } from '../../../../reactives/messages';
 export default {
     data() {
         return {
@@ -188,6 +193,17 @@ export default {
         this.userAddress = await Authentication.userAddress();
     },
     methods: {
+        onBorrow: function () {
+            if (this.borrowerRequest) {
+                messages.insertMessage({
+                    title: 'Action failed',
+                    description: 'Cancel Borrow Request to Borrow a loan.',
+                    type: 'failed'
+                })
+                return
+            }
+            this.borrow = true
+        },
         startCountdown: function () {
             let to = this.offer.expiresAt * 1000;
             let _this = this;
@@ -616,5 +632,4 @@ export default {
     font-weight: 400;
     font-size: 14px;
     color: var(--textdimmed);
-}
-</style>
+}</style>

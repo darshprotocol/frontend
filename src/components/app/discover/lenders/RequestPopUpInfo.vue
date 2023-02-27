@@ -37,7 +37,7 @@
                 <div>
                     <div class="label">Borrower</div>
                     <div class="box_grid_item">
-                        <img class="photo" src="/images/user1.png" />
+                        <div id="img_borrower" class="photo"></div>
                         <p>Borrower 01</p>
                     </div>
                 </div>
@@ -72,6 +72,7 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 <script>
 import Authentication from '../../../../scripts/Authentication';
 import { messages } from '../../../../reactives/messages';
+import Profile from '../../../../scripts/Profile';
 export default {
     props: ['requestAction', 'offer'],
     data() {
@@ -150,6 +151,9 @@ export default {
         }
     },
     mounted() {
+        let el = Profile.generate(30, this.requestAction.request.creator)
+        document.getElementById(`img_borrower`).appendChild(el)
+
         document.body.classList.add('modal')
     },
     unmounted() {

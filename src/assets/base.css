@@ -114,7 +114,6 @@ body {
 .modal {
   height: 100vh;
   overflow-y: hidden;
-  padding-right: 10px;
 }
 
 input::-webkit-outer-spin-button,

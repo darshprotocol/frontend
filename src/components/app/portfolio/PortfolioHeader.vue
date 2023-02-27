@@ -18,13 +18,13 @@
         </div>
         <div class="profile">
             <div class="profile_info">
-                <img src="/images/user4.png" alt="">
+                <!-- <img src="/images/user4.png" alt=""> -->
+                <div class="image">
+                    <div class="img" id="img"></div>
+                </div>
                 <div class="profile_names">
-                    <h3>Ibro.ftm</h3>
-                    <p class="address">{{ userAddress.substring(0, 8) }}....{{
-                        userAddress.substring(userAddress.length - 8,
-                            userAddress.length)
-                    }}
+                    <h3>{{ $shortName(userAddress, 6) }}</h3>
+                    <p class="address">{{ $shortAddress(userAddress, 8, '....') }}
                         <IconCopy />
                     </p>
                     <div class="profile_stats">
@@ -110,14 +110,21 @@ import IconBadge from '../../icons/IconBadge.vue';
 
 <script>
 import Authentication from '../../../scripts/Authentication'
+import Profile from '../../../scripts/Profile';
 export default {
     data() {
         return {
             userAddress: null
         }
     },
-   async mounted() {
+    async mounted() {
         this.userAddress = await Authentication.userAddress()
+    },
+    updated() {
+        if (this.userAddress) {
+            let el = Profile.generate(82, this.userAddress)
+            document.getElementById('img').appendChild(el)
+        }
     }
 }
 </script>
@@ -198,11 +205,19 @@ main {
     gap: 30px;
 }
 
-.profile_info img {
+.profile_info .image {
     width: 114px;
-height: 114px;
-border-radius: 10px;
-object-fit: cover;
+    height: 114px;
+    background: var(--bglighter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.profile_info .img {
+    height: 82px;
 }
 
 .profile_names {

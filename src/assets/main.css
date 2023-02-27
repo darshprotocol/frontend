@@ -52,3 +52,13 @@ a {
     transform: translateY(0);
   }
 }
+
+@keyframes fade_in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

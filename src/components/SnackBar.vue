@@ -50,7 +50,7 @@ export default {
 <style scoped>
 .snackbars {
     position: fixed;
-    left: 50%;
+    left: calc(50% + 123px);
     bottom: 0;
     transform: translate(-50%, 0);
     z-index: 100;
@@ -68,6 +68,7 @@ export default {
     align-items: center;
     gap: 20px;
     position: relative;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .indicator {

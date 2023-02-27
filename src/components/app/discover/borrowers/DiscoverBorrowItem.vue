@@ -135,7 +135,7 @@
         
         <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="lenderLoan" v-if="payback && lenderLoan" v-on:close="payback = false" />
         
-        <LendPopUp v-on:done="fetchLendingOffer(false)" v-if="lend" :offer="offer" v-on:close="lend = false" />
+        <LendPopUp v-on:done="fetchLendingOffer(false)" v-if="lend" :offer="offer" v-on:close="onLend()" />
         
         <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo && lenderLoan"
             v-on:close="loanInfo = false" />
@@ -163,6 +163,7 @@ import BorrowerStats from './LenderStats.vue';
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
+import { messages } from '../../../../reactives/messages';
 export default {
     data() {
         return {
@@ -185,6 +186,17 @@ export default {
         this.userAddress = await Authentication.userAddress()
     },
     methods: {
+         onLend: function () {
+            if (this.lenderRequest) {
+                messages.insertMessage({
+                    title: 'Action failed',
+                    description: 'Cancel Lend Request to Lend a loan.',
+                    type: 'failed'
+                })
+                return
+            }
+            this.lend = true
+        },
         startCountdown: function () {
             let to = this.offer.expiresAt * 1000
             let _this = this

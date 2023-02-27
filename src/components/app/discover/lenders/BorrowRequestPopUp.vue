@@ -302,6 +302,7 @@ export default {
         this.getCollateralAmount()
         let interest = this.getInterest(this.offer.interest, this.offer.daysToMaturity)
         this.interest = Number(interest)
+        
         document.body.classList.add('modal')
     },
     unmounted() {

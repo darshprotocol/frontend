@@ -22,12 +22,11 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="transfer in sortActivities(offer.transfers)" :key="transfer._id">
+                <tbody v-for="transfer, index in sortActivities(offer.transfers)" :key="transfer._id">
                     <tr>
                         <td>
                             <div>
-                                <img v-if="transfer.from == userAddress" :src="`/images/user1.png`" alt="">
-                                <img v-else :src="`/images/user2.png`" alt="">
+                                <div :id="`img_vault${index}`" class="img"></div>
 
                                 <p v-if="transfer.from == userAddress">You</p>
                                 <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Lender 1</p>
@@ -95,6 +94,7 @@ import IconAddCircle from '../../../icons/IconAddCircle.vue'
 import IconMinusCircle from '../../../icons/IconMinusCircle.vue'
 import IconCoin from '../../../icons/IconCoin.vue';
 import IconLock from '../../../icons/IconLock.vue';
+import Profile from '../../../../scripts/Profile';
 </script >
 
 <script>
@@ -108,6 +108,12 @@ export default {
                 return activities.filter(activity => activity.from == this.userAddress.toLowerCase())
             }
         },
+    },
+    mounted() {
+        for (let index = 0; index < this.offer.transfers.length; index++) {
+            let el = Profile.generate(20, this.offer.transfers[index].from)
+            document.getElementById(`img_vault${index}`).appendChild(el)
+        }
     }
 }
 </script>
@@ -216,6 +222,11 @@ export default {
     font-size: 14px;
     color: var(--textnormal);
     margin-top: 2px;
+}
+
+.request_table tbody td .img {
+    width: 20px;
+    height: 20px;
 }
 
 .request_table tbody td img {

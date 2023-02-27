@@ -24,7 +24,7 @@ const Approval = {
         const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
         const contract = new web3.eth.Contract(ERC20.abi, tokenAddress)
 
-        if (tokenAddress == nativeAddress) return '100000000000000000000000000000000000000000'
+        if (tokenAddress.toLowerCase() == nativeAddress.toLowerCase()) return '100000000000000000000000000000000000000000'
 
         try {
             return await contract.methods.allowance(userAddress, spender).call();

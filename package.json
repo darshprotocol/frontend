@@ -17,6 +17,7 @@
     "arc-progress": "^1.0.0",
     "axios": "^1.3.2",
     "gsap": "^3.11.4",
+    "jazzicon": "^1.5.0",
     "swiper": "^8.4.6",
     "truffle-contract": "^4.0.31",
     "vue": "^3.2.45",

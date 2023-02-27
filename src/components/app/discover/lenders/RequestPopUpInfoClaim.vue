@@ -37,7 +37,7 @@
                 <div>
                     <div class="label">Borrower</div>
                     <div class="box_grid_item">
-                        <img class="photo" src="/images/user1.png" />
+                        <div id="img_borrower" class="photo"></div>
                         <p>Borrower 01</p>
                     </div>
                 </div>
@@ -61,6 +61,7 @@
 import { messages } from '../../../../reactives/messages';
 import Authentication from '../../../../scripts/Authentication';
 import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
+import Profile from '../../../../scripts/Profile';
 import IconClock from '../../../icons/IconClock.vue';
 import IconClose from '../../../icons/IconClose.vue';
 import IconInterest from '../../../icons/IconInterest.vue';
@@ -115,6 +116,9 @@ export default {
         }
     },
     mounted() {
+        let el = Profile.generate(30, this.request.creator)
+        document.getElementById(`img_borrower`).appendChild(el)
+
         document.body.classList.add('modal')
     },
     unmounted() {

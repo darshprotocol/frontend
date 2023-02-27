@@ -36,7 +36,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = principalToken == nativeAddress
+        let isNative = principalToken.toLowerCase() == nativeAddress
         if (collateralTokens.length == 0) return null
 
         try {
@@ -70,7 +70,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = principalToken == nativeAddress
+        let isNative = principalToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.acceptBorrowingOffer(
@@ -126,7 +126,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = principalToken == nativeAddress
+        let isNative = principalToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.createLendingRequest(
@@ -174,7 +174,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = collateralToken == nativeAddress
+        let isNative = collateralToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.createBorrowingOffer(
@@ -207,7 +207,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = collateralToken == nativeAddress
+        let isNative = collateralToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.acceptLendingOffer(
@@ -264,7 +264,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = collateralToken == nativeAddress
+        let isNative = collateralToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.createBorrowingRequest(
@@ -344,7 +344,7 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        let isNative = principalToken == nativeAddress
+        let isNative = principalToken.toLowerCase() == nativeAddress
 
         try {
             const trx = await instance.repayLoan(

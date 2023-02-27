@@ -2,6 +2,7 @@ import AssetLibrary from '../utils/AssetLibrary'
 import Converter from '../utils/Converter'
 import Approval from '../scripts/Approval'
 import Countdown from '../utils/Countdown'
+import Profile from '../scripts/Profile'
 export default {
     // eslint-disable-next-line no-unused-vars
     install: (app, options) => {
@@ -34,6 +35,12 @@ export default {
         },
         app.config.globalProperties.$approve = async (userAddress, tokenAddress, spender) => {
             return await Approval.approve(userAddress, '1000000000000000000000000000', tokenAddress, spender)
+        },
+        app.config.globalProperties.$shortAddress = (userAddress, pad, gap) => {
+            return Profile.shortAddress(userAddress, pad, gap)
+        },
+        app.config.globalProperties.$shortName = (userAddress, pad) => {
+            return Profile.shortName(userAddress, pad)
         },
         app.config.globalProperties.$allowanceOf = async (userAddress, tokenAddress, spender) => {
             return await Approval.getAllocationOf(userAddress, tokenAddress, spender)

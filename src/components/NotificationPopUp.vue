@@ -23,11 +23,11 @@
                     <div v-for="(notification, index) in data" :key="index"
                         :class="!notification.markedAsRead ? 'notification active' : 'notification'">
                         <div class="image">
-                            <img :src="notification.from.image" alt="">
+                            <div class="img" :id="`img_notification${index}`"></div>
                         </div>
                         <div class="text">
                             <p class="action">
-                                <span v-if="notification.from.name">{{ notification.from.name }}</span>
+                                <span>{{ $shortName(notification.from.address, 6) }}</span>
                                 {{ notification.action }}
                             </p>
                             <p class="timestamp">
@@ -51,8 +51,9 @@
 </template>
 
 <script setup>
-import IconClose from '../icons/IconClose.vue';
-import IconOut from '../icons/IconOut.vue';
+import Profile from '../scripts/Profile';
+import IconClose from './icons/IconClose.vue';
+import IconOut from './icons/IconOut.vue';
 </script>
 
 <script>
@@ -62,8 +63,7 @@ export default {
             data: [
                 {
                     from: {
-                        image: "/images/user1.png",
-                        name: "LenderA.ftm"
+                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
                     },
                     action: "accepts your request.",
                     actionCode: 1,
@@ -72,8 +72,7 @@ export default {
                 },
                 {
                     from: {
-                        image: "/images/user1.png",
-                        name: "Alice.ftm"
+                        address: "0x0Ae2BbC63Ac6A365E4424a6E4BD91f99B8C006dC",
                     },
                     action: "rejects your request.",
                     actionCode: 2,
@@ -82,7 +81,7 @@ export default {
                 },
                 {
                     from: {
-                        image: "/images/user1.png"
+                        address: "0x36c8f83F1dcC316d591d5c15935951D240752558",
                     },
                     action: "Your request expires.",
                     actionCode: 3,
@@ -91,7 +90,7 @@ export default {
                 },
                 {
                     from: {
-                        image: "/images/user1.png"
+                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
                     },
                     action: "You accepted a request.",
                     actionCode: 1,
@@ -100,7 +99,8 @@ export default {
                 },
                 {
                     from: {
-                        image: "/images/user1.png"
+                        image: "/images/user1.png",
+                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
                     },
                     action: "You rejected a request.",
                     actionCode: 2,
@@ -110,7 +110,7 @@ export default {
                 {
                     from: {
                         image: "/images/user1.png",
-                        name: "Alice.ftm"
+                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2"
                     },
                     action: "rejects your request.",
                     actionCode: 2,
@@ -119,6 +119,12 @@ export default {
                 }
             ]
         };
+    },
+    mounted() {
+        for (let index = 0; index < this.data.length; index++) {
+            let el = Profile.generate(50, this.data[index].from.address)
+            document.getElementById(`img_notification${index}`).appendChild(el)
+        }
     }
 }
 </script>
@@ -133,10 +139,11 @@ main {
     top: 0;
     left: 0;
     background: rgba(20, 20, 22, 0.5);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    animation: fade_in .2s ease-in-out;
 }
 
 .box {
@@ -221,7 +228,7 @@ main {
     padding: 25px 30px;
 }
 
-.notification .image img {
+.notification .image .img {
     width: 50px;
     height: 50px;
     border-radius: 50%;

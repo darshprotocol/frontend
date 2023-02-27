@@ -1,6 +1,6 @@
 <script setup>
 import AppHeader from '../components/app/AppHeader.vue';
-import NotificationPopUp from '../components/app/NotificationPopUp.vue';
+import NotificationPopUp from '../components/NotificationPopUp.vue';
 import SideBar from '../components/app/SideBar.vue';
 import SnackBar from '../components/SnackBar.vue';
 </script>
