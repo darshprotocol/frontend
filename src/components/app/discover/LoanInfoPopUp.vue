@@ -196,6 +196,7 @@ main {
     background-color: var(--bglight);
     border-radius: 6px;
     overflow: hidden;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

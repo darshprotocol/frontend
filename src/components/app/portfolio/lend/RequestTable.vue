@@ -84,7 +84,7 @@
             </div>
         </table>
 
-        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+        <RequestPopUpInfo :offer="offer" v-on:done="$emit('done')" :requestAction="requestAction" v-if="requestAction"
             v-on:close="requestAction = null" />
     </main>
 </template>
@@ -93,7 +93,7 @@
 import Authentication from '../../../../scripts/Authentication';
 import IconOut from '../../../icons/IconOut.vue';
 import IconSort from '../../../icons/IconSort.vue';
-import RequestPopUpInfo from '../../discover/borrowers/RequestPopUpInfo.vue';
+import RequestPopUpInfo from '../../discover/lenders/RequestPopUpInfo.vue';
 </script >
 
 <script>

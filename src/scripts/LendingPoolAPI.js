@@ -447,6 +447,49 @@ const LendingPoolAPI = {
             console.error(error);
             return null
         }
+    },
+
+    ////////////////// Remove Offer
+    removePrincipal: async function (
+        offerId, percentage, userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            const trx = await instance.removePrincipal(
+                offerId,
+                percentage,
+                {
+                    from: userAddress
+                }
+            )
+            return trx
+        } catch (error) {
+            console.error(error);
+            return null
+        }
+    },
+
+    removeCollateral: async function (
+        offerId, percentage, userAddress
+    ) {
+        const instance = await this.getInstance()
+        if (instance == null) return null
+
+        try {
+            const trx = await instance.removeCollateral(
+                offerId,
+                percentage,
+                {
+                    from: userAddress
+                }
+            )
+            return trx
+        } catch (error) {
+            console.error(error);
+            return null
+        }
     }
 }
 

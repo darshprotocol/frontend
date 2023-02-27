@@ -3,7 +3,7 @@
         <div class="table_head">
             <div class="title">
                 <p>Lend Requests</p>
-                <span>{{ offer.requests.length }}</span>
+                <span>{{ sortRequests(offer.requests).length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <div class="tbody">
-                <tbody v-for="request in offer.requests" :key="request._id">
+                <tbody v-for="request in sortRequests(offer.requests)" :key="request._id">
                     <tr>
                         <td>
                             <div>
@@ -53,20 +53,19 @@
                         </td>
                         <td>
                             <div>
-                                <img :src="`/images/${$findAsset(request.collateralToken).image}.png`" alt="">
-                                <p>{{ $toMoney($fromWei(request.collateralAmount), 3) }}</p>
+                                <img :src="`/images/${$findAsset(offer.collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(getCollateral(request.percentage))) }}</p>
                             </div>
                         </td>
                         <td>
                             <p>{{ getExpire(request) }} hours</p>
                         </td>
                         <td>
-                            <div v-if="accepting == request.requestId" class="action accept">•••</div>
-                            <div v-else v-on:click="accepting != -1 ? acceptRequest(request) : null" class="action accept">
+                            <div v-on:click="setRequestAction('accept', request)" class="action accept">
                                 Accept</div>
                         </td>
                         <td>
-                            <div class="action reject">Reject</div>
+                            <div v-on:click="setRequestAction('reject', request)" class="action reject">Reject</div>
                         </td>
                         <td>
                             <RouterLink :to="''">
@@ -79,11 +78,14 @@
                     </tr>
                 </tbody>
             </div>
-            <div class="t_empty" v-if="offer.requests.length == 0">
+            <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
                 <img src="../../../../assets/images/receipt-text.png" alt="">
                 <p>No Borrow Requests found.</p>
             </div>
         </table>
+
+        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
+            v-on:close="requestAction = null" v-on:done="$emit('done')" />
     </main>
 </template>
 <script setup>
@@ -92,8 +94,65 @@ import IconSort from '../../../icons/IconSort.vue';
 </script >
 
 <script>
+import Authentication from '../../../../scripts/Authentication';
+import RequestPopUpInfo from '../../discover/borrowers/RequestPopUpInfo.vue';
 export default {
-    props: ["offer"]
+    props: ["offer"],
+    data() {
+        return {
+            activeRequest: "",
+            userAddress: "",
+            requestAction: null,
+            accepting: -1
+        };
+    },
+    methods: {
+        sortRequests: function (requests) {
+            return requests.filter(request => request.state == 0);
+        },
+        setRequestAction: function (action, request) {
+            this.requestAction = {
+                action: action,
+                request: request
+            };
+        },
+        getPrincipal: function (percentage) {
+            let principal = this.offer.initialPrincipal * (percentage / 100);
+            return principal.toString();
+        },
+        getCollateral: function (percentage) {
+            let collateral = this.offer.initialCollateral * (percentage / 100);
+            return collateral.toString();
+        },
+        getPayback: function (request) {
+            let accrued = this.$fromWei(this.getAccrued(request));
+            let principal = this.$fromWei(this.getPrincipal(request.percentage));
+            return Number(accrued) + Number(principal);
+        },
+        getAccrued: function (request) {
+            let duration = request.daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(request.interest);
+            let principalAmount = (this.getPrincipal(request.percentage));
+            let accrued = (principalAmount * interest * duration) / 100;
+            return accrued;
+        },
+        getInterest: function (rate, daysToMaturity) {
+            let result = rate * daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
+        },
+        getExpire: function (request) {
+            let expire = request.expiresAt;
+            let now = Date.now() / 1000;
+            let elasped = expire - now;
+            if (elasped <= 0)
+                return 0;
+            return (elasped / 60 / 60).toFixed(0);
+        },
+    },
+    async created() {
+        this.userAddress = await Authentication.userAddress();
+    }
 }
 </script>
 

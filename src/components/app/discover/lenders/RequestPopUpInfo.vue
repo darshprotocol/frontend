@@ -106,7 +106,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Accept failed',
@@ -117,6 +116,8 @@ export default {
 
             this.$emit('done')
             this.$emit('close')
+
+            this.accepting = false
         },
         rejectRequest: async function () {
             this.rejecting = true
@@ -144,6 +145,8 @@ export default {
 
             this.$emit('done')
             this.$emit('close')
+
+            this.rejecting = false
         }
     },
     mounted() {

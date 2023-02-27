@@ -26,7 +26,7 @@ import PortfolioLendItem from '../components/app/portfolio/lend/PortfolioLendIte
 import PortfolioBorrowItem from '../components/app/portfolio/borrow/PortfolioBorrowItem.vue'
 
 import PortfolioVault from '../components/app/portfolio/vault/PortfolioVault.vue'
-import VaultItem from '../components/app/vault/VaultItem.vue'
+import VaultItem from '../components/app/portfolio/vault/VaultItem.vue'
 
 import DashBoardItem from '../components/app/dashboard/DashBoardItem.vue'
 

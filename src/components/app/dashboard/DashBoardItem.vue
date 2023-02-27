@@ -157,7 +157,7 @@ export default {
             },
             series: [{
                 name: 'TVL',
-                data: [30, 50, 31, 20, 49, 60, 40, 91, 125, 30, 21],
+                data: [34, 35, 31, 38, 40, 35, 42, 38, 34, 38, 80],
             }],
             xaxis: {
                 categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],

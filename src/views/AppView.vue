@@ -1,5 +1,6 @@
 <script setup>
 import AppHeader from '../components/app/AppHeader.vue';
+import NotificationPopUp from '../components/app/NotificationPopUp.vue';
 import SideBar from '../components/app/SideBar.vue';
 import SnackBar from '../components/SnackBar.vue';
 </script>
@@ -7,7 +8,8 @@ import SnackBar from '../components/SnackBar.vue';
 <template>
     <div class="app-section">
         <div class="app-width">
-            <AppHeader :userAddress="userAddress" v-on:connected="userAddress = $event" />
+            <AppHeader v-on:notification="notification = true" :userAddress="userAddress"
+                v-on:connected="userAddress = $event" />
             <div class="app">
                 <SideBar class="sidebar" />
                 <div></div>
@@ -18,6 +20,7 @@ import SnackBar from '../components/SnackBar.vue';
         </div>
 
         <SnackBar />
+        <NotificationPopUp v-on:close="notification = false" v-if="notification" />
     </div>
 </template>
 
@@ -25,7 +28,8 @@ import SnackBar from '../components/SnackBar.vue';
 export default {
     data() {
         return {
-            userAddress: null
+            userAddress: null,
+            notification: false
         };
     }
 }

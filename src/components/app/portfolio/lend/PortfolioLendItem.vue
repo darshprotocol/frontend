@@ -9,7 +9,7 @@
         <div class="header">
             <div class="toolbar">
                 <div class="path">
-                    <RouterLink :to="`/discover/borrow/${this.$route.params.id}`">
+                    <RouterLink :to="`/discover/lenders/${this.$route.params.id}`">
                         <p>My Lend Offer</p>
                     </RouterLink>
                     <span>/</span>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="buttons" v-else>
-                    <RouterLink :to="`/vault/${offer._id}`">
+                    <RouterLink :to="`/portfolio/vault/${offer._id}`">
                         <div class="go_to_vault">
                             <p>Go to Loan's Vault</p>
                             <IconOut :color="'var(--textnormal)'" />
@@ -83,7 +83,8 @@
                         <div class="extra_user">0 <span>Borrowers</span></div>
                     </div>
                     <div class="borrowers" v-else>
-                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId" :src="`/images/user${index + 1}.png`" />
+                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId"
+                            :src="`/images/user${index + 1}.png`" />
                         <div class="extra_user">{{ offer.loans.length }} <span>Borrowers</span></div>
                     </div>
                     <div class="expires_at" v-if="offer.loans.length == 0">
@@ -102,12 +103,15 @@
                     </div>
                 </div>
                 <div class="second_row_item">
-                    <PrimaryButton :text="'Remove'" :bg="'rgba(108, 110, 115, 0.1)'" />
+                    <PrimaryButton v-on:click="removePrincipal = true" :text="'Remove'" :bg="'rgba(108, 110, 115, 0.1)'" />
                 </div>
             </div>
         </div>
 
-        <RequestTable class="table" :offer="offer" />
+        <RemovePrincipalPopUp v-if="removePrincipal" v-on:done="fetchLendingOffer(false)" :offer="offer"
+            v-on:close="removePrincipal = false" />
+
+        <RequestTable class="table" :offer="offer" v-on:done="fetchLendingOffer(false)" />
     </main>
 </template>
 
@@ -125,6 +129,7 @@ import ProgressBox from '../../../ProgressBox.vue';
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
 import IconOut from '../../../icons/IconOut.vue';
+import RemovePrincipalPopUp from './RemovePrincipalPopUp.vue';
 export default {
     data() {
         return {
@@ -132,7 +137,8 @@ export default {
             userAddress: null,
             editOptions: false,
             offer: null,
-            dueDate: ""
+            dueDate: "",
+            removePrincipal: false
         };
     },
     methods: {
@@ -147,9 +153,9 @@ export default {
                 this.dueDate = text;
             });
         },
-        fetchBorrowingOffer: async function () {
+        fetchLendingOffer: async function (fetching) {
             let id = this.$route.params.id;
-            this.fetching = true;
+            this.fetching = fetching;
             if (this.userAddress == null) {
                 return;
             }
@@ -167,8 +173,9 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-        this.fetchBorrowingOffer();
-    }
+        this.fetchLendingOffer(true);
+    },
+    components: { RemovePrincipalPopUp }
 }
 </script>
 

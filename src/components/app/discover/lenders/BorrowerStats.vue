@@ -1,7 +1,7 @@
 <template>
     <div class="stats" v-if="userType != 'lender'">
         <div class="owner">
-            <p>Lender's Stats</p>
+            <p>Lender's Ratings</p>
             <div v-on:click="$emit('profile')">
                 <IconInformation />
                 <p>Info</p>
@@ -9,7 +9,7 @@
         </div>
         <div :class="`score ${score.tag}`">
             <div>
-                <p>Trust Score</p>
+                <!-- <p>Trust Score</p> -->
                 <div>
                     <IconBadge />
                     <p><span>{{ score.score }}</span> of 100</p>
@@ -124,7 +124,7 @@ export default {
 
 .score>div:first-child>div {
     display: flex;
-    margin-top: 12px;
+    /* margin-top: 12px; */
     align-items: center;
     gap: 10px;
 }

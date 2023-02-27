@@ -177,21 +177,21 @@
 </template>
 
 <script setup>
-import IconChart from '../../icons/IconChart.vue';
-import IconClock from '../../icons/IconClock.vue';
-import IconInfo from '../../icons/IconInfo.vue';
-import IconInformation from '../../icons/IconInformation.vue';
-import IconOut from '../../icons/IconOut.vue';
-import PrimaryButton from '../../PrimaryButton.vue';
+import IconChart from '../../../icons/IconChart.vue';
+import IconClock from '../../../icons/IconClock.vue';
+import IconInfo from '../../../icons/IconInfo.vue';
+import IconInformation from '../../../icons/IconInformation.vue';
+import IconOut from '../../../icons/IconOut.vue';
+import PrimaryButton from '../../../PrimaryButton.vue';
 import HistoryTable from './HistoryTable.vue'
-import ProgressBox from '../../ProgressBox.vue';
+import ProgressBox from '../../../ProgressBox.vue';
 </script>
 
 <script>
-import Authentication from '../../../scripts/Authentication';
-import IconCalendar from '../../icons/IconCalendar.vue';
-import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
-import { messages } from '../../../reactives/messages';
+import Authentication from '../../../../scripts/Authentication';
+import IconCalendar from '../../../icons/IconCalendar.vue';
+import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
+import { messages } from '../../../../reactives/messages';
 export default {
     data() {
         return {

@@ -28,7 +28,7 @@
                             <div>
                                 <img v-if="transfer.from == userAddress" :src="`/images/user1.png`" alt="">
                                 <img v-else :src="`/images/user2.png`" alt="">
-                                
+
                                 <p v-if="transfer.from == userAddress">You</p>
                                 <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Lender 1</p>
                                 <p v-else-if="transfer.from != userAddress && offer.offerType == 1">Borrower 1</p>
@@ -56,8 +56,8 @@
                         <td>
                             <div>
                                 <p>{{ $toDate(transfer.timestamp).month + ' ' + $toDate(transfer.timestamp).date }}, <span>
-                                    {{ $toDate(transfer.timestamp).hour + ':' + $toDate(transfer.timestamp).min }}
-                                </span></p>
+                                        {{ $toDate(transfer.timestamp).hour + ':' + $toDate(transfer.timestamp).min }}
+                                    </span></p>
                             </div>
                         </td>
                         <td>
@@ -81,7 +81,7 @@
                 </tbody>
             </div>
             <div class="t_empty" v-if="offer.transfers.length == 0">
-                <img src="../../../assets/images/receipt-text.png" alt="">
+                <img src="../../../../assets/images/receipt-text.png" alt="">
                 <p>No activity.</p>
             </div>
         </table>
@@ -89,12 +89,12 @@
 </template>
 
 <script setup>
-import IconOut from '../../icons/IconOut.vue';
-import IconSort from '../../icons/IconSort.vue';
-import IconAddCircle from '../../icons/IconAddCircle.vue'
-import IconMinusCircle from '../../icons/IconMinusCircle.vue'
-import IconCoin from '../../icons/IconCoin.vue';
-import IconLock from '../../icons/IconLock.vue';
+import IconOut from '../../../icons/IconOut.vue';
+import IconSort from '../../../icons/IconSort.vue';
+import IconAddCircle from '../../../icons/IconAddCircle.vue'
+import IconMinusCircle from '../../../icons/IconMinusCircle.vue'
+import IconCoin from '../../../icons/IconCoin.vue';
+import IconLock from '../../../icons/IconLock.vue';
 </script >
 
 <script>

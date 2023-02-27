@@ -1,5 +1,6 @@
 <template>
-    <main>
+    <p v-if="!userAddress">Connect Wallet</p>
+    <main v-if="userAddress">
         <div class="header">
             <h3 class="title">Portfolio</h3>
             <div class="ratings">
@@ -20,7 +21,10 @@
                 <img src="/images/user4.png" alt="">
                 <div class="profile_names">
                     <h3>Ibro.ftm</h3>
-                    <p class="address">0xdf15a4....d2e2ds89
+                    <p class="address">{{ userAddress.substring(0, 8) }}....{{
+                        userAddress.substring(userAddress.length - 8,
+                            userAddress.length)
+                    }}
                         <IconCopy />
                     </p>
                     <div class="profile_stats">
@@ -102,6 +106,20 @@ import IconSort from '../../icons/IconSort.vue';
 import IconAdd from '../../icons/IconAdd.vue';
 import IconCopy from '../../icons/IconCopy.vue';
 import IconBadge from '../../icons/IconBadge.vue';
+</script>
+
+<script>
+import Authentication from '../../../scripts/Authentication'
+export default {
+    data() {
+        return {
+            userAddress: null
+        }
+    },
+   async mounted() {
+        this.userAddress = await Authentication.userAddress()
+    }
+}
 </script>
 
 <style scoped>

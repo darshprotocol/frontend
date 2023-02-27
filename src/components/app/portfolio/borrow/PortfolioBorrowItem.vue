@@ -9,7 +9,7 @@
         <div class="header">
             <div class="toolbar">
                 <div class="path">
-                    <RouterLink :to="`/discover/lend/${this.$route.params.id}`">
+                    <RouterLink :to="`/discover/borrowers/${this.$route.params.id}`">
                         <p>My Borrow Offer</p>
                     </RouterLink>
                     <span>/</span>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="buttons" v-else>
-                    <RouterLink :to="`/vault/${offer._id}`">
+                    <RouterLink :to="`/portfolio/vault/${offer._id}`">
                         <div class="go_to_vault">
                             <p>Go to Loan's Vault</p>
                             <IconOut :color="'var(--textnormal)'" />
@@ -93,7 +93,7 @@
                                 {{ $findAsset(offer.principalToken).symbol }}
                             </p>
                         </div>
-                        <p>Total Principal Lent</p>
+                        <p>Total Principal Received</p>
                     </div>
                 </div>
                 <div class="second_row_item">
@@ -102,14 +102,12 @@
             </div>
         </div>
 
-        <RequestTable class="table" :offer="offer" />
-
-        <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
-            v-on:close="requestAction = null" />
+        <RequestTable class="table" :offer="offer" v-on:done="fetchBorrowingOffer(false)" />
     </main>
 </template>
 
 <script setup>
+import IconOut from '../../../icons/IconOut.vue';
 import IconChart from '../../../icons/IconChart.vue';
 import IconClock from '../../../icons/IconClock.vue';
 import IconInterest from '../../../icons/IconInterest.vue';
@@ -121,7 +119,6 @@ import ProgressBox from '../../../ProgressBox.vue';
 
 <script>
 import Authentication from '../../../../scripts/Authentication';
-import RequestPopUpInfo from '../../discover/borrowers/RequestPopUpInfo.vue';
 import Countdown from '../../../../utils/Countdown';
 export default {
     data() {
@@ -145,9 +142,9 @@ export default {
                 this.dueDate = text;
             });
         },
-        fetchBorrowingOffer: async function () {
+        fetchBorrowingOffer: async function (fetching) {
             let id = this.$route.params.id;
-            this.fetching = true;
+            this.fetching = fetching;
             if (this.userAddress == null) {
                 return;
             }
@@ -165,9 +162,8 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-        this.fetchBorrowingOffer();
-    },
-    components: { RequestPopUpInfo }
+        this.fetchBorrowingOffer(true);
+    }
 }
 </script>
 
@@ -263,6 +259,29 @@ export default {
 
 .edit_icon svg {
     width: 18px;
+}
+
+
+.go_to_vault {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: var(--bglighter);
+    border-radius: 2px;
+}
+
+.go_to_vault svg {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.go_to_vault p {
+    padding: 0 30px;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 
 /* dashboard */
@@ -373,6 +392,34 @@ export default {
     color: var(--textnormal);
 }
 
+
+.total_borrowed {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.total_borrowed>div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.total_borrowed img {
+    width: 17px;
+    height: 17px;
+}
+
+.total_borrowed div p {
+    font-size: 14px;
+    color: var(--textnormal);
+}
+
+.total_borrowed>p {
+    font-size: 12px;
+    margin-top: 8px;
+    color: var(--textdimmed);
+}
 
 .borrowers {
     display: flex;

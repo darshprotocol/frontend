@@ -2,13 +2,13 @@
     <main>
         <div class="box">
             <div class="title">
-                <h3>Borrow Request</h3>
+                <h3>Lend Request</h3>
                 <div v-if="!(accepting || rejecting)" class="close" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
             <div class="principal_needed">
-                <p class="label">Principal Needed</p>
+                <p class="label">Principal</p>
                 <div class="principal_needed_token">
                     <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                     <p>
@@ -35,16 +35,16 @@
             </div>
             <div class="box_grid">
                 <div>
-                    <div class="label">Borrower</div>
+                    <div class="label">Lender</div>
                     <div class="box_grid_item">
                         <img class="photo" src="/images/user1.png" />
-                        <p>Borrower 01</p>
+                        <p>Lender 01</p>
                     </div>
                 </div>
                 <div class="collateral">
-                    <div class="label">Borrower's Collateral</div>
+                    <div class="label">Collateral required</div>
                     <div class="box_grid_item">
-                        <p>{{ $toMoney($fromWei(requestAction.request.collateralAmount)) }}</p>
+                        <p>{{ $toMoney($fromWei(getCollateral(requestAction.request.percentage))) }}</p>
                         <img class="icon" :src="`/images/${$findAsset(offer.collateralToken).image}.png`" />
                     </div>
                 </div>
@@ -85,6 +85,10 @@ export default {
             let principal = this.offer.initialPrincipal * (percentage / 100);
             return principal.toString();
         },
+        getCollateral: function (percentage) {
+            let collateral = this.offer.initialCollateral * (percentage / 100);
+            return collateral.toString();
+        },
         getInterest: function (rate, daysToMaturity) {
             let result = rate * daysToMaturity * 24 * 60 * 60;
             let interest = this.$fromWei(result.toString());
@@ -106,7 +110,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Accept failed',
@@ -117,6 +120,8 @@ export default {
 
             this.$emit('done')
             this.$emit('close')
+
+            this.accepting = false
         },
         rejectRequest: async function () {
             this.rejecting = true
@@ -144,6 +149,8 @@ export default {
 
             this.$emit('done')
             this.$emit('close')
+
+            this.rejecting = false
         }
     },
     mounted() {
@@ -178,6 +185,7 @@ main {
     background-image: url('/images/request_gradient.png');
     border-radius: 6px;
     overflow: hidden;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

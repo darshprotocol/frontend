@@ -9,7 +9,7 @@
                 <RouterLink to="/faucet">Faucet</RouterLink>
             </div>
             <div class="actions">
-                <div class="notifications icon_badge">
+                <div class="notifications icon_badge" v-on:click="$emit('notification')">
                     <IconNotification />
                     <div class="new_notification"></div>
                 </div>
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-</main>
+    </main>
 </template>
 
 <script setup>
@@ -38,16 +38,17 @@ import IconSettings from '../icons/IconSettings.vue';
 <script>
 import Authentication from '../../scripts/Authentication'
 export default {
-    props: ['userAddress'],
+    props: ["userAddress"],
     methods: {
         authenticate: async function (request = false) {
-            const userAddress = await Authentication.userAddress(request)
-            if (request) this.$router.go()
-            this.$emit('connected', userAddress)
+            const userAddress = await Authentication.userAddress(request);
+            if (request)
+                this.$router.go();
+            this.$emit("connected", userAddress);
         }
     },
     mounted() {
-        this.authenticate()
+        this.authenticate();
     }
 }
 </script>

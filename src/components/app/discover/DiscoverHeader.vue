@@ -68,8 +68,6 @@ main {
 }
 
 .title {
-    
-    
     font-weight: 500;
     font-size: 30px;
     color: var(--textnormal);
@@ -86,8 +84,6 @@ main {
 }
 
 .label p {
-    
-    
     font-weight: 500;
     font-size: 12px;
     line-height: 12px;
@@ -104,8 +100,6 @@ main {
 }
 
 .value p {
-    
-    
     font-weight: 500;
     font-size: 14px;
     line-height: 14px;
@@ -138,8 +132,6 @@ main {
 }
 
 .tab p {
-    
-    
     font-weight: 500;
     font-size: 16px;
     color: var(--textdimmed);

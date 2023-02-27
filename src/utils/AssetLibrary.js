@@ -8,7 +8,11 @@ const AssetLibrary = {
             type: 'native',
             address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
             maxDecimal: 6,
-            faucetAmount: '0'
+            faucetAmount: '0',
+            minLendOffer: 160,
+            maxLendOffer: 32000,
+            minBorrowOffer: 160,
+            maxBorrowOffer: 16000
         },
         {
             id: 1,
@@ -16,45 +20,65 @@ const AssetLibrary = {
             name: 'Bitcoin',
             image: 'btc',
             type: 'native',
-            address: '0x12cEef63C446f0ed1C89558d2D391358dF4f7b4B',
+            address: '0xBcEdBF29D6dff33fCf5CA6c1816CcA886fd6F5C4',
             maxDecimal: 10,
-            faucetAmount: '10000000000000000000'
+            faucetAmount: '10000000000000000000',
+            minLendOffer: 0.008,
+            maxLendOffer: 0.6,
+            minBorrowOffer: 0.008,
+            maxBorrowOffer: 0.3
         }, {
             id: 2,
             symbol: 'WETH',
             name: 'Ethereum',
             image: 'eth',
             type: 'native',
-            address: '0x949b0DAefEBEBD82Da725c5237529CBc0f3a7A19',
+            address: '0x2b42D1149f3427044acd6B310F6721c5d87c652e',
             maxDecimal: 5,
-            faucetAmount: '50000000000000000000'
+            faucetAmount: '50000000000000000000',
+            minLendOffer: 0.08,
+            maxLendOffer: 10,
+            minBorrowOffer: 0.08,
+            maxBorrowOffer: 5
         }, {
             id: 3,
             symbol: 'USDT',
             name: 'USDT',
             image: 'usdt',
             type: 'stable',
-            address: '0x642eaECe1868844aaa25fF1Faef7Fd7765a7c93f',
+            address: '0x114Eb0218066A32d072bDe9F1C396D0F0C5F5180',
             maxDecimal: 2,
-            faucetAmount: '40000000000000000000000'
+            faucetAmount: '40000000000000000000000',
+            minLendOffer: 80,
+            maxLendOffer: 20000,
+            minBorrowOffer: 80,
+            maxBorrowOffer: 10000
         }, {
             id: 4,
             symbol: 'USDC',
             name: 'USDC',
             image: 'usdc',
             type: 'stable',
-            address: '0x2ee75386c3EC42F0eeb2663278afF929c90CD5C9',
+            address: '0x81733e12b6C9c5F4Dd6459F3766dFDB2DC1f89f8',
             maxDecimal: 2,
-            faucetAmount: '40000000000000000000000'
+            faucetAmount: '40000000000000000000000',
+            minLendOffer: 80,
+            maxLendOffer: 20000,
+            minBorrowOffer: 80,
+            maxBorrowOffer: 10000
         }, {
             id: 5,
             symbol: 'DAI',
             name: 'DAI',
             image: 'dai',
             type: 'stable',
-            address: '0x1af942B51bED831d66C81b96d80F1B39E6c751f5',
+            address: '0xBE6FdBafBD486733601cA35300Cc1dbb763d6edB',
             maxDecimal: 2,
-            faucetAmount: '40000000000000000000000'
+            faucetAmount: '40000000000000000000000',
+            minLendOffer: 80,
+            maxLendOffer: 20000,
+            minBorrowOffer: 80,
+            maxBorrowOffer: 10000
         },
     ],
     findAsset: function(address) {
