@@ -94,14 +94,10 @@
 
             <!---->
             <div class="borrower_action">
-                <PrimaryButton v-on:click="emitLoan(lenderLoan)" :text="'Loan Info'"
-                    :bg="'rgba(108, 110, 115, 0.1)'" />
+                <PrimaryButton v-on:click="emitLoan(lenderLoan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
 
-                <PrimaryButton
-                    :state="(lenderLoan.unClaimedPrincipal == 0 || claimingPayback) ? 'disable' : ''"
-                    :progress="claimingPayback"
-                    v-on:click="claimPayback()"
-                    class="claim_button" :text="'Claim'" />
+                <PrimaryButton :state="(lenderLoan.unClaimedPrincipal == 0 || claimingPayback) ? 'disable' : ''"
+                    :progress="claimingPayback" v-on:click="claimPayback()" class="claim_button" :text="'Claim'" />
             </div>
         </div>
     </div>
@@ -315,7 +311,7 @@ export default {
             }
         },
         claimPayback: async function () {
-            if (this.claimingPayback) return
+            if (this.claimingPayback || this.lenderLoan.unClaimedPrincipal == 0) return
             this.claimingPayback = true
 
             const trx = await LendingPoolAPI.claimPrincipal(
@@ -338,7 +334,7 @@ export default {
                     type: 'failed'
                 })
             }
-            
+
             this.$emit('done')
             this.claimingPayback = false
         }
