@@ -9,7 +9,7 @@
         <div class="header">
             <div class="toolbar">
                 <div class="path">
-                    <RouterLink :to="`/discover/lenders/${this.$route.params.id}`">
+                    <RouterLink :to="`/discover/lenders/${$route.params.id}`">
                         <p>My Lend Offer</p>
                     </RouterLink>
                     <span>/</span>
