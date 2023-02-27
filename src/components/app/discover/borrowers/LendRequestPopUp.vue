@@ -12,7 +12,7 @@
                     <div class="option">
                         <p>Principal needed</p>
                         <div>
-                            <p>{{ $toMoney(getPrincipal() / 1e18) }}</p>
+                            <p>{{ $toMoney($fromWei(getPrincipal())) }}</p>
                             <div class="click_1">
                                 <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                                 <p>{{ $findAsset(offer.principalToken).symbol }}</p>

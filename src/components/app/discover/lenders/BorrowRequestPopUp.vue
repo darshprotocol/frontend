@@ -44,7 +44,7 @@
                         <p>Interest</p>
                         <div>
                             <div class="input">
-                                <input type="number" :style="getInputWidth(interest)" placeholder="0" min="1" max="50"
+                                <input type="number" disabled :style="getInputWidth(interest)" placeholder="0" min="1" max="50"
                                     v-model="interest">
                                 <span>%</span>
                             </div>
@@ -61,7 +61,7 @@
                     <div class="option">
                         <p>Collateral Amount</p>
                         <div>
-                            <p>{{ $toMoney(collateralAmount / 1e18) }}</p>
+                            <p>{{ $toMoney($fromWei(collateralAmount)) }}</p>
                             <div class="click_1" v-on:click="dropDown = !dropDown">
                                 <img :src="`/images/${$findAsset(collateralToken).image}.png`" alt="">
                                 <p>{{ $findAsset(collateralToken).symbol }}</p>
@@ -281,12 +281,12 @@ export default {
         },
         incrementInterest: function () {
             if (this.interest < 50) {
-                this.interest += 1;
+                this.interest += 0.5;
             }
         },
         decrementInterest: function () {
             if (this.interest > 1) {
-                this.interest -= 1;
+                this.interest -= 0.5;
             }
         },
         getInputWidth: function (value) {
