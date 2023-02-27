@@ -1,11 +1,32 @@
 const Converter = {
     fromWei: function (wei) {
-        let ether = (wei / 1e18)
-        return ether
+        try {
+            let cleanWei = ''
+            for (let index = 0; index < wei.length; index++) {
+                const element = wei[index];
+                if (index > 18) {
+                    cleanWei += '0'
+                } else {
+                    cleanWei += element
+                }
+            }
+
+            let ether = (cleanWei / 1e18)
+            if (ether < 0) return 0
+            return ether
+        } catch (error) {
+            console.error('ether', error);
+            return '0'
+        }
     },
     toWei: function (ether) {
-        let wei = (ether * 1e18)
-        return wei.toFixed(0)
+        try {
+            let wei = (ether + '000000000000000000')
+            return wei
+        } catch (error) {
+            console.error('wei', error);
+            return '0'
+        }
     },
     toMoney: function (amount, max = null) {
         let maxF = max ? max : 6

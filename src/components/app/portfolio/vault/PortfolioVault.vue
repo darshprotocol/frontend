@@ -143,7 +143,6 @@ export default {
                 return;
             }
             this.axios.get(`https://darshprotocol.onrender.com/loans/vault?address=${this.userAddress.toLowerCase()}`).then(response => {
-                console.log(response.data);
                 this.loans = response.data;
                 this.fetching = false;
             }).catch(error => {

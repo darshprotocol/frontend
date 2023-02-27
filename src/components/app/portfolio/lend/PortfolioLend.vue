@@ -123,7 +123,6 @@ export default {
                 return;
             }
             this.axios.get(`https://darshprotocol.onrender.com/offers?offerType=0&creator=${this.userAddress.toLowerCase()}`).then(response => {
-                console.log(response.data);
                 this.offers = response.data;
                 this.fetching = false;
             }).catch(error => {

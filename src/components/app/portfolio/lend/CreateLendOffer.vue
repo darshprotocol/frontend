@@ -9,7 +9,8 @@
                     <span>/</span>
                     <p class="cr">Create Lend Offer</p>
                 </div>
-                <PrimaryButton v-if="(principalAmount <= 0 || !checkbox || collateralTokens.length == 0)" :width="'160px'"
+                <PrimaryButton :progress="approving"
+                    v-if="(principalAmount <= 0 || !checkbox || collateralTokens.length == 0)" :width="'160px'"
                     :text="'Create'" :state="'disable'" />
 
                 <PrimaryButton :state="creating ? 'disable' : ''" :progress="creating"
@@ -208,13 +209,18 @@ export default {
             return this.principalAmount.toString();
         },
         findTokenBalance: function () {
-            let address = this.principalToken;
+            let address = this.principalToken.toLowerCase();
+
             if (address == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
                 address = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
             }
+
             let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase());
+
             if (!token)
                 return "0.00";
+
+
             return this.$toMoney(this.$fromWei(token.balance));
         },
         selectedPrincipal: function (address) {
@@ -228,14 +234,22 @@ export default {
             this.tokenBalances = response.data.items;
         },
         getAllowance: async function () {
-            let amount = await this.$allowanceOf(await Authentication.userAddress(), this.principalToken, LendingPoolAPI.address);
-            this.allowance = amount;
+            let amount = await this.$allowanceOf(
+                await Authentication.userAddress(),
+                this.principalToken,
+                LendingPoolAPI.address
+            );
+            this.allowance = amount.toString();
         },
         approve: async function () {
             if (this.approving)
                 return;
             this.approving = true;
-            await this.$approve(await Authentication.userAddress(), this.principalToken, LendingPoolAPI.address);
+            await this.$approve(
+                await Authentication.userAddress(),
+                this.principalToken,
+                LendingPoolAPI.address
+            );
             this.approving = false;
             this.getAllowance();
         },
@@ -317,8 +331,7 @@ export default {
                 calWidth = minWidth;
             return `width: ${calWidth}px;`;
         }
-    },
-    components: { CreateLendOfferPopUp }
+    }
 }
 </script>
 

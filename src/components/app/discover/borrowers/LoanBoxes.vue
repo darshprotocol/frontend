@@ -184,10 +184,6 @@ export default {
         nextLoan: function () {
             if (this.loanIndex < this.offer.loans.length) {
                 this.loanIndex++
-                let dis = 380 * this.loanIndex * -1
-                let style = `translateX(${dis}px);`
-                this.$refs['slides'].style.transform = style
-                console.log(this.$refs['slides'].style.transform);
             }
         },
         getDueDate: function () {

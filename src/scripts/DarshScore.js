@@ -14,7 +14,6 @@ const LtvAPI = {
 
         try {
             this.instance = await HealthScore.deployed()
-            console.log(this.instance);
             return this.instance
         } catch (error) {
             console.error(error);

@@ -96,8 +96,6 @@ const LendingPoolAPI = {
         const instance = await this.getInstance()
         if (instance == null) return null
 
-        console.log(requestId);
-
         try {
             const trx = await instance.acceptBorrowingRequest(
                 requestId,

@@ -9,8 +9,8 @@
                     <span>/</span>
                     <p class="cr">Create Borrow Offer</p>
                 </div>
-                <PrimaryButton v-if="(collateralAmount <= 0 || !checkbox)" :width="'160px'" :text="'Create'"
-                    :state="'disable'" />
+                <PrimaryButton :progress="(approving || fetchingPrice)" v-if="(collateralAmount <= 0 || !checkbox)"
+                    :width="'160px'" :text="'Create'" :state="'disable'" />
 
                 <PrimaryButton v-else-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
                     :progress="(creating || fetchingPrice)" :state="(creating || fetchingPrice) ? 'disable' : ''"
@@ -127,9 +127,10 @@
             </div>
         </div>
 
-        <CreateBorrowOfferPopUp :interest="interest" :collateral="collateralAmount" :principal="principalAmount" :collateralToken="collateralToken"
-            :daysToMaturity="daysToMaturity" :principalToken="principalToken" :hoursToExpire="hoursToExpire"
-            v-on:close="createPopUp = false" v-if="createPopUp" v-on:create="createOffer()" />
+        <CreateBorrowOfferPopUp :interest="interest" :collateral="collateralAmount" :principal="principalAmount"
+            :collateralToken="collateralToken" :daysToMaturity="daysToMaturity" :principalToken="principalToken"
+            :hoursToExpire="hoursToExpire" v-on:close="createPopUp = false" v-if="createPopUp"
+            v-on:create="createOffer()" />
     </main>
 </template>
 
@@ -242,8 +243,12 @@ export default {
             this.tokenBalances = response.data.items;
         },
         getAllowance: async function () {
-            let amount = await this.$allowanceOf(await Authentication.userAddress(), this.collateralToken, LendingPoolAPI.address);
-            this.allowance = amount;
+            let amount = await this.$allowanceOf(
+                await Authentication.userAddress(),
+                this.collateralToken, LendingPoolAPI.address
+            );
+
+            this.allowance = amount.toString();
         },
         approve: async function () {
             if (this.approving)
@@ -255,19 +260,35 @@ export default {
         },
         getCollateralAmount: async function () {
             this.fetchingPrice = true;
-            let collateralAmount = await LtvAPI.getCollateralAmount(this.principalToken, this.collateralToken, this.$toWei(this.principalAmount), await Authentication.userAddress());
+            let collateralAmount = await LtvAPI.getCollateralAmount(
+                this.principalToken,
+                this.collateralToken,
+                this.$toWei(this.principalAmount),
+                await Authentication.userAddress()
+            );
             this.fetchingPrice = false;
+
             this.collateralAmount = collateralAmount.toString();
             this.getAllowance();
         },
         createOffer: async function () {
             if (this.creating || this.fetchingPrice)
                 return;
+
             this.creating = true;
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (this.principalAmount * targetDurationInSecs);
-            const trx = await LendingPoolAPI.createBorrowingOffer(this.principalToken, this.$toWei(this.principalAmount), this.collateralToken, this.$toWei(calcInterest), this.daysToMaturity, this.hoursToExpire, await Authentication.userAddress());
+            const trx = await LendingPoolAPI.createBorrowingOffer(
+                this.principalToken,
+                this.$toWei(this.principalAmount),
+                this.collateralToken,
+                this.$toWei(calcInterest),
+                this.daysToMaturity,
+                this.hoursToExpire,
+                await Authentication.userAddress()
+            );
+
             if (trx && trx.tx) {
                 messages.insertMessage({
                     title: "Offer created",
@@ -289,6 +310,7 @@ export default {
                     type: "failed"
                 });
             }
+
             this.creating = false;
         },
         incrementDuration: function () {
