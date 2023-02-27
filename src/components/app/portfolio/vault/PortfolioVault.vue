@@ -80,13 +80,19 @@
                             <div class="emission_token_image">
                                 <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                             </div>
-                            <p>{{ $toMoney(loan.unClaimedBorrowedPrincipal) }} {{ $findAsset(loan.principalToken).symbol }}</p>
+                            <p>
+                                {{ $toMoney(loan.unClaimedBorrowedPrincipal) }} 
+                                {{ $findAsset(loan.principalToken).symbol }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </RouterLink>
         </div>
-
+        <div class="t_empty" v-if="!fetching && loans.length == 0">
+            <img src="../../../../assets/images/receipt-text.png" alt="">
+            <p>No Vaults found.</p>
+        </div>
     </main>
 </template>
 
@@ -320,5 +326,22 @@ export default {
 
 .emission_token_image img:first-child {
     margin: 0;
+}
+
+
+.t_empty {
+    width: 100%;
+    height: 298px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.t_empty p {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 </style>

@@ -114,16 +114,18 @@ import Profile from '../../../scripts/Profile';
 export default {
     data() {
         return {
-            userAddress: null
+            userAddress: null,
+            generate: false
         }
     },
     async mounted() {
         this.userAddress = await Authentication.userAddress()
     },
     updated() {
-        if (this.userAddress) {
+        if (this.userAddress && !this.generate) {
             let el = Profile.generate(82, this.userAddress)
             document.getElementById('img').appendChild(el)
+            this.generate = true
         }
     }
 }
@@ -131,7 +133,7 @@ export default {
 
 <style scoped>
 main {
-    top: -66px;
+    top: -277px;
     position: sticky;
     z-index: 5;
 }

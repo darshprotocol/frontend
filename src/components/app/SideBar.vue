@@ -1,7 +1,9 @@
 <template>
     <main>
         <div class="logo">
-            <img src="../../assets/images/logo.png" alt="">
+            <RouterLink to="/discover">
+                <img src="../../assets/images/logo.png" alt="">
+            </RouterLink>
         </div>
         <div class="overflow">
             <div class="tab_items">
@@ -259,4 +261,5 @@ main {
 .social_icon {
     width: 26px;
     height: 26px;
-}</style>
+}
+</style>

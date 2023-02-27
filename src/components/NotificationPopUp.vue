@@ -216,6 +216,14 @@ main {
     border-bottom: 2px solid var(--primary);
 }
 
+.tabs .active p {
+    color: var(--textnormal) !important;
+}
+
+.tabs .active span {
+    color: var(--textnormal) !important;
+}
+
 .scroll {
     overflow-y: auto;
     height: calc(100% - 120px);

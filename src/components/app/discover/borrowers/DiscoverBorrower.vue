@@ -62,6 +62,11 @@
                 </div>
             </RouterLink>
         </div>
+        
+        <div class="t_empty" v-if="!fetching && offers.length == 0">
+            <img src="../../../../assets/images/receipt-text.png" alt="">
+            <p>No Borrowers found.</p>
+        </div>
     </main>
 </template>
 
@@ -224,8 +229,6 @@ export default {
 }
 
 .info>div>div p {
-
-
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);
@@ -271,8 +274,6 @@ export default {
     align-items: center;
     justify-content: center;
     background: var(--background);
-
-
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
@@ -286,8 +287,6 @@ export default {
 }
 
 .needed>div>p {
-
-
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);
@@ -318,19 +317,32 @@ export default {
 }
 
 .expire p:first-child {
-
-
     font-weight: 500;
     font-size: 12px;
     color: var(--textdimmed);
 }
 
 .expire p:nth-child(2) {
-
-
     font-weight: 500;
     font-size: 12px;
     color: var(--textnormal);
     margin-top: 6px;
+}
+
+
+.t_empty {
+    width: 100%;
+    height: 298px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.t_empty p {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 </style>
