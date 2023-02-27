@@ -263,7 +263,7 @@ export default {
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.principalToken,
                 this.collateralToken,
-                this.$toWei(this.principalAmount),
+                this.$toWei(this.principalAmount.toString()),
                 await Authentication.userAddress()
             );
             this.fetchingPrice = false;

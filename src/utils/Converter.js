@@ -1,19 +1,11 @@
+import BigNumber from 'bignumber.js'
+import Units from 'ethereumjs-units'
+
 const Converter = {
     fromWei: function (wei) {
         try {
-            let cleanWei = ''
-            for (let index = 0; index < wei.length; index++) {
-                const element = wei[index];
-                if (index > 18) {
-                    cleanWei += '0'
-                } else {
-                    cleanWei += element
-                }
-            }
-
-            let ether = (cleanWei / 1e18)
-            if (ether < 0) return 0
-            return ether
+            let number = new BigNumber(wei).toFixed()
+            return Units.convert(number.toString(), 'wei', 'eth')
         } catch (error) {
             console.error('ether', error);
             return '0'
@@ -21,8 +13,9 @@ const Converter = {
     },
     toWei: function (ether) {
         try {
-            let wei = (ether + '000000000000000000')
-            return wei
+            if (ether == '') return '0'
+            let number = new BigNumber(ether).toFixed()
+            return Units.convert(number.toString(), 'eth', 'wei')
         } catch (error) {
             console.error('wei', error);
             return '0'
