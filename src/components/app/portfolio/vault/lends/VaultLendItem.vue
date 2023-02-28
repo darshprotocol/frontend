@@ -45,7 +45,7 @@
 
             <div class="second_box">
                 <div class="buttons">
-                    <RouterLink :to="`/discover/${offer.offerType == 0 ? 'borrowers' : 'lenders'}/${$route.params.id}`">
+                    <RouterLink :to="`/discover/lenders/${$route.params.id}`">
                         <div class="go_to_vault">
                             <p>Go to Vault's Loan</p>
                             <IconOut :color="'var(--textnormal)'" />
