@@ -81,8 +81,8 @@
                                 <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                             </div>
                             <p>
-                                {{ $toMoney($fromWei(loan.unClaimedBorrowedPrincipal)) }} 
-                                {{ $findAsset(loan.principalToken).symbol }}
+                                {{ $toMoney($fromWei(loan.unClaimedCollateral)) }} 
+                                {{ $findAsset(loan.collateralToken).symbol }}
                             </p>
                         </div>
                     </div>
