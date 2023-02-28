@@ -40,6 +40,7 @@ const LtvAPI = {
         principalAmount,
         userAddress
     ) {
+        console.log(principalAmount);
         const instance = await this.getInstance()
         if (instance == null) return null
 
@@ -57,8 +58,8 @@ const LtvAPI = {
                 principalAmount
             );
 
-            let base = await instance.ltv.getBase()
-            return this.percentageOf(collateralNormalAmount, ltv) / base;
+            let base = 10
+            return this.percentageOf(collateralNormalAmount, ltv / base);
         } catch (error) {
             console.error(error);
             return '0'

@@ -219,12 +219,7 @@ export default {
         },
         getPrincipal: function () {
             let principal = this.offer.initialPrincipal * (this.percentage / 100)
-            console.log(principal);
-            let a = this.$fromWei(principal)
-            console.log(a);
-            let b = this.$toWei(a)
-            console.log(b);
-            return b.toString()
+            return principal.toString()
         },
         createRequest: async function () {
             this.requesting = true
