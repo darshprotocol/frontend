@@ -80,7 +80,7 @@
                 </tbody>
             </div>
             <div class="t_empty" v-if="offer.transfers.length == 0">
-                <img src="../../../../assets/images/receipt-text.png" alt="">
+                <img src="../../../../../assets/images/receipt-text.png" alt="">
                 <p>No activity.</p>
             </div>
         </table>
