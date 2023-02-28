@@ -52,6 +52,8 @@ const LtvAPI = {
 
             let ltv = await instance.ltv.getRelativeLTV(userAddress, principalPriceInUSD);
 
+            console.log(principalPriceInUSD);
+
             let collateralNormalAmount = await instance.priceFeed.exchangeRate(
                 principalToken,
                 collateralToken,
