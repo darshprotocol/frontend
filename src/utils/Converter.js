@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import Units from 'ethereumjs-units'
 
+BigNumber.config({ DECIMAL_PLACES: 30 })
+
 const Converter = {
     fromWei: function (wei) {
         try {

@@ -192,6 +192,7 @@ export default {
         },
         getCollateralAmount: async function () {
             this.fetchingPrice = true
+            
             let collateralAmount = await LtvAPI.getCollateralAmount(
                 this.offer.principalToken,
                 this.collateralToken,
