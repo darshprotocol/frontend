@@ -33,21 +33,25 @@
             <!---->
             <div v-if="getState(lenderLoan.loanId) != 'defaulted'">
                 <p>Borrower's Collateral</p>
-                <div>
-                    <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
-                    <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }}</p>
-                    <IconOut />
-                </div>
+                <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
+                    <div style="border: none;">
+                        <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
+                        <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }}</p>
+                        <IconOut />
+                    </div>
+                </RouterLink>
             </div>
             <div v-if="getState(lenderLoan.loanId) == 'defaulted'">
                 <p>My Collateral</p>
-                <div>
-                    <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
-                    <p class="strike">{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }} {{
-                        $findAsset(lenderLoan.collateralToken).symbol
-                    }}</p>
-                    <IconOut />
-                </div>
+                <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
+                    <div style="border: none;">
+                        <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
+                        <p class="strike">{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }} {{
+                            $findAsset(lenderLoan.collateralToken).symbol
+                        }}</p>
+                        <IconOut />
+                    </div>
+                </RouterLink>
             </div>
 
             <!----->
