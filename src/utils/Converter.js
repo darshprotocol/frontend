@@ -1,13 +1,9 @@
-import BigNumber from 'bignumber.js'
-import Units from 'ethereumjs-units'
-
-BigNumber.config({ DECIMAL_PLACES: 30 })
+import convert from './BaseConverter.js'
 
 const Converter = {
     fromWei: function (wei) {
         try {
-            let number = new BigNumber(wei).toFixed()
-            return Units.convert(number.toString(), 'wei', 'eth')
+            return convert(wei, 'wei', 'ether')
         } catch (error) {
             console.error('ether', error);
             return '0'
@@ -16,8 +12,7 @@ const Converter = {
     toWei: function (ether) {
         try {
             if (ether == '') return '0'
-            let number = new BigNumber(ether).toFixed()
-            return Units.convert(number.toString(), 'eth', 'wei')
+            return convert(ether, 'ether', 'wei')
         } catch (error) {
             console.error('wei', error);
             return '0'
