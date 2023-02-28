@@ -52,7 +52,12 @@ const LtvAPI = {
                 principalAmount
             );
 
-            let ltv = await instance.ltv.getRelativeLTV(userAddress, BigNumber(principalPriceInUSD).toString());
+            console.log(BigNumber(principalPriceInUSD).toString());
+
+            let ltv = await instance.ltv.getRelativeLTV(
+                userAddress, 
+                BigNumber(principalPriceInUSD).toString()
+            );
 
             let collateralNormalAmount = await instance.priceFeed.exchangeRate(
                 principalToken,
