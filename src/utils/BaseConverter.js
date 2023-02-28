@@ -59,7 +59,7 @@ function convert(value, from, to) {
         throw new Error('Unsupported output unit')
     }
 
-    return new BigNumber(value, 10).multipliedBy(units[from]).div(units[to]).toString(10)
+    return new BigNumber(value, 10).mul(units[from]).round(0, BigNumber.ROUND_DOWN).div(units[to]).toString(10)
 }
 
 export default convert
