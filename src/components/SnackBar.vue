@@ -11,16 +11,16 @@
                 </div>
                 <IconClose class="close" v-on:click="removeIndex(index)" />
 
-                <a :href="message.linkUrl" target="_blank"
-                    v-if="message.linkUrl && message.linkUrl != '' && message.linkUrl.startsWith('http')"
-                    v-on:click="removeIndex(index)">
+                <a target="_blank" v-if="message.linkUrl && message.linkUrl != '' && message.linkUrl.startsWith('http')"
+                    v-on:click="removeIndex(index)" :href="message.linkUrl">
                     <div class="link">
                         <p>{{ message.linkTitle }}</p>
                         <IconOut />
                     </div>
                 </a>
 
-                <RouterLink :to="message.linkUrl" v-else-if="message.linkTitle" v-on:click="removeIndex(index)">
+                <RouterLink v-else-if="message.linkUrl && message.linkUrl != ''" :to="message.linkUrl"
+                    v-on:click="removeIndex(index)">
                     <div class="link">
                         <p>{{ message.linkTitle }}</p>
                         <IconOut />

@@ -261,6 +261,7 @@ export default {
             let targetProfit = (this.interest / 100) * this.principalAmount;
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (this.principalAmount * targetDurationInSecs);
+                             
             const trx = await LendingPoolAPI.createLendingOffer(
                 this.principalToken,
                 this.$toWei(this.principalAmount),

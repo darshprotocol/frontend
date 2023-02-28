@@ -235,8 +235,9 @@ export default {
                             return;
                         }
                     });
+
                     this.offer.requests.forEach(request => {
-                        if (request.creator.toLowerCase() == this.userAddress) {
+                        if (request.creator.toLowerCase() == this.userAddress && request.state != 3) {
                             this.borrowerRequest = request;
                             return;
                         }

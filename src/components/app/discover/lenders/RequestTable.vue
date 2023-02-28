@@ -95,9 +95,9 @@
         </div>
 
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
-            v-on:close="requestAction = null" v-on:done="$emit(done)" />
+            v-on:close="requestAction = null" v-on:done="$emit('done')" />
 
-        <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
+        <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit('done')" v-if="cancelRequest"
             v-on:close="cancelRequest = null" />
 
         <RequestPopUpInfoClaim v-if="claimRequest" :offer="offer" :borrowerLoan="borrowerLoan" :request="claimRequest"

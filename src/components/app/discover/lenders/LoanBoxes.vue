@@ -183,8 +183,8 @@
 
             <!---->
             <div class="claim">
-                <p>Repayments</p>
-                <div class="claim_asset">
+                <p v-if="offer.loans[loanIndex].unClaimedPrincipal > 0">Repayments</p>
+                <div v-if="offer.loans[loanIndex].unClaimedPrincipal > 0" class="claim_asset">
                     <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
                     <h3>
                         {{ $toMoney($fromWei(offer.loans[loanIndex].unClaimedPrincipal)) }}
@@ -193,7 +193,7 @@
                 </div>
 
                 <!---->
-                <div class="borrower_action">
+                <div :style="offer.loans[loanIndex].unClaimedPrincipal == 0 ? 'margin-top: 10px !important;' : ''" class="borrower_action">
                     <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'"
                         :bg="'rgba(108, 110, 115, 0.1)'" />
 

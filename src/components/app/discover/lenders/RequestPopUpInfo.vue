@@ -38,7 +38,7 @@
                     <div class="label">Borrower</div>
                     <div class="box_grid_item">
                         <div id="img_borrower" class="photo"></div>
-                        <p>Borrower 01</p>
+                        <p>{{ $shortName(requestAction.request.creator, 6) }}</p>
                     </div>
                 </div>
                 <div class="collateral">
@@ -135,7 +135,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Reject failed',

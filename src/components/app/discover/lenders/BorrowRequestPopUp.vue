@@ -228,7 +228,7 @@ export default {
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (principalAmount * targetDurationInSecs)
-            let userAddress = await Authentication.userAddress()
+
             const trx = await LendingPoolAPI.createBorrowingRequest(
                 this.offer.offerId,
                 this.percentage,
@@ -237,7 +237,7 @@ export default {
                 this.$toWei(calcInterest),
                 this.daysToMaturity,
                 this.hoursToExpire,
-                userAddress
+                await Authentication.userAddress()
             )
 
             if (trx && trx.tx) {
@@ -302,7 +302,10 @@ export default {
     },
     mounted() {
         this.getCollateralAmount()
-        let interest = this.getInterest(this.offer.interest, this.offer.daysToMaturity)
+        let interest = this.getInterest(
+            this.offer.interest, 
+            this.offer.daysToMaturity
+        )
         this.interest = Number(interest)
         
         document.body.classList.add('modal')
