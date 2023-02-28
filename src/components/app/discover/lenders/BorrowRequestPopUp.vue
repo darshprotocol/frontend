@@ -193,13 +193,13 @@ export default {
         getCollateralAmount: async function () {
             this.fetchingPrice = true
 
-            // let collateralAmount = await LtvAPI.getCollateralAmount(
-            //     this.offer.principalToken,
-            //     this.collateralToken,
-            //     this.getPrincipal(),
-            //     await Authentication.userAddress()
-            // )
-            // this.collateralAmount = collateralAmount.toString()
+            let collateralAmount = await LtvAPI.getCollateralAmount(
+                this.offer.principalToken,
+                this.collateralToken,
+                this.getPrincipal(),
+                await Authentication.userAddress()
+            )
+            this.collateralAmount = collateralAmount.toString()
 
             this.fetchingPrice = false
             this.getAllowance()
@@ -219,7 +219,12 @@ export default {
         },
         getPrincipal: function () {
             let principal = this.offer.initialPrincipal * (this.percentage / 100)
-            return principal.toString()
+            console.log(principal);
+            let a = this.$fromWei(principal)
+            console.log(a);
+            let b = this.$toWei(a)
+            console.log(b);
+            return b.toString()
         },
         createRequest: async function () {
             this.requesting = true
