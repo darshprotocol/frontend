@@ -12,7 +12,7 @@
                     <div class="option">
                         <p>Principal needed</p>
                         <div>
-                            <p>{{ $toMoney(getPrincipal()) }}</p>
+                            <p>{{ $toMoney($fromWei(getPrincipal())) }}</p>
                             <div class="click_1">
                                 <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                                 <p>{{ $findAsset(offer.principalToken).symbol }}</p>
@@ -44,8 +44,8 @@
                         <p>Interest</p>
                         <div>
                             <div class="input">
-                                <input type="number" disabled :style="getInputWidth(interest)" placeholder="0" min="1"
-                                    max="50" v-model="interest">
+                                <input type="number" disabled :style="getInputWidth(interest)" placeholder="0" min="1" max="50"
+                                    v-model="interest">
                                 <span>%</span>
                             </div>
                             <div class="clicks">
@@ -99,14 +99,13 @@
                         </div>
                     </div>
                     <div>
-                        <PrimaryButton :progress="fetchingPrice || approving"
-                            :state="(fetchingPrice || approving) ? 'disable' : ''"
+                        <PrimaryButton :progress="fetchingPrice || approving" :state="(fetchingPrice || approving) ? 'disable' : ''"
                             v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'"
                             v-if="$fromWei(allowance) < $fromWei(collateralAmount)" />
 
-                        <PrimaryButton :progress="fetchingPrice || requesting"
-                            :state="(fetchingPrice || requesting) ? 'disable' : ''" v-else
-                            v-on:click="!(fetchingPrice || requesting) ? createRequest() : null" :text="'Make Request'" />
+                        <PrimaryButton :progress="fetchingPrice || requesting" :state="(fetchingPrice || requesting) ? 'disable' : ''"
+                            v-else v-on:click="!(fetchingPrice || requesting) ? createRequest() : null"
+                            :text="'Make Request'" />
                     </div>
                 </div>
             </div>
@@ -194,13 +193,13 @@ export default {
         getCollateralAmount: async function () {
             this.fetchingPrice = true
 
-            let collateralAmount = await LtvAPI.getCollateralAmount(
-                this.offer.principalToken,
-                this.collateralToken,
-                this.$toWei(this.getPrincipal()),
-                await Authentication.userAddress()
-            )
-            this.collateralAmount = collateralAmount.toString()
+            // let collateralAmount = await LtvAPI.getCollateralAmount(
+            //     this.offer.principalToken,
+            //     this.collateralToken,
+            //     this.getPrincipal(),
+            //     await Authentication.userAddress()
+            // )
+            // this.collateralAmount = collateralAmount.toString()
 
             this.fetchingPrice = false
             this.getAllowance()
@@ -216,17 +215,16 @@ export default {
             this.getAllowance()
         },
         max: function () {
-            return (this.$fromWei(this.offer.currentPrincipal) 
-                / this.$fromWei(this.offer.initialPrincipal)) * 100
+            return (this.offer.currentPrincipal / this.offer.initialPrincipal) * 100
         },
         getPrincipal: function () {
-            let principal = this.$fromWei(this.offer.initialPrincipal) * (this.percentage / 100)
+            let principal = this.offer.initialPrincipal * (this.percentage / 100)
             return principal.toString()
         },
         createRequest: async function () {
             this.requesting = true
-
-            let principalAmount = this.getPrincipal()
+            
+            let principalAmount = this.$fromWei(this.getPrincipal())
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;
             let calcInterest = (targetProfit * 100) / (principalAmount * targetDurationInSecs)
@@ -257,10 +255,10 @@ export default {
                     type: 'failed'
                 })
             }
-
+            
             this.$emit('done')
             this.$emit('close')
-
+            
             this.requesting = false
         },
         incrementDuration: function () {
@@ -306,7 +304,7 @@ export default {
         this.getCollateralAmount()
         let interest = this.getInterest(this.offer.interest, this.offer.daysToMaturity)
         this.interest = Number(interest)
-
+        
         document.body.classList.add('modal')
     },
     unmounted() {
