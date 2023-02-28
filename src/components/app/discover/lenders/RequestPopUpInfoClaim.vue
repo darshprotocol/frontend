@@ -8,7 +8,7 @@
                 </div>
             </div>
             <div class="principal_needed">
-                <p class="label">Principal Needed</p>
+                <p class="label">Principal needed</p>
                 <div class="principal_needed_token">
                     <img :src="`/images/${$findAsset(offer.principalToken).image}.png`" alt="">
                     <p>
@@ -35,14 +35,14 @@
             </div>
             <div class="box_grid">
                 <div>
-                    <div class="label">Borrower</div>
+                    <div class="label">Lender</div>
                     <div class="box_grid_item">
                         <div id="img_borrower" class="photo"></div>
-                        <p>Borrower 01</p>
+                        <p>{{ $shortName(offer.creator, 6) }}</p>
                     </div>
                 </div>
                 <div class="collateral">
-                    <div class="label">Borrower's Collateral</div>
+                    <div class="label">My Collateral</div>
                     <div class="box_grid_item">
                         <p>{{ $toMoney($fromWei(request.collateralAmount)) }}</p>
                         <img class="icon" :src="`/images/${$findAsset(request.collateralToken).image}.png`" />
@@ -50,8 +50,8 @@
                 </div>
             </div>
             <div class="box_action">
-                <PrimaryButton :text="'Cancel Request'" :progress="cancelling" :state="cancelling ? 'disable' : ''"
-                    v-on:click="!cancelling ? cancelRequest() : null" :bg="'rgba(108, 110, 115, 0.1)'" />
+                <PrimaryButton :text="'Claim'" :progress="claiming" :state="claiming ? 'disable' : ''"
+                    v-on:click="!claiming ? claimRequest() : null" />
             </div>
         </div>
     </main>
@@ -70,10 +70,10 @@ import PrimaryButton from '../../../PrimaryButton.vue';
 
 <script>
 export default {
-    props: ['request', 'offer'],
+    props: ['request', 'offer', 'borrowerLoan'],
     data() {
         return {
-            cancelling: false
+            claiming: false
         }
     },
     methods: {
@@ -86,18 +86,18 @@ export default {
             let interest = this.$fromWei(result.toString());
             return this.$toMoney(interest);
         },
-        cancelRequest: async function () {
-            this.cancelling = true
+        claimRequest: async function () {
+            this.claiming = true
 
-            const trx = await LendingPoolAPI.cancelRequest(
-                this.request.requestId,
+            const trx = await LendingPoolAPI.claimBorrowedPrincipal(
+                this.borrowerLoan.loanId,
                 await Authentication.userAddress()
             )
 
             if (trx && trx.tx) {
                 messages.insertMessage({
-                    title: 'Request cancalled',
-                    description: 'Borrow request was successfully cancelled.',
+                    title: 'Principal claimed',
+                    description: 'Loan principal was successfully claimed.',
                     type: 'success',
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
@@ -105,14 +105,16 @@ export default {
                 this.$emit('close')
             } else {
                 messages.insertMessage({
-                    title: 'Cancelling failed',
-                    description: 'Borrow request failed to cancel.',
+                    title: 'Claiming failed',
+                    description: 'Loan principal failed to claim.',
                     type: 'failed'
                 })
             }
 
             this.$emit('done')
-            this.cancelling = false
+            this.$emit('close')
+
+            this.claiming = false
         }
     },
     mounted() {
@@ -150,6 +152,7 @@ main {
     background-image: url('/images/request_gradient.png');
     border-radius: 6px;
     overflow: hidden;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

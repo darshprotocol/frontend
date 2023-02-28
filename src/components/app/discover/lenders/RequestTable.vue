@@ -89,11 +89,19 @@
             </div>
         </table>
 
+        <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
+            <img src="../../../../assets/images/receipt-text.png" alt="">
+            <p>No Borrow Requests found.</p>
+        </div>
+
         <RequestPopUpInfo :offer="offer" :requestAction="requestAction" v-if="requestAction"
             v-on:close="requestAction = null" v-on:done="$emit(done)" />
 
         <RequestPopUpInfoCancel :offer="offer" :request="cancelRequest" v-on:done="$emit(done)" v-if="cancelRequest"
             v-on:close="cancelRequest = null" />
+
+        <RequestPopUpInfoClaim v-if="claimRequest" :offer="offer" :borrowerLoan="borrowerLoan" :request="claimRequest"
+            v-on:close="claimRequest = null" v-on:done="$emit('done')" />
     </main>
 </template>
 
@@ -106,17 +114,19 @@ import IconMenu from '../../../icons/IconMenu.vue'
 import IconOut from '../../../icons/IconOut.vue';
 import RequestPopUpInfo from './RequestPopUpInfo.vue';
 import RequestPopUpInfoCancel from './RequestPopUpInfoCancel.vue';
+import RequestPopUpInfoClaim from './RequestPopUpInfoClaim.vue'
 </script>
 
 <script>
 export default {
-    props: ["offer"],
+    props: ["offer", "borrowerLoan"],
     data() {
         return {
             activeRequest: "",
             userAddress: "",
             requestAction: null,
-            cancelRequest: null
+            cancelRequest: null,
+            claimRequest: null
         };
     },
     methods: {
@@ -125,8 +135,13 @@ export default {
                 return requests.filter(request => request.state == 0);
             }
             else {
-                const result = requests.filter(request => (request.creator == this.userAddress.toLowerCase() &&
-                    (request.state != 1 || request.state != 3)) || request.state == 0);
+                const result = requests.filter(request => {
+                    switch (request.state) {
+                        case 1: return (this.borrowerLoan.unClaimedBorrowedPrincipal > 0);
+                        case 3: return false
+                        default: return true;
+                    }
+                })
                 return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()));
             }
         },
@@ -142,6 +157,8 @@ export default {
             }
             else if (request.state == 2) {
                 this.cancelRequest = request;
+            } else if (request.state == 1) {
+                this.claimRequest = request
             }
         },
         isCreator: function () {
@@ -368,6 +385,23 @@ tbody:nth-child(even) .overlay {
     background: var(--bglighter);
     border-radius: 2px;
     cursor: pointer;
+}
+
+.t_empty {
+    width: 100%;
+    height: 298px;
+    background: var(--bglight);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+}
+
+.t_empty p {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--textdimmed);
 }
 
 /* state */

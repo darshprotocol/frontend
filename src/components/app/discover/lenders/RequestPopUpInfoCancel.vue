@@ -130,6 +130,7 @@ main {
     background-image: url('/images/request_gradient.png');
     border-radius: 6px;
     overflow: hidden;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

@@ -347,6 +347,7 @@ main {
     background-color: var(--bglight);
     padding-top: 70px;
     padding-bottom: 100px;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {

@@ -101,11 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    <RequestTable :offer="offer" v-on:done="fetchLendingOffer(false)" />
-                    <div class="t_empty" v-if="sortRequests(offer.requests).length == 0">
-                        <img src="../../../../assets/images/receipt-text.png" alt="">
-                        <p>No Borrow Requests found.</p>
-                    </div>
+                    <RequestTable :borrowerLoan="borrowerLoan" :offer="offer" v-on:done="fetchLendingOffer(false)" />
                 </div>
             </div>
             <div>
@@ -263,15 +259,6 @@ export default {
         },
         getLenderScore: async function (address) {
             this.lenderScore = await HealthScore.getHealthScore(address);
-        },
-        sortRequests: function (requests) {
-            if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
-                return requests.filter(request => request.state == 0);
-            }
-            else {
-                return requests.filter(request => (request.creator == this.userAddress.toLowerCase() &&
-                    (request.state != 1 || request.state != 3)) || request.state == 0);
-            }
         }
     },
     updated() {
@@ -635,20 +622,4 @@ export default {
     margin-top: 2px;
 }
 
-.t_empty {
-    width: 100%;
-    height: 298px;
-    background: var(--bglight);
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
-    justify-content: center;
-}
-
-.t_empty p {
-    font-weight: 400;
-    font-size: 14px;
-    color: var(--textdimmed);
-}
 </style>
