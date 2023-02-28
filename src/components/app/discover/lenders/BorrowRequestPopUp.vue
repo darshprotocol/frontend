@@ -222,6 +222,7 @@ export default {
         },
         createRequest: async function () {
             this.requesting = true
+            
             let principalAmount = this.$fromWei(this.getPrincipal())
             let targetProfit = (this.interest / 100) * principalAmount
             let targetDurationInSecs = this.daysToMaturity * 24 * 60 * 60;

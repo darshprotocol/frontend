@@ -121,10 +121,11 @@
                         </div>
                     </div>
                     <div class="manage_offer" v-if="userType == 'lender'">
-                        <RouterLink :to="`/portfolio/lend/${offer._id}`">
+                        <RouterLink :to="`/portfolio/lends/${offer._id}`">
                             <PrimaryButton class="manage_offer_button" :text="'Manage Offer'" />
                         </RouterLink>
                     </div>
+
                     <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
                         :borrowerLoan="borrowerLoan" :userType="userType" v-on:done="fetchLendingOffer(false)" />
 
