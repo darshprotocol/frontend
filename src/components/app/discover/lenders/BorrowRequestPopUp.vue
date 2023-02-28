@@ -188,7 +188,7 @@ export default {
                 this.collateralToken,
                 LendingPoolAPI.address
             )
-            this.allowance = amount
+            this.allowance = amount.toString()
         },
         getCollateralAmount: async function () {
             this.fetchingPrice = true
