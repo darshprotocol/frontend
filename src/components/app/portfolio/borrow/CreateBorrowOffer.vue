@@ -3,7 +3,7 @@
         <div class="header">
             <div class="toolbar">
                 <div class="path">
-                    <RouterLink to="/portfolio/borrow">
+                    <RouterLink to="/portfolio/borrows">
                         <p>My Borrows</p>
                     </RouterLink>
                     <span>/</span>

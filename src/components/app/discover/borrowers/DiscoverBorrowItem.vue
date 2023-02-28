@@ -287,12 +287,14 @@ export default {
     updated() {
         if (this.offer && !this.generated) {
             let el = Profile.generate(36, this.offer.creator)
-            document.getElementById('img_borrower').appendChild(el)
+            let dom = document.getElementById('img_borrower')
+            if (dom) dom.appendChild(el)
 
             for (let index = 0; index < this.offer.loans.length; index++) {
                 const loan = this.offer.loans[index];
                 let elx = Profile.generate(32, loan.lender)
-                document.getElementById(`img_lender${index}`).appendChild(elx)
+                let domx = document.getElementById(`img_lender${index}`)
+                if (domx) domx.appendChild(elx)
             }
 
             this.generated = true
