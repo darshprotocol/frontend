@@ -137,7 +137,7 @@ export default {
             else {
                 const result = requests.filter(request => {
                     switch (request.state) {
-                        case 1: return (this.borrowerLoan.unClaimedBorrowedPrincipal > 0);
+                        case 1: return (this.borrowerLoan && this.borrowerLoan.unClaimedBorrowedPrincipal > 0);
                         case 3: return false
                         default: return true;
                     }
