@@ -187,6 +187,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fade_in .2s ease-in-out;
 }
 
 .box {

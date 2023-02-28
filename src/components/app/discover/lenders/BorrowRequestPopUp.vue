@@ -326,6 +326,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fade_in .2s ease-in-out;
 }
 
 
@@ -333,6 +334,7 @@ main {
     border-radius: 6px;
     overflow: hidden;
     position: relative;
+    animation: slide_in_up .2s ease-in-out;
 }
 
 .scroll_box {
@@ -347,7 +349,6 @@ main {
     background-color: var(--bglight);
     padding-top: 70px;
     padding-bottom: 100px;
-    animation: slide_in_up .2s ease-in-out;
 }
 
 .title {
