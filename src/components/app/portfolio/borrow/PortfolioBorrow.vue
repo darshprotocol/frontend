@@ -7,7 +7,7 @@
         </div>
 
         <div class="lends" v-if="!fetching && userAddress != null">
-            <RouterLink v-for="offer in offers" :to="`/portfolio/borrow/${offer._id}`" :key="offer.offerId">
+            <RouterLink v-for="offer in offers" :to="`/portfolio/borrows/${offer._id}`" :key="offer.offerId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
