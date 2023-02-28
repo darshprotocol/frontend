@@ -83,13 +83,13 @@
                     <IconSort />
                     <p>Sort By</p>
                 </div>
-                <RouterLink v-if="$route.name == 'portfolio-lend'" to="/portfolio/lends/create">
+                <RouterLink v-if="$route.name == 'portfolio-lends'" to="/portfolio/lends/create">
                     <div class="filter create_offer">
                         <IconAdd :color="'#fff'" />
                         <p>Create Offer</p>
                     </div>
                 </RouterLink>
-                <RouterLink v-else-if="$route.name == 'portfolio-borrow'" to="/portfolio/borrows/create">
+                <RouterLink v-else-if="$route.name == 'portfolio-borrows'" to="/portfolio/borrows/create">
                     <div class="filter create_offer">
                         <IconAdd :color="'#fff'" />
                         <p>Create Offer</p>

@@ -81,7 +81,7 @@ const router = createRouter({
             },
             {
               path: '/portfolio/borrows',
-              name: 'portfolio-borrow',
+              name: 'portfolio-borrows',
               component: PortfolioBorrow
             },
             {
