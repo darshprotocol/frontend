@@ -3,9 +3,7 @@ import contract from 'truffle-contract'
 import LoanToValueABI from '../contracts/LoanToValueRatio.json'
 import PriceFeedABI from '../contracts/PriceFeed.json'
 import Web3 from 'web3'
-import BigNumber from 'bignumber.js'
-
-BigNumber.config({DECIMAL_PLACES: 30})
+import convert from '../utils/BaseConverter'
 
 const LtvAPI = {
     ltv: null,
@@ -51,12 +49,10 @@ const LtvAPI = {
                 principalToken,
                 principalAmount
             );
-
-            console.log(BigNumber(principalPriceInUSD).toString());
-
+            
             let ltv = await instance.ltv.getRelativeLTV(
                 userAddress, 
-                BigNumber(principalPriceInUSD).toString()
+                convert(principalPriceInUSD, 'wei', 'wei')
             );
 
             let collateralNormalAmount = await instance.priceFeed.exchangeRate(

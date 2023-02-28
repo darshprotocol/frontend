@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js'
 
-BigNumber.config({ DECIMAL_PLACES: 30 });
+BigNumber.config({ DECIMAL_PLACES: 5 });
 
-var Units = {}
+const Units = {}
 
-var rawUnits = {
+const rawUnits = {
     "wei": "1",
     "kwei": "1000",
     "Kwei": "1000",
@@ -34,7 +34,7 @@ var rawUnits = {
     "tether": "1000000000000000000000000000000"
 }
 
-var units = {}
+const units = {}
 
 Object.keys(rawUnits).map(function (unit) {
     units[unit] = new BigNumber(rawUnits[unit], 10)
@@ -42,24 +42,9 @@ Object.keys(rawUnits).map(function (unit) {
 
 Units.units = rawUnits
 
-var re = RegExp(/^[0-9]+\.?[0-9]*$/)
-
 function convert(value, from, to) {
-    if (!re.test(value)) {
-        throw new Error('Unsupported value')
-    }
-
-    from = from.toLowerCase()
-    if (!units[from]) {
-        throw new Error('Unsupported input unit')
-    }
-
-    to = to.toLowerCase()
-    if (!units[to]) {
-        throw new Error('Unsupported output unit')
-    }
-
-    return new BigNumber(value, 10).mul(units[from]).round(0, BigNumber.ROUND_DOWN).div(units[to]).toString(10)
+    let result =  new BigNumber(value, 10).mul(units[from]).round(0, BigNumber.ROUND_DOWN).div(units[to])
+    return result.toString(10)
 }
 
 export default convert
