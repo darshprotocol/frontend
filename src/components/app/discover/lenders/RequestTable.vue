@@ -99,7 +99,9 @@
 
 <script setup>
 import Authentication from '../../../../scripts/Authentication';
+import IconClock from '../../../icons/IconClock.vue';
 import IconClose from '../../../icons/IconClose.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
 import IconMenu from '../../../icons/IconMenu.vue'
 import IconOut from '../../../icons/IconOut.vue';
 import RequestPopUpInfo from './RequestPopUpInfo.vue';
@@ -111,8 +113,8 @@ export default {
     props: ["offer"],
     data() {
         return {
-            activeRequest: '',
-            userAddress: '',
+            activeRequest: "",
+            userAddress: "",
             requestAction: null,
             cancelRequest: null
         };
@@ -120,27 +122,26 @@ export default {
     methods: {
         sortRequests: function (requests) {
             if (this.userAddress == null || this.offer.creator == this.userAddress.toLowerCase()) {
-                return requests.filter(request => request.state == 0)
+                return requests.filter(request => request.state == 0);
             }
             else {
-                const result = requests.filter(request =>
-                    (request.creator == this.userAddress.toLowerCase() &&
-                        (request.state != 1 || request.state != 3)) || request.state == 0
-                )
-                return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()))
+                const result = requests.filter(request => (request.creator == this.userAddress.toLowerCase() &&
+                    (request.state != 1 || request.state != 3)) || request.state == 0);
+                return result.sort((a, b) => (b.creator == this.userAddress.toLowerCase()) - (a.creator == this.userAddress.toLowerCase()));
             }
         },
         setRequestAction: function (action, request) {
             this.requestAction = {
                 action: action,
                 request: request
-            }
+            };
         },
         openMenu: function (request) {
             if (request.state == 0) {
-                this.activeRequest = request._id
-            } else if (request.state == 2) {
-                this.cancelRequest = request
+                this.activeRequest = request._id;
+            }
+            else if (request.state == 2) {
+                this.cancelRequest = request;
             }
         },
         isCreator: function () {
@@ -181,7 +182,8 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-    }
+    },
+    components: { IconClock, IconInterest }
 }
 </script>
 
