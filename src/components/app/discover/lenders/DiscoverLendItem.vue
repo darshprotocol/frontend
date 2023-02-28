@@ -43,8 +43,7 @@
                         <div class="borrowed">
                             <div>
                                 <IconChart class="icon" />
-                                <p><span>{{ $toMoney($fromWei(offer.initialPrincipal - offer.currentPrincipal)) }}</span>/
-                                    {{
+                                <p><span>{{ $toMoney($fromWei(offer.initialPrincipal - offer.currentPrincipal)) }}</span>/{{
                                         $toMoney($fromWei(offer.initialPrincipal)) }}</p>
                             </div>
                             <p>Borrowed</p>
