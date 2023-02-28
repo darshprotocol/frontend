@@ -98,12 +98,12 @@ const router = createRouter({
           children: [
             {
               path: '/portfolio/vaults/lends/:id',
-              name: 'portfolio-vaults-id',
+              name: 'portfolio-vaults-lends-id',
               component: VaultLendItem
             },
             {
               path: '/portfolio/vaults/borrows/:id',
-              name: 'portfolio-vaults-id',
+              name: 'portfolio-vaults-borrows-id',
               component: VaultBorrowItem
             }
           ]
