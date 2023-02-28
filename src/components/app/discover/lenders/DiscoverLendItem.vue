@@ -58,8 +58,9 @@
                                     <div class="img" v-for="index in 4" :key="index"></div>
                                     <div class="extra_user">0</div>
                                 </div>
-                               <div class="users" v-else>
-                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_borrower${index}`" :key="index">
+                                <div class="users" v-else>
+                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_borrower${index}`"
+                                        :key="index">
                                     </div>
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
@@ -277,12 +278,14 @@ export default {
     updated() {
         if (this.offer && !this.generated) {
             let el = Profile.generate(36, this.offer.creator)
-            document.getElementById('img_lender').appendChild(el)
+            let dom = document.getElementById('img_lender')
+            if (dom) dom.appendChild(el)
 
             for (let index = 0; index < this.offer.loans.length; index++) {
                 const loan = this.offer.loans[index];
                 let elx = Profile.generate(32, loan.borrower)
-                document.getElementById(`img_borrower${index}`).appendChild(elx)
+                let domx = document.getElementById(`img_borrower${index}`)
+                if (domx) domx.appendChild(elx)
             }
 
             this.generated = true
