@@ -60,17 +60,17 @@
         <div class="toolbar">
             <div class="tab_items">
                 <RouterLink to="/portfolio">
-                    <div :class="$route.name == 'portfolio-lend' ? 'tab tab_active' : 'tab'">
+                    <div :class="$route.name == 'portfolio-lends' ? 'tab tab_active' : 'tab'">
                         <p>My Lends</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/portfolio/borrow">
-                    <div :class="$route.name == 'portfolio-borrow' ? 'tab tab_active' : 'tab'">
+                <RouterLink to="/portfolio/borrows">
+                    <div :class="$route.name == 'portfolio-borrows' ? 'tab tab_active' : 'tab'">
                         <p>My Borrows</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/portfolio/vault">
-                    <div :class="$route.name == 'portfolio-vault' ? 'tab tab_active' : 'tab'">
+                <RouterLink to="/portfolio/vaults">
+                    <div :class="$route.name == 'portfolio-vaults' ? 'tab tab_active' : 'tab'">
                         <p>Vaults</p>
                     </div>
                 </RouterLink>
@@ -83,13 +83,13 @@
                     <IconSort />
                     <p>Sort By</p>
                 </div>
-                <RouterLink v-if="$route.name == 'portfolio-lend'" to="/portfolio/lend/create">
+                <RouterLink v-if="$route.name == 'portfolio-lend'" to="/portfolio/lends/create">
                     <div class="filter create_offer">
                         <IconAdd :color="'#fff'" />
                         <p>Create Offer</p>
                     </div>
                 </RouterLink>
-                <RouterLink v-else-if="$route.name == 'portfolio-borrow'" to="/portfolio/borrow/create">
+                <RouterLink v-else-if="$route.name == 'portfolio-borrow'" to="/portfolio/borrows/create">
                     <div class="filter create_offer">
                         <IconAdd :color="'#fff'" />
                         <p>Create Offer</p>

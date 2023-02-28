@@ -134,7 +134,7 @@
                 <!---->
                 <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
                     <p>My Collateral</p>
-                    <RouterLink :to="`/portfolio/vault/${$route.params.id}`">
+                    <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
                         <div style="border: none;">
                             <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
                             <p>{{ $toMoney($fromWei(offer.loans[loanIndex].initialCollateral)) }} </p>
@@ -144,7 +144,7 @@
                 </div>
                 <div v-else>
                     <p>My Collateral</p>
-                    <RouterLink :to="`/portfolio/vault/${$route.params.id}`">
+                    <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
                         <div style="border: none;">
                             <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
                             <p>{{ $toMoney($fromWei(offer.loans[loanIndex].currentCollateral)) }} </p>

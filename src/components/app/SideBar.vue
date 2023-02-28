@@ -49,11 +49,11 @@
                         <RouterLink to="/portfolio">
                             <div :class="$route.name.startsWith('portfolio-lend') ? 'tab tab_active' : 'tab'">My Lends</div>
                         </RouterLink>
-                        <RouterLink to="/portfolio/borrow">
+                        <RouterLink to="/portfolio/borrows">
                             <div :class="$route.name.startsWith('portfolio-borrow') ? 'tab tab_active' : 'tab'">My Borrows
                             </div>
                         </RouterLink>
-                        <RouterLink to="/portfolio/vault">
+                        <RouterLink to="/portfolio/vaults">
                             <div :class="$route.name.startsWith('portfolio-vault') ? 'tab tab_active' : 'tab'">Vaults</div>
                         </RouterLink>
                     </div>

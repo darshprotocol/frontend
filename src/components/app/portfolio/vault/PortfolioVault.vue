@@ -7,7 +7,7 @@
         </div>
 
         <div class="lends" v-if="!fetching && userAddress != null">
-            <RouterLink v-for="loan in loans" :to="`/portfolio/vault/${loan.offer[0]._id}`" :key="loan.loanId">
+            <RouterLink v-for="loan in loans" :to="`/portfolio/vaults/${loan.offer[0].offerType == 0 ? 'lends' : 'borrows'}/${loan.offer[0]._id}`" :key="loan.loanId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
@@ -81,7 +81,7 @@
                                 <img :src="`/images/${$findAsset(loan.collateralToken).image}.png`" alt="">
                             </div>
                             <p>
-                                {{ $toMoney(loan.unClaimedBorrowedPrincipal) }} 
+                                {{ $toMoney($fromWei(loan.unClaimedBorrowedPrincipal)) }} 
                                 {{ $findAsset(loan.principalToken).symbol }}
                             </p>
                         </div>

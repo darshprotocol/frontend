@@ -26,7 +26,9 @@ import PortfolioLendItem from '../components/app/portfolio/lend/PortfolioLendIte
 import PortfolioBorrowItem from '../components/app/portfolio/borrow/PortfolioBorrowItem.vue'
 
 import PortfolioVault from '../components/app/portfolio/vault/PortfolioVault.vue'
-import VaultItem from '../components/app/portfolio/vault/VaultItem.vue'
+
+import VaultLendItem from '../components/app/portfolio/vault/lends/VaultLendItem.vue'
+import VaultBorrowItem from '../components/app/portfolio/vault/borrows/VaultBorrowItem.vue'
 
 import DashBoardItem from '../components/app/dashboard/DashBoardItem.vue'
 
@@ -69,35 +71,40 @@ const router = createRouter({
         },
         {
           path: '/portfolio',
-          name: 'portfolio-lend',
+          name: 'portfolio-lends',
           component: PortfolioView,
           children: [
             {
               path: '/portfolio',
-              name: 'portfolio-lend',
+              name: 'portfolio-lends',
               component: PortfolioLend
             },
             {
-              path: '/portfolio/borrow',
+              path: '/portfolio/borrows',
               name: 'portfolio-borrow',
               component: PortfolioBorrow
             },
             {
-              path: '/portfolio/vault/',
-              name: 'portfolio-vault',
+              path: '/portfolio/vaults',
+              name: 'portfolio-vaults',
               component: PortfolioVault
             }
           ]
         },
         {
-          path: '/portfolio/vault',
-          name: 'vault',
+          path: '/portfolio/vaults',
+          name: 'vaults',
           component: VaultView,
           children: [
             {
-              path: '/portfolio/vault/:id',
-              name: 'portfolio-vault-id',
-              component: VaultItem
+              path: '/portfolio/vaults/lends/:id',
+              name: 'portfolio-vaults-id',
+              component: VaultLendItem
+            },
+            {
+              path: '/portfolio/vaults/borrows/:id',
+              name: 'portfolio-vaults-id',
+              component: VaultBorrowItem
             }
           ]
         },
@@ -112,23 +119,23 @@ const router = createRouter({
           component: DiscoverBorrowItem
         },
         {
-          path: '/portfolio/borrow/create',
+          path: '/portfolio/borrows/create',
           name: 'portfolio-borrow-create',
           component: CreateBorrowOffer
         },
         {
-          path: '/portfolio/lend/create',
-          name: 'portfolio-lend-create',
+          path: '/portfolio/lends/create',
+          name: 'portfolio-lends-create',
           component: CreateLendOffer
         },
         {
-          path: '/portfolio/lend/:id',
-          name: 'portfolio-lend-id',
+          path: '/portfolio/lends/:id',
+          name: 'portfolio-lends-id',
           component: PortfolioLendItem
         },
         {
-          path: '/portfolio/borrow/:id',
-          name: 'portfolio-borrow-id',
+          path: '/portfolio/borrows/:id',
+          name: 'portfolio-borrows-id',
           component: PortfolioBorrowItem
         },
         {

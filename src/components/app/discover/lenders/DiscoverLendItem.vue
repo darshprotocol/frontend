@@ -53,15 +53,18 @@
                     <div class="expire">
                         <div>
                             <div class="progress">
+                                <!---->
                                 <div class="users" v-if="offer.loans.length == 0">
                                     <div class="img" v-for="index in 4" :key="index"></div>
                                     <div class="extra_user">0</div>
                                 </div>
-                                <div class="users" v-else>
-                                    <img v-for="(loan, index) in offer.loans" :key="index"
-                                        :src="`/images/user${index + 1}.png`" alt="">
+                               <div class="users" v-else>
+                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_borrower${index}`" :key="index">
+                                    </div>
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
+
+                                <!---->
                                 <div class="date" v-if="offer.loans.length == 0">
                                     <p>Offer expires in</p>
                                     <p>{{ countdown }}</p>
@@ -111,10 +114,10 @@
                         <p>Owned by</p>
                         <div>
                             <div>
-                                <p>Elon Musk</p>
+                                <p>{{ $shortName(offer.creator, 6) }}</p>
                                 <p>20,250 Total Loans</p>
                             </div>
-                            <img src="/images/user1.png" alt="">
+                            <div class="img" id="img_lender"></div>
                         </div>
                     </div>
                     <div class="manage_offer" v-if="userType == 'lender'">
@@ -169,6 +172,7 @@ import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
 import ProfilePopUp from '../ProfilePopUp.vue';
 import { messages } from '../../../../reactives/messages';
+import Profile from '../../../../scripts/Profile';
 export default {
     data() {
         return {
@@ -269,7 +273,20 @@ export default {
             }
         }
     },
-    components: { ProfilePopUp }
+    updated() {
+        if (this.offer && !this.generated) {
+            let el = Profile.generate(36, this.offer.creator)
+            document.getElementById('img_lender').appendChild(el)
+
+            for (let index = 0; index < this.offer.loans.length; index++) {
+                const loan = this.offer.loans[index];
+                let elx = Profile.generate(32, loan.borrower)
+                document.getElementById(`img_borrower${index}`).appendChild(elx)
+            }
+
+            this.generated = true
+        }
+    }
 }
 </script>
 
@@ -367,8 +384,6 @@ export default {
 }
 
 .info>div>div>p {
-
-
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -495,6 +510,7 @@ export default {
     font-size: 12px;
     color: var(--textnormal);
     margin-left: -16px;
+    z-index: 1;
 }
 
 
@@ -604,7 +620,7 @@ export default {
     color: var(--textnormal);
 }
 
-.created img {
+.created .img {
     width: 36px;
     height: 36px;
 }

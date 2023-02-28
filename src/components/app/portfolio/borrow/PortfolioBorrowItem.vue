@@ -21,14 +21,14 @@
                         <IconMenu :color="'var(--textnormal)'" />
                         <div class="edit_options" v-if="editOptions">
                             <div class="edit_option">Close Offer</div>
-                            <RouterLink :to="`/portfolio/vault/${offer._id}`">
+                            <RouterLink :to="`/portfolio/vaults/borrows/${offer._id}`">
                                 <div class="edit_option">Loan's Vault</div>
                             </RouterLink>
                         </div>
                     </div>
                 </div>
                 <div class="buttons" v-else>
-                    <RouterLink :to="`/portfolio/vault/${offer._id}`">
+                    <RouterLink :to="`/portfolio/vaults/borrows/${offer._id}`">
                         <div class="go_to_vault">
                             <p>Go to Loan's Vault</p>
                             <IconOut :color="'var(--textnormal)'" />

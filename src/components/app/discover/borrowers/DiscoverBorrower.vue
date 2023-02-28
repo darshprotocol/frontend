@@ -5,7 +5,7 @@
         </div>
 
         <div class="lends" v-else>
-            <RouterLink v-for="offer in offers" :to="`/discover/borrowers/${offer._id}`" :key="offer.offerId">
+            <RouterLink v-for="offer, fIndex in offers" :to="`/discover/borrowers/${offer._id}`" :key="offer.offerId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
@@ -44,7 +44,9 @@
                     </div>
                     <div class="progress" v-else>
                         <div class="users">
-                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
+                            <div class="img" v-for="loan, index in offer.loans" :key="index"
+                                :id="`${fIndex}img_lender${index}`">
+                            </div>
                             <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
                         <div class="needed">
@@ -62,7 +64,7 @@
                 </div>
             </RouterLink>
         </div>
-        
+
         <div class="t_empty" v-if="!fetching && offers.length == 0">
             <img src="../../../../assets/images/receipt-text.png" alt="">
             <p>No Borrowers found.</p>
@@ -80,6 +82,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 
 <script>
 import Countdown from '../../../../utils/Countdown';
+import Profile from '../../../../scripts/Profile';
 export default {
     data() {
         return {
@@ -113,6 +116,18 @@ export default {
                 console.error(error);
                 this.fetching = false
             })
+        }
+    },
+    updated() {
+        if (this.offers) {
+            for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
+                const offer = this.offers[fIndex];
+                for (let index = 0; index < offer.loans.length; index++) {
+                    const loan = offer.loans[index];
+                    let el = Profile.generate(30, loan.lender)
+                    document.getElementById(`${fIndex}img_lender${index}`).appendChild(el)
+                }
+            }
         }
     }
 }
@@ -252,24 +267,24 @@ export default {
     align-items: center;
 }
 
-.users img {
+.users img,
+.users .img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-}
-
-.users img {
     margin-left: -16px;
+    background: var(--bglight);
 }
 
-.users img:first-child {
+.users img:first-child,
+.users .img:first-child {
     margin: 0;
 }
 
 .extra_user {
-    width: 32px;
+    width: 40px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -278,6 +293,7 @@ export default {
     font-size: 12px;
     color: var(--textdimmed);
     margin-left: -16px;
+    z-index: 1;
 }
 
 .needed>div {

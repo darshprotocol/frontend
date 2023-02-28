@@ -88,13 +88,13 @@
 </template>
 
 <script setup>
-import IconOut from '../../../icons/IconOut.vue';
-import IconSort from '../../../icons/IconSort.vue';
-import IconAddCircle from '../../../icons/IconAddCircle.vue'
-import IconMinusCircle from '../../../icons/IconMinusCircle.vue'
-import IconCoin from '../../../icons/IconCoin.vue';
-import IconLock from '../../../icons/IconLock.vue';
-import Profile from '../../../../scripts/Profile';
+import IconOut from '../../../../icons/IconOut.vue';
+import IconSort from '../../../../icons/IconSort.vue';
+import IconAddCircle from '../../../../icons/IconAddCircle.vue'
+import IconMinusCircle from '../../../../icons/IconMinusCircle.vue'
+import IconCoin from '../../../../icons/IconCoin.vue';
+import IconLock from '../../../../icons/IconLock.vue';
+import Profile from '../../../../../scripts/Profile';
 </script >
 
 <script>
@@ -110,8 +110,10 @@ export default {
         },
     },
     mounted() {
-        for (let index = 0; index < this.offer.transfers.length; index++) {
-            let el = Profile.generate(20, this.offer.transfers[index].from)
+        let transfers = this.sortActivities(this.offer.transfers)
+
+        for (let index = 0; index < transfers.length; index++) {
+            let el = Profile.generate(20, transfers[index].from)
             document.getElementById(`img_vault${index}`).appendChild(el)
         }
     }

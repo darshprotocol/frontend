@@ -57,14 +57,18 @@
                     <div class="expire">
                         <div>
                             <div class="progress">
+                                <!---->
                                 <div class="users" v-if="offer.loans.length == 0">
                                     <div class="img" v-for="index in 4" :key="index"></div>
                                     <div class="extra_user">0</div>
                                 </div>
                                 <div class="users" v-else>
-                                    <img v-for="index in offer.loans" :key="index" src="/images/user1.png" alt="">
+                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_lender${index}`" :key="index">
+                                    </div>
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
+
+                                <!---->
                                 <div class="date" v-if="offer.loans.length == 0">
                                     <p>Offer expires in</p>
                                     <p>{{ countdown }}</p>
@@ -113,14 +117,14 @@
                         <p>Owned by</p>
                         <div>
                             <div>
-                                <p>Elon Musk</p>
+                                <p>{{ $shortName(offer.creator, 6) }}</p>
                                 <p>20,250 Total Loans</p>
                             </div>
-                            <img src="/images/user1.png" alt="">
+                            <div class="img" id="img_borrower"></div>
                         </div>
                     </div>
                     <div class="manage_offer" v-if="userType == 'borrower'">
-                        <RouterLink :to="`/portfolio/borrow/${offer._id}`">
+                        <RouterLink :to="`/portfolio/borrows/${offer._id}`">
                             <PrimaryButton class="manage_offer_button" :text="'Manage Offer'" />
                         </RouterLink>
                     </div>
@@ -167,24 +171,25 @@ import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
 import { messages } from '../../../../reactives/messages';
 import IconInformation from '../../../icons/IconInformation.vue';
+import Profile from '../../../../scripts/Profile';
 export default {
     components: {
-    LendPopUp,
-    LoanInfoPopUp,
-    IconClock,
-    IconAdd,
-    IconChart,
-    RequestTable,
-    PrimaryButton,
-    IconInterest,
-    ProgressBox,
-    IconSort,
-    LoanPayBackPopUp,
-    LendRequestPopUp,
-    LoanBoxes,
-    BorrowerStats,
-    IconInformation
-},
+        LendPopUp,
+        LoanInfoPopUp,
+        IconClock,
+        IconAdd,
+        IconChart,
+        RequestTable,
+        PrimaryButton,
+        IconInterest,
+        ProgressBox,
+        IconSort,
+        LoanPayBackPopUp,
+        LendRequestPopUp,
+        LoanBoxes,
+        BorrowerStats,
+        IconInformation
+    },
     data() {
         return {
             offer: null,
@@ -198,7 +203,8 @@ export default {
             lenderScore: '•••',
             lend: false,
             payback: false,
-            request: false
+            request: false,
+            generated: false
         };
     },
     async created() {
@@ -276,6 +282,20 @@ export default {
         },
         sortRequests: function (requests) {
             return requests.filter(request => request.state == 0);
+        }
+    },
+    updated() {
+        if (this.offer && !this.generated) {
+            let el = Profile.generate(36, this.offer.creator)
+            document.getElementById('img_borrower').appendChild(el)
+
+            for (let index = 0; index < this.offer.loans.length; index++) {
+                const loan = this.offer.loans[index];
+                let elx = Profile.generate(32, loan.lender)
+                document.getElementById(`img_lender${index}`).appendChild(elx)
+            }
+
+            this.generated = true
         }
     }
 }
@@ -376,8 +396,6 @@ export default {
 }
 
 .info>div>div>p {
-
-
     font-weight: 500;
     font-size: 14px;
     color: var(--textdimmed);
@@ -408,8 +426,6 @@ export default {
 
 .info>div>div>div p,
 .info>div>div>div span {
-
-
     font-weight: 500;
     font-size: 20px;
     color: var(--textnormal);
@@ -504,6 +520,7 @@ export default {
     font-size: 12px;
     color: var(--textnormal);
     margin-left: -16px;
+    z-index: 1;
 }
 
 .request_section {
@@ -610,7 +627,7 @@ export default {
     color: var(--textnormal);
 }
 
-.created img {
+.created .img {
     width: 36px;
     height: 36px;
 }
@@ -631,8 +648,6 @@ export default {
 }
 
 .open_loans h3 {
-
-
     font-weight: 500;
     font-size: 16px;
     color: var(--textnormal);

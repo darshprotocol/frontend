@@ -5,7 +5,7 @@
         </div>
 
         <div class="lends" v-else>
-            <RouterLink v-for="offer in offers" :to="`/discover/lenders/${offer._id}`" :key="offer.offerId">
+            <RouterLink v-for="offer, fIndex in offers" :to="`/discover/lenders/${offer._id}`" :key="offer.offerId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
@@ -20,8 +20,8 @@
                                 }}</p>
                             </div>
                             <div>
-                                <img v-for="asset in offer.collateralTokens"
-                                    :src="`/images/${$findAsset(asset).image}.png`" :key="asset.id" alt="">
+                                <img v-for="asset in offer.collateralTokens" :src="`/images/${$findAsset(asset).image}.png`"
+                                    :key="asset.id" alt="">
                             </div>
                         </div>
                     </div>
@@ -51,14 +51,15 @@
                             <div class="extra_user">0</div>
                         </div>
                         <div class="users" v-else>
-                            <img v-for="(loan, index) in offer.loans" :src="`/images/user${index + 1}.png`"  :key="loan.loanId" alt="">
+                            <div class="img" v-for="loan, index in offer.loans" :key="index" :id="`${fIndex}img_borrower${index}`">
+                            </div>
                             <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
 
                         <div class="needed">
                             <div class="label">
                                 <p>{{ $toMoney($fromWei(offer.currentPrincipal)) }} <span>/ {{
-                                $toMoney($fromWei(offer.initialPrincipal)) }} {{
+                                    $toMoney($fromWei(offer.initialPrincipal)) }} {{
         $findAsset(offer.principalToken).symbol
     }}</span></p>
                                 <IconInfo />
@@ -88,6 +89,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 </script >
 
 <script>
+import Profile from '../../../../scripts/Profile'
 import Countdown from '../../../../utils/Countdown'
 export default {
     data() {
@@ -122,6 +124,18 @@ export default {
                 console.error(error);
                 this.fetching = false
             })
+        }
+    },
+    updated() {
+        if (this.offers) {
+            for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
+                const offer = this.offers[fIndex];
+                for (let index = 0; index < offer.loans.length; index++) {
+                    const loan = offer.loans[index];
+                    let el = Profile.generate(30, loan.borrower)
+                    document.getElementById(`${fIndex}img_borrower${index}`).appendChild(el)
+                }
+            }
         }
     }
 }
@@ -293,6 +307,7 @@ export default {
     font-size: 12px;
     color: var(--textdimmed);
     margin-left: -16px;
+    z-index: 1;
 }
 
 .needed>div {
