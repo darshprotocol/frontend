@@ -31,13 +31,13 @@
                         <div class="detail">
                             <img :src="`/images/${asset.image}.png`" alt="">
                             <div class="detail_info">
-                                <p>{{ asset.name }}</p>
                                 <p>{{ asset.symbol }}</p>
+                                <p>{{ asset.name }}</p>
                             </div>
                         </div>
                         <div class="balance">
-                            <p>24.4903</p>
-                            <p>~ $849.43</p>
+                            <p>{{ findTokenBalance(asset.address) }}</p>
+                            <p>~ $0.00</p>
                         </div>
                     </div>
                 </div>
@@ -58,9 +58,36 @@ import IconLogout from './icons/IconLogout.vue';
 </script>
 
 <script>
+import CovalentAPI from '../utils/CovalentAPI'
 export default {
     props: ["userAddress"],
+    data() {
+        return {
+            tokenBalances: []
+        }
+    },
+    methods: {
+        getTokenBalances: async function () {
+            let response = await CovalentAPI.getTokenBalances(this.userAddress);
+            if (!response)
+                return;
+            this.tokenBalances = response.data.items;
+        },
+        findTokenBalance: function (address) {
+            if (address == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
+                address = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
+            }
+
+            let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase());
+
+            if (!token)
+                return "0.00";
+
+            return this.$toMoney(this.$fromWei(token.balance));
+        },
+    },
     mounted() {
+        this.getTokenBalances()
         document.body.classList.add('modal')
     },
     unmounted() {

@@ -17,7 +17,7 @@ const AssetLibrary = {
         {
             id: 1,
             symbol: 'WBTC',
-            name: 'Bitcoin',
+            name: 'Wrapped Bitcoin',
             image: 'btc',
             type: 'native',
             address: '0xBcEdBF29D6dff33fCf5CA6c1816CcA886fd6F5C4',
@@ -30,7 +30,7 @@ const AssetLibrary = {
         }, {
             id: 2,
             symbol: 'WETH',
-            name: 'Ethereum',
+            name: 'Wrapped Ethereum',
             image: 'eth',
             type: 'native',
             address: '0x2b42D1149f3427044acd6B310F6721c5d87c652e',
