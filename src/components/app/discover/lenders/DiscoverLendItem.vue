@@ -250,7 +250,10 @@ export default {
                 this.fetching = false;
                 this.startCountdown();
                 this.getLenderScore(this.offer.creator);
+
                 this.generateImages()
+                
+                this.generated = false
             }
             catch (error) {
                 console.error(error);
