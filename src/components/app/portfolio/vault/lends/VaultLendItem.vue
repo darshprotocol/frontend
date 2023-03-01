@@ -70,8 +70,7 @@
                             <IconChart />
                             <p class="deep_text">{{
                                 $nFormat(
-                                    ($fromWei(offer.initialPrincipal)) -
-                                    ($fromWei(offer.currentPrincipal))
+                                    ($fromWei(offer.currentCollateral))
                                 )
                             }}<span>/{{
     $nFormat($fromWei(offer.initialPrincipal)) }}
@@ -164,8 +163,10 @@
                             </div>
                         </div>
                         <div class="emission_action2">
-                            <PrimaryButton :progress="claimingCollateral" :state="(claimingCollateral || loan.unClaimedCollateral == 0) ? 'disable' : ''"
-                                v-on:click="!(claimingCollateral || loan.unClaimedCollateral == 0) ? claimCollateral() : null" :text="'Claim'" />
+                            <PrimaryButton :progress="claimingCollateral"
+                                :state="(claimingCollateral || loan.unClaimedCollateral == 0) ? 'disable' : ''"
+                                v-on:click="!(claimingCollateral || loan.unClaimedCollateral == 0) ? claimCollateral() : null"
+                                :text="'Claim'" />
                         </div>
                     </div>
                 </div>
