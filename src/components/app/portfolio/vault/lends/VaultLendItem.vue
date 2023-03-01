@@ -1,5 +1,7 @@
 <template>
-    <p v-if="!userAddress">Connect Wallet</p>
+    <p v-if="!userAddress">
+        <NoWallet />
+    </p>
 
     <div class="progress_box" v-if="fetching && userAddress != null">
         <ProgressBox />
@@ -193,13 +195,14 @@ import Authentication from '../../../../../scripts/Authentication';
 import IconCalendar from '../../../../icons/IconCalendar.vue';
 import LendingPoolAPI from '../../../../../scripts/LendingPoolAPI';
 import { messages } from '../../../../../reactives/messages';
+import NoWallet from '../../../../NoWallet.vue';
 export default {
     data() {
         return {
             userAddress: null,
             fetching: true,
             offer: null,
-            daysAgo: '',
+            daysAgo: "",
             loan: null,
             claimingCollateral: false
         };
@@ -213,61 +216,56 @@ export default {
             }
             this.axios.get(`https://darshprotocol.onrender.com/offers/${id}?creator=${this.userAddress.toLowerCase()}`).then(response => {
                 this.offer = response.data;
-                this.getDaysAgo(this.offer.createdAt)
+                this.getDaysAgo(this.offer.createdAt);
                 this.fetching = false;
-
                 if (this.offer.creator != this.userAddress.toLowerCase()) {
                     this.offer.loans.forEach(loan => {
                         if (loan.borrower == this.userAddress.toLowerCase()) {
-                            this.loan = loan
+                            this.loan = loan;
                         }
-                    })
+                    });
                 }
-
             }).catch(error => {
                 console.error(error);
             });
         },
         getDaysAgo: function (createdAt) {
-            let now = Date.now() / 1000
-            let elapsed = now - createdAt
-            let daysAgo = elapsed / 24 / 60 / 60
+            let now = Date.now() / 1000;
+            let elapsed = now - createdAt;
+            let daysAgo = elapsed / 24 / 60 / 60;
             if (daysAgo < 1) {
-                daysAgo = 1
+                daysAgo = 1;
             }
-            this.daysAgo = daysAgo.toFixed(0)
+            this.daysAgo = daysAgo.toFixed(0);
         },
         claimCollateral: async function () {
-            this.claimingCollateral = true
-            const trx = await LendingPoolAPI.claimCollateral(
-                this.loan.loanId,
-                await Authentication.userAddress()
-            )
-
+            this.claimingCollateral = true;
+            const trx = await LendingPoolAPI.claimCollateral(this.loan.loanId, await Authentication.userAddress());
             if (trx && trx.tx) {
                 messages.insertMessage({
-                    title: 'Collateral claimed',
-                    description: 'Collateral was successfully claimed.',
-                    type: 'success',
-                    linkTitle: 'View Trx',
+                    title: "Collateral claimed",
+                    description: "Collateral was successfully claimed.",
+                    type: "success",
+                    linkTitle: "View Trx",
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
-                })
-            } else {
-                messages.insertMessage({
-                    title: 'Claim failed',
-                    description: 'Collateral failed to claim.',
-                    type: 'failed'
-                })
+                });
             }
-
-            this.claimingCollateral = false
-            this.fetchOffer(false)
+            else {
+                messages.insertMessage({
+                    title: "Claim failed",
+                    description: "Collateral failed to claim.",
+                    type: "failed"
+                });
+            }
+            this.claimingCollateral = false;
+            this.fetchOffer(false);
         }
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchOffer(true);
-    }
+    },
+    components: { NoWallet }
 }
 </script>
 

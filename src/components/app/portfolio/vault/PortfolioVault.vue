@@ -1,6 +1,8 @@
 <template>
     <main>
-        <p v-if="!userAddress">Connect Wallet</p>
+        <p v-if="!userAddress">
+            <NoWallet />
+        </p>
 
         <div class="progress_box" v-if="fetching && userAddress != null">
             <ProgressBox />
@@ -107,6 +109,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 import Countdown from '../../../../utils/Countdown'
 import Authentication from '../../../../scripts/Authentication';
 import IconChart from '../../../icons/IconChart.vue';
+import NoWallet from '../../../NoWallet.vue';
 export default {
     data() {
         return {
@@ -151,7 +154,7 @@ export default {
             });
         }
     },
-    components: { IconChart }
+    components: { IconChart, NoWallet }
 }
 </script>
 

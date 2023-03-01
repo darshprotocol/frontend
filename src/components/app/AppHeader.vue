@@ -13,7 +13,7 @@
                     <IconNotification />
                     <div class="new_notification"></div>
                 </div>
-                <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate()">
+                <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate(true)">
                     <IconMetamask v-if="userAddress" />
                     <IconWallet v-else />
                     <p v-if="userAddress">{{ userAddress.substring(0, 5) }}•••{{
@@ -39,6 +39,7 @@ import IconSettings from '../icons/IconSettings.vue';
 <script>
 import Authentication from '../../scripts/Authentication'
 import IconWallet from '../icons/IconWallet.vue';
+import { messages } from '../../reactives/messages';
 export default {
     props: ["userAddress"],
     methods: {
@@ -48,16 +49,24 @@ export default {
                 return;
             }
             const userAddress = await Authentication.userAddress(request);
-            if (request) {
+
+            if (request && !userAddress) {
+                messages.insertMessage({
+                    title: 'Failed to connect wallet',
+                    description: 'Please check your network, refresh or try again.',
+                    type: 'failed'
+                })
+            }
+            else if (userAddress && request) {
                 this.$router.go();
             }
+
             this.$emit("connected", userAddress);
         }
     },
     mounted() {
         this.authenticate();
-    },
-    components: { IconWallet }
+    }
 }
 </script>
 

@@ -1,6 +1,8 @@
 <template>
     <main>
-        <p v-if="!userAddress">Connect Wallet</p>
+        <p v-if="!userAddress">
+            <NoWallet />
+        </p>
 
         <div class="progress_box" v-if="fetching && userAddress != null">
             <ProgressBox />
@@ -82,6 +84,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 <script>
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
+import NoWallet from '../../../NoWallet.vue';
 export default {
     data() {
         return {
@@ -96,17 +99,17 @@ export default {
     },
     methods: {
         getInterest: function (rate, daysToMaturity) {
-            let result = rate * daysToMaturity * 24 * 60 * 60
-            let interest = this.$fromWei(result.toString())
-            return this.$toMoney(interest)
+            let result = rate * daysToMaturity * 24 * 60 * 60;
+            let interest = this.$fromWei(result.toString());
+            return this.$toMoney(interest);
         },
         getExpire: function (offer) {
-            let txt = ''
-            let due = offer.expiresAt * 1000
+            let txt = "";
+            let due = offer.expiresAt * 1000;
             Countdown.start(due, (text) => {
-                txt = text
-            })
-            return txt
+                txt = text;
+            });
+            return txt;
         },
         fetchBorrowingOffers: async function () {
             this.fetching = true;
@@ -121,7 +124,8 @@ export default {
                 // this.fetching = false;
             });
         }
-    }
+    },
+    components: { NoWallet }
 }
 </script>
 

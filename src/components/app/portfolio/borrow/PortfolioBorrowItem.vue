@@ -1,5 +1,7 @@
 <template>
-    <p v-if="!userAddress">Connect Wallet</p>
+    <p v-if="!userAddress">
+        <NoWallet />
+    </p>
 
     <div class="progress_box" v-if="fetching && userAddress != null">
         <ProgressBox />
@@ -120,6 +122,7 @@ import ProgressBox from '../../../ProgressBox.vue';
 <script>
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
+import NoWallet from '../../../NoWallet.vue';
 export default {
     data() {
         return {
@@ -163,7 +166,8 @@ export default {
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchBorrowingOffer(true);
-    }
+    },
+    components: { NoWallet }
 }
 </script>
 

@@ -1,5 +1,4 @@
 <template>
-    <p v-if="!userAddress">Connect Wallet</p>
     <main v-if="userAddress">
         <div class="header">
             <h3 class="title">Portfolio</h3>

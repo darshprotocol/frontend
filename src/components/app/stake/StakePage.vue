@@ -1,17 +1,13 @@
 <template>
     <main>
         <div class="box">
-
+            <img src="/images/linear_gradient_background.png" alt="">
         </div>
     </main>
 </template>
 
 <style scoped>
-.box {
-    background-image: url('/images/success_gradient.png');
-    background-size: cover;
-
-    width: 684px;
-    height: 272px;
+img {
+    width: 1000px;
 }
 </style>
