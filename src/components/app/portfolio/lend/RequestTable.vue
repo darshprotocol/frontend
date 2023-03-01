@@ -91,6 +91,8 @@
 
 <script setup>
 import Authentication from '../../../../scripts/Authentication';
+import IconClock from '../../../icons/IconClock.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
 import IconOut from '../../../icons/IconOut.vue';
 import IconSort from '../../../icons/IconSort.vue';
 import RequestPopUpInfo from '../../discover/lenders/RequestPopUpInfo.vue';
@@ -101,21 +103,21 @@ export default {
     props: ["offer"],
     data() {
         return {
-            activeRequest: '',
-            userAddress: '',
+            activeRequest: "",
+            userAddress: "",
             requestAction: null,
             accepting: -1
         };
     },
     methods: {
-        sortRequests: function(requests) {
-            return requests.filter(request => request.state == 0)
+        sortRequests: function (requests) {
+            return requests.filter(request => request.state == 0);
         },
         setRequestAction: function (action, request) {
             this.requestAction = {
                 action: action,
                 request: request
-            }
+            };
         },
         getPrincipal: function (percentage) {
             let principal = this.offer.initialPrincipal * (percentage / 100);
@@ -149,7 +151,8 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-    }
+    },
+    components: { IconClock, IconInterest }
 }
 </script>
 

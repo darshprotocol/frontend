@@ -96,6 +96,8 @@ import IconSort from '../../../icons/IconSort.vue';
 <script>
 import Authentication from '../../../../scripts/Authentication';
 import RequestPopUpInfo from '../../discover/borrowers/RequestPopUpInfo.vue';
+import IconClock from '../../../icons/IconClock.vue';
+import IconInterest from '../../../icons/IconInterest.vue';
 export default {
     props: ["offer"],
     data() {
@@ -152,7 +154,8 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
-    }
+    },
+    components: { IconClock, IconInterest }
 }
 </script>
 
