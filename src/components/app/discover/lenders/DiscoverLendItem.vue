@@ -250,10 +250,7 @@ export default {
                 this.fetching = false;
                 this.startCountdown();
                 this.getLenderScore(this.offer.creator);
-
                 this.generateImages()
-                
-                this.generated = false
             }
             catch (error) {
                 console.error(error);
@@ -267,19 +264,21 @@ export default {
             this.lenderScore = await HealthScore.getHealthScore(address);
         },
         generateImages: function () {
-            if (this.offer && !this.generated) {
+            if (this.offer) {
                 let el = Profile.generate(36, this.offer.creator)
                 let dom = document.getElementById('img_lender')
-                if (dom) dom.appendChild(el)
+                if (dom &&  dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
 
                 for (let index = 0; index < this.offer.loans.length; index++) {
                     const loan = this.offer.loans[index];
                     let elx = Profile.generate(32, loan.borrower)
                     let domx = document.getElementById(`img_borrower${index}`)
-                    if (domx) domx.appendChild(elx)
+                    if (domx && domx.childNodes.length == 0) {
+                        domx.appendChild(elx)
+                    }
                 }
-
-                this.generated = true
             }
         }
     },
