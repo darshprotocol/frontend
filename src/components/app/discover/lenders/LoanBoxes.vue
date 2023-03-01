@@ -324,6 +324,7 @@ export default {
             }
             
             this.$emit('done')
+
             this.claimingPaybackOf = -1
         }
     },

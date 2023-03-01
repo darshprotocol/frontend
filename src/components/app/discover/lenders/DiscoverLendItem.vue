@@ -44,7 +44,7 @@
                             <div>
                                 <IconChart class="icon" />
                                 <p><span>{{ $toMoney($fromWei(offer.initialPrincipal - offer.currentPrincipal)) }}</span>/{{
-                                        $toMoney($fromWei(offer.initialPrincipal)) }}</p>
+                                    $toMoney($fromWei(offer.initialPrincipal)) }}</p>
                             </div>
                             <p>Borrowed</p>
                         </div>
@@ -246,9 +246,11 @@ export default {
                 else {
                     this.userType = "none";
                 }
+                
                 this.fetching = false;
                 this.startCountdown();
                 this.getLenderScore(this.offer.creator);
+                this.generateImages()
             }
             catch (error) {
                 console.error(error);
@@ -260,23 +262,26 @@ export default {
         },
         getLenderScore: async function (address) {
             this.lenderScore = await HealthScore.getHealthScore(address);
+        },
+        generateImages: function () {
+            if (this.offer && !this.generated) {
+                let el = Profile.generate(36, this.offer.creator)
+                let dom = document.getElementById('img_lender')
+                if (dom) dom.appendChild(el)
+
+                for (let index = 0; index < this.offer.loans.length; index++) {
+                    const loan = this.offer.loans[index];
+                    let elx = Profile.generate(32, loan.borrower)
+                    let domx = document.getElementById(`img_borrower${index}`)
+                    if (domx) domx.appendChild(elx)
+                }
+
+                this.generated = true
+            }
         }
     },
     updated() {
-        if (this.offer && !this.generated) {
-            let el = Profile.generate(36, this.offer.creator)
-            let dom = document.getElementById('img_lender')
-            if (dom) dom.appendChild(el)
-
-            for (let index = 0; index < this.offer.loans.length; index++) {
-                const loan = this.offer.loans[index];
-                let elx = Profile.generate(32, loan.borrower)
-                let domx = document.getElementById(`img_borrower${index}`)
-                if (domx) domx.appendChild(elx)
-            }
-
-            this.generated = true
-        }
+        this.generateImages()
     }
 }
 </script>
@@ -622,5 +627,4 @@ export default {
     color: var(--textdimmed);
     margin-top: 2px;
 }
-
 </style>

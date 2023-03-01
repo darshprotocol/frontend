@@ -266,9 +266,9 @@ export default {
                 }
 
                 this.fetching = false;
-
                 this.startCountdown()
                 this.getBorrowerScore(this.offer.creator)
+                this.generateImages()
             } catch (error) {
                 console.error(error);
             }
@@ -282,10 +282,9 @@ export default {
         },
         sortRequests: function (requests) {
             return requests.filter(request => request.state == 0);
-        }
-    },
-    updated() {
-        if (this.offer && !this.generated) {
+        },
+        generateImages: function() {
+            if (this.offer && !this.generated) {
             let el = Profile.generate(36, this.offer.creator)
             let dom = document.getElementById('img_borrower')
             if (dom) dom.appendChild(el)
@@ -299,6 +298,10 @@ export default {
 
             this.generated = true
         }
+        }
+    },
+    updated() {
+        this.generateImages()
     }
 }
 </script>

@@ -3,7 +3,7 @@
         <div class="box">
             <div class="title">
                 <h3>Loan Payback</h3>
-                <div class="close" v-on:click="$emit('close')">
+                <div class="close"  v-if="!(payingback || approving)" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
@@ -94,7 +94,6 @@ export default {
                     linkTitle: 'View Trx',
                     linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
                 })
-                this.$emit('done')
             } else {
                 messages.insertMessage({
                     title: 'Payment failed',
@@ -102,8 +101,11 @@ export default {
                     type: 'failed'
                 })
             }
-
+            
+            this.$emit('done')
             this.$emit('close')
+
+            this.payingback = false
         },
         getAllowance: async function () {
             this.fetchingPrice = true
