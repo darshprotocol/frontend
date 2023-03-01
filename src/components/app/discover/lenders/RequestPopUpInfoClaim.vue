@@ -115,13 +115,20 @@ export default {
             this.$emit('close')
 
             this.claiming = false
+        },
+        generateImages: function () {
+            let el = Profile.generate(30, this.request.creator)
+            let dom = document.getElementById(`img_borrower`)
+            if (dom && dom.childNodes.length == 0) {
+                dom.appendChild(el)
+            }
         }
     },
     mounted() {
-        let el = Profile.generate(30, this.request.creator)
-        document.getElementById(`img_borrower`).appendChild(el)
-
         document.body.classList.add('modal')
+        this.generateImages()
+    }, updated() {
+        this.generateImages()
     },
     unmounted() {
         document.body.classList.remove('modal')

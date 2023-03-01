@@ -118,13 +118,24 @@ export default {
                     markedAsRead: true
                 }
             ]
-        };
+        }
+    },
+    methods: {
+        generateImages: function () {
+            for (let index = 0; index < this.data.length; index++) {
+                let el = Profile.generate(50, this.data[index].from.address)
+                let dom = document.getElementById(`img_notification${index}`)
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
+            }
+        }
     },
     mounted() {
-        for (let index = 0; index < this.data.length; index++) {
-            let el = Profile.generate(50, this.data[index].from.address)
-            document.getElementById(`img_notification${index}`).appendChild(el)
-        }
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages()
     }
 }
 </script>

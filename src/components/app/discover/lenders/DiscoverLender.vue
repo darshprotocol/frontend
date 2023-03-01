@@ -51,7 +51,8 @@
                             <div class="extra_user">0</div>
                         </div>
                         <div class="users" v-else>
-                            <div class="img" v-for="loan, index in offer.loans" :key="index" :id="`${fIndex}img_borrower${index}`">
+                            <div class="img" v-for="loan, index in offer.loans" :key="index"
+                                :id="`${fIndex}img_borrower${index}`">
                             </div>
                             <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
@@ -124,19 +125,28 @@ export default {
                 console.error(error);
                 this.fetching = false
             })
-        }
-    },
-    updated() {
-        if (this.offers) {
-            for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
-                const offer = this.offers[fIndex];
-                for (let index = 0; index < offer.loans.length; index++) {
-                    const loan = offer.loans[index];
-                    let el = Profile.generate(30, loan.borrower)
-                    document.getElementById(`${fIndex}img_borrower${index}`).appendChild(el)
+        },
+        generateImages: function () {
+            if (this.offers) {
+                for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
+                    const offer = this.offers[fIndex];
+                    for (let index = 0; index < offer.loans.length; index++) {
+                        const loan = offer.loans[index];
+                        let el = Profile.generate(30, loan.borrower)
+                        let dom = document.getElementById(`${fIndex}img_borrower${index}`)
+                        if (dom && dom.childNodes.length == 0) {
+                            dom.appendChild(el)
+                        }
+                    }
                 }
             }
         }
+    },
+    mounted() {
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages()
     }
 }
 </script>

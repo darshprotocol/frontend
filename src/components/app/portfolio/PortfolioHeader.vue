@@ -114,19 +114,26 @@ import Profile from '../../../scripts/Profile';
 export default {
     data() {
         return {
-            userAddress: null,
-            generate: false
+            userAddress: null
+        }
+    },
+    methods: {
+        generateImages: function () {
+            if (this.userAddress) {
+                let el = Profile.generate(82, this.userAddress)
+                let dom = document.getElementById('img')
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
+            }
         }
     },
     async mounted() {
         this.userAddress = await Authentication.userAddress()
+        this.generateImages()
     },
     updated() {
-        if (this.userAddress && !this.generate) {
-            let el = Profile.generate(82, this.userAddress)
-            document.getElementById('img').appendChild(el)
-            this.generate = true
-        }
+        this.generateImages()
     }
 }
 </script>

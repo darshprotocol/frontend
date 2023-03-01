@@ -116,19 +116,28 @@ export default {
                 console.error(error);
                 this.fetching = false
             })
-        }
-    },
-    updated() {
-        if (this.offers) {
-            for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
-                const offer = this.offers[fIndex];
-                for (let index = 0; index < offer.loans.length; index++) {
-                    const loan = offer.loans[index];
-                    let el = Profile.generate(30, loan.lender)
-                    document.getElementById(`${fIndex}img_lender${index}`).appendChild(el)
+        },
+        generateImages: function () {
+            if (this.offers) {
+                for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
+                    const offer = this.offers[fIndex];
+                    for (let index = 0; index < offer.loans.length; index++) {
+                        const loan = offer.loans[index];
+                        let el = Profile.generate(30, loan.lender)
+                        let dom = document.getElementById(`${fIndex}img_lender${index}`)
+                        if (dom && dom.childNodes.length == 0) {
+                            dom.appendChild(el)
+                        }
+                    }
                 }
             }
         }
+    },
+    mounted() {
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages()
     }
 }
 </script>

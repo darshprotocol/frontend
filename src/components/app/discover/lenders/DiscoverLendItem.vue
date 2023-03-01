@@ -294,6 +294,9 @@ export default {
             }
         }
     },
+    mounted() {
+        this.generateImages()
+    },
     updated() {
         this.generateImages();
     },
