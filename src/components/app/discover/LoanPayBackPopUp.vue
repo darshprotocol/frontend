@@ -21,14 +21,16 @@
                 <Slider v-model="percentage" :step="25" :min="min()" :max="100" :format="{ suffix: '%' }" />
             </div>
             <div>
+                <PrimaryButton :progress="(fetchingPrice || approving)"
+                    :state="(fetchingPrice || approving) ? 'disable' : ''"
+                    v-if="$fromWei(allowance) < $fromWei(getPaybackAmount())"
+                    v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
+
                 <PrimaryButton :progress="(fetchingPrice || payingback)"
                     :state="(fetchingPrice || payingback) ? 'disable' : ''"
-                    v-if="$fromWei(allowance) >= $fromWei(getPaybackAmount())"
+                   v-else
                     v-on:click="!(fetchingPrice || payingback) ? repayLoan() : null" :text="'Payback'" />
 
-                <PrimaryButton :progress="(fetchingPrice || approving)"
-                    :state="(fetchingPrice || approving) ? 'disable' : ''" v-else
-                    v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
             </div>
         </div>
     </main>

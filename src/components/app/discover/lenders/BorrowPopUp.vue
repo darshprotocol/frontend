@@ -43,11 +43,14 @@
                 </div>
             </div>
             <div>
-                <PrimaryButton :state="(fetchingPrice || borrowing) ? 'disable' : ''" v-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
-                   :progress="(fetchingPrice || borrowing)"  v-on:click="!(fetchingPrice || borrowing) ? borrowLoan(): null" :text="'Borrow'" />
 
-                <PrimaryButton v-else :progress="(fetchingPrice || approving)" :state="(fetchingPrice || approving) ? 'disable' : ''"
+                <PrimaryButton v-if="$fromWei(allowance) < $fromWei(collateralAmount)"
+                    :progress="(fetchingPrice || approving)" :state="(fetchingPrice || approving) ? 'disable' : ''"
                     v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
+
+                <PrimaryButton :state="(fetchingPrice || borrowing) ? 'disable' : ''" v-else
+                    :progress="(fetchingPrice || borrowing)" v-on:click="!(fetchingPrice || borrowing) ? borrowLoan() : null"
+                    :text="'Borrow'" />
             </div>
         </div>
     </main>

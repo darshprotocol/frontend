@@ -3,6 +3,7 @@ import convert from './BaseConverter.js'
 const Converter = {
     fromWei: function (wei) {
         try {
+            if (wei == '' || wei == 0) return '0'
             return convert(wei, 'wei', 'ether')
         } catch (error) {
             console.error('ether', error);
