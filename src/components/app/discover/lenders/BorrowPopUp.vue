@@ -44,7 +44,7 @@
             </div>
             <div>
 
-                <PrimaryButton v-if="$fromWei(allowance) < $fromWei(collateralAmount)"
+                <PrimaryButton v-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
                     :progress="(fetchingPrice || approving)" :state="(fetchingPrice || approving) ? 'disable' : ''"
                     v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
 

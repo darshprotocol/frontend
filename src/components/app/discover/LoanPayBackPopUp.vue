@@ -23,7 +23,7 @@
             <div>
                 <PrimaryButton :progress="(fetchingPrice || approving)"
                     :state="(fetchingPrice || approving) ? 'disable' : ''"
-                    v-if="$fromWei(allowance) < $fromWei(getPaybackAmount())"
+                    v-if="$fromWei(allowance) >= $fromWei(getPaybackAmount())"
                     v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
 
                 <PrimaryButton :progress="(fetchingPrice || payingback)"
