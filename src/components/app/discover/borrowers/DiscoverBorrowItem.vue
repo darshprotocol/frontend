@@ -63,7 +63,8 @@
                                     <div class="extra_user">0</div>
                                 </div>
                                 <div class="users" v-else>
-                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_lender${index}`" :key="index">
+                                    <div class="img" v-for="loan, index in offer.loans" :id="`img_lender${index}`"
+                                        :key="index">
                                     </div>
                                     <div class="extra_user">{{ offer.loans.length }}</div>
                                 </div>
@@ -203,8 +204,7 @@ export default {
             lenderScore: '•••',
             lend: false,
             payback: false,
-            request: false,
-            generated: false
+            request: false
         };
     },
     async created() {
@@ -283,21 +283,23 @@ export default {
         sortRequests: function (requests) {
             return requests.filter(request => request.state == 0);
         },
-        generateImages: function() {
-            if (this.offer && !this.generated) {
-            let el = Profile.generate(36, this.offer.creator)
-            let dom = document.getElementById('img_borrower')
-            if (dom) dom.appendChild(el)
+        generateImages: function () {
+            if (this.offer) {
+                let el = Profile.generate(36, this.offer.creator)
+                let dom = document.getElementById('img_borrower')
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
 
-            for (let index = 0; index < this.offer.loans.length; index++) {
-                const loan = this.offer.loans[index];
-                let elx = Profile.generate(32, loan.lender)
-                let domx = document.getElementById(`img_lender${index}`)
-                if (domx) domx.appendChild(elx)
+                for (let index = 0; index < this.offer.loans.length; index++) {
+                    const loan = this.offer.loans[index];
+                    let elx = Profile.generate(32, loan.lender)
+                    let domx = document.getElementById(`img_lender${index}`)
+                    if (domx && domx.childNodes.length == 0) {
+                        domx.appendChild(elx)
+                    }
+                }
             }
-
-            this.generated = true
-        }
         }
     },
     updated() {
