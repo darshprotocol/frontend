@@ -14,7 +14,8 @@
                     <div class="new_notification"></div>
                 </div>
                 <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate()">
-                    <IconMetamask />
+                    <IconMetamask v-if="userAddress" />
+                    <IconWallet v-else />
                     <p v-if="userAddress">{{ userAddress.substring(0, 5) }}•••{{
                         userAddress.substring(userAddress.length - 5,
                             userAddress.length)
@@ -37,23 +38,26 @@ import IconSettings from '../icons/IconSettings.vue';
 
 <script>
 import Authentication from '../../scripts/Authentication'
+import IconWallet from '../icons/IconWallet.vue';
 export default {
     props: ["userAddress"],
     methods: {
         authenticate: async function (request = false) {
             if (this.userAddress) {
-                this.$emit('wallet')
-                return
+                this.$emit("wallet");
+                return;
             }
-
             const userAddress = await Authentication.userAddress(request);
-            if (request) { this.$router.go(); }
+            if (request) {
+                this.$router.go();
+            }
             this.$emit("connected", userAddress);
         }
     },
     mounted() {
         this.authenticate();
-    }
+    },
+    components: { IconWallet }
 }
 </script>
 
