@@ -64,7 +64,10 @@
                 <p>Repaid on</p>
                 <div>
                     <IconCalendar />
-                    <p>{{ dueDate }} days</p>
+                    <p>
+                        {{ $toDate(offer.loans[loanIndex].repaidOn).month }}
+                        {{ $toDate(offer.loans[loanIndex].repaidOn).date }}
+                    </p>
                 </div>
             </div>
             <div v-if="getState(borrowerLoan.loanId) == 'defaulting'">
@@ -193,7 +196,8 @@
                 </div>
 
                 <!---->
-                <div :style="offer.loans[loanIndex].unClaimedPrincipal == 0 ? 'margin-top: 10px !important;' : ''" class="borrower_action">
+                <div :style="offer.loans[loanIndex].unClaimedPrincipal == 0 ? 'margin-top: 10px !important;' : ''"
+                    class="borrower_action">
                     <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'"
                         :bg="'rgba(108, 110, 115, 0.1)'" />
 
@@ -322,7 +326,7 @@ export default {
                     type: 'failed'
                 })
             }
-            
+
             this.$emit('done')
 
             this.claimingPaybackOf = -1

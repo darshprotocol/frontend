@@ -11,17 +11,23 @@
                 </div>
             </div>
             <div class="fill fill_1">
+                <!---->
                 <div>
                     <p>Amount Borrowed + Interest</p>
                     <div class="fill_1_detail">
                         <img :src="`/images/${$findAsset(loan.principalToken).image}.png`" alt="">
                         <h3>{{ $fromWei(loan.initialPrincipal) }} {{ $findAsset(loan.principalToken).symbol }}</h3>
-                        <div class="accrued">
+                        <div class="accrued" v-if="loanState != 'repaid'">
                             <IconAdd class="icon" />
                             <p>{{ $toMoney($fromWei(getAccrued())) }}</p>
                         </div>
+                        <div class="accrued" v-if="loanState == 'repaid'">
+                            <IconAdd class="icon" />
+                            <p>{{ $toMoney($fromWei(loan.totalInterestPaid)) }}</p>
+                        </div>
                     </div>
                 </div>
+                <!---->
                 <div class="paid">
                     <div class="paid_token">
                         <p>-{{ $toMoney($fromWei(loan.initialPrincipal) - $fromWei(loan.currentPrincipal)) }}</p>
@@ -51,7 +57,10 @@
                     <p>Repaid on</p>
                     <div>
                         <IconCalendar class="icon" />
-                        <p>{{ dueDate }} days</p>
+                        <p>
+                            {{ $toDate(loan.repaidOn).month }}
+                            {{ $toDate(loan.repaidOn).date }}
+                        </p>
                     </div>
                 </div>
                 <div class="grid_1" v-if="loanState == 'defaulting'">
@@ -73,8 +82,8 @@
                 <div class="grid_2">
                     <p>Lender</p>
                     <div>
-                        <img src="/images/user1.png" alt="">
-                        <p>Elon Musk</p>
+                        <div class="img" id="img_lender_loan"></div>
+                        <p>{{ $shortName(loan.lender, 6) }}</p>
                     </div>
                 </div>
 
@@ -101,7 +110,7 @@
                 <PrimaryButton v-if="loanState == 'repaid'" :text="'Payback'" :state="'disable'" />
             </div>
         </div>
-</main>
+    </main>
 </template>
 
 <script setup>
@@ -116,6 +125,7 @@ import PrimaryButton from '../../PrimaryButton.vue';
 <script>
 import Countdown from '../../../utils/Countdown';
 import IconCalendar from '../../icons/IconCalendar.vue';
+import Profile from '../../../scripts/Profile';
 export default {
     props: ["loan"],
     data() {
@@ -161,12 +171,23 @@ export default {
             else if (this.loanState == 2 || now >= defaulted) {
                 this.loanState = "defaulted";
             }
+        },
+        generateImages: function () {
+            let el = Profile.generate(30, this.loan.lender)
+            let dom = document.getElementById('img_lender_loan')
+            if (dom && dom.childNodes.length == 0) {
+                dom.appendChild(el)
+            }
         }
     },
     mounted() {
         this.getDueDate();
         this.getLoanState()
+        this.generateImages()
         document.body.classList.add("modal");
+    },
+    updated() {
+        this.generateImages()
     },
     unmounted() {
         document.body.classList.remove("modal");
@@ -283,6 +304,11 @@ main {
     margin-bottom: 14px;
 }
 
+.paid_token img {
+    width: 20px;
+    height: 20px;
+}
+
 .paid_text {
     font-weight: 400;
     font-size: 12px;
@@ -368,7 +394,7 @@ main {
     align-items: flex-end;
 }
 
-.grid_2:first-child img {
+.grid_2:first-child .img {
     width: 30px;
     height: 30px;
 }
@@ -396,6 +422,7 @@ main {
 .open {
     background-image: url('/images/loan_gradient_open2.png');
 }
+
 .repaid {
     background-image: url('/images/loan_gradient_repaid2.png');
 }
