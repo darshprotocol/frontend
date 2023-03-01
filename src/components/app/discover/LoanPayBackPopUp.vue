@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="slider">
-                <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
+                <Slider v-model="percentage" :step="25" :min="min()" :max="100" :format="{ suffix: '%' }" />
             </div>
             <div>
                 <PrimaryButton :progress="(fetchingPrice || payingback)"
@@ -61,8 +61,8 @@ export default {
         }
     },
     methods: {
-        max: function () {
-            return (this.loan.currentPrincipal / this.loan.initialPrincipal) * 100
+        min: function () {
+            return ((this.loan.initialPrincipal - this.loan.currentPrincipal) / this.loan.initialPrincipal) * 100
         },
         getPaybackAmount: function () {
             return ((this.loan.initialPrincipal * this.percentage) / 100) + this.getAccrued()
@@ -80,7 +80,7 @@ export default {
 
             const trx = await LendingPoolAPI.repayLoan(
                 this.loan.loanId,
-                this.percentage,
+                this.percentage - this.min(),
                 this.getPaybackAmount(),
                 this.loan.principalToken,
                 await Authentication.userAddress()

@@ -107,14 +107,23 @@ export default {
                 return activities.filter(activity => activity.from == this.userAddress.toLowerCase())
             }
         },
+        generateImages: function () {
+            let transfers = this.sortActivities(this.offer.transfers)
+
+            for (let index = 0; index < transfers.length; index++) {
+                let el = Profile.generate(20, transfers[index].from)
+                let dom = document.getElementById(`img_vault${index}`)
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
+            }
+        }
     },
     mounted() {
-        let transfers = this.sortActivities(this.offer.transfers)
-
-        for (let index = 0; index < transfers.length; index++) {
-            let el = Profile.generate(20, transfers[index].from)
-            document.getElementById(`img_vault${index}`).appendChild(el)
-        }
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages()
     }
 }
 </script>

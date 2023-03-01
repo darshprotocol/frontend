@@ -106,7 +106,21 @@
             </div>
             <div>
                 <div class="sticky">
-                    <div class="created" v-if="userType != 'lender'">
+                    <div class="vault" v-if="borrowerLoan && borrowerLoan.unClaimedCollateral > 0">
+                        <RouterLink :to="`/portfolio/vaults/lends/${$route.params.id}`">
+                        <div class="go_to_vault">
+                            <div>
+                                <p class="vault_title">Unclaimed collateral</p>
+                                <div class="vault_token">
+                                    <img :src="`/images/${$findAsset(borrowerLoan.collateralToken).image}.png`" alt="">
+                                    <p>{{ $toMoney($fromWei(borrowerLoan.unClaimedCollateral)) }}</p>
+                                </div>
+                            </div>
+                            <IconOut :color="'var(--textnormal)'" />
+                        </div>
+                    </RouterLink>
+                    </div>
+                    <div class="created" v-else-if="userType != 'lender'">
                         <p>Owned by</p>
                         <div>
                             <div>
@@ -170,6 +184,7 @@ import HealthScore from '../../../../scripts/DarshScore'
 import ProfilePopUp from '../ProfilePopUp.vue';
 import { messages } from '../../../../reactives/messages';
 import Profile from '../../../../scripts/Profile';
+import IconOut from '../../../icons/IconOut.vue';
 export default {
     data() {
         return {
@@ -196,13 +211,13 @@ export default {
         onBorrow: function () {
             if (this.borrowerRequest) {
                 messages.insertMessage({
-                    title: 'Action failed',
-                    description: 'Cancel Borrow Request to Borrow a loan.',
-                    type: 'failed'
-                })
-                return
+                    title: "Action failed",
+                    description: "Cancel Borrow Request to Borrow a loan.",
+                    type: "failed"
+                });
+                return;
             }
-            this.borrow = true
+            this.borrow = true;
         },
         startCountdown: function () {
             let to = this.offer.expiresAt * 1000;
@@ -235,7 +250,6 @@ export default {
                             return;
                         }
                     });
-
                     this.offer.requests.forEach(request => {
                         if (request.creator.toLowerCase() == this.userAddress && request.state != 3) {
                             this.borrowerRequest = request;
@@ -246,11 +260,10 @@ export default {
                 else {
                     this.userType = "none";
                 }
-                
                 this.fetching = false;
                 this.startCountdown();
                 this.getLenderScore(this.offer.creator);
-                this.generateImages()
+                this.generateImages();
             }
             catch (error) {
                 console.error(error);
@@ -265,26 +278,26 @@ export default {
         },
         generateImages: function () {
             if (this.offer) {
-                let el = Profile.generate(36, this.offer.creator)
-                let dom = document.getElementById('img_lender')
-                if (dom &&  dom.childNodes.length == 0) {
-                    dom.appendChild(el)
+                let el = Profile.generate(36, this.offer.creator);
+                let dom = document.getElementById("img_lender");
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el);
                 }
-
                 for (let index = 0; index < this.offer.loans.length; index++) {
                     const loan = this.offer.loans[index];
-                    let elx = Profile.generate(32, loan.borrower)
-                    let domx = document.getElementById(`img_borrower${index}`)
+                    let elx = Profile.generate(32, loan.borrower);
+                    let domx = document.getElementById(`img_borrower${index}`);
                     if (domx && domx.childNodes.length == 0) {
-                        domx.appendChild(elx)
+                        domx.appendChild(elx);
                     }
                 }
             }
         }
     },
     updated() {
-        this.generateImages()
-    }
+        this.generateImages();
+    },
+    components: { IconOut }
 }
 </script>
 
@@ -572,6 +585,54 @@ export default {
 .sticky {
     position: sticky;
     top: 150px;
+}
+
+
+.vault {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 40px;
+}
+
+.go_to_vault {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    height: 40px;
+    border-radius: 2px;
+}
+
+.go_to_vault svg {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.go_to_vault>div {
+    padding: 0 30px;
+}
+.vault_title {
+    font-size: 14px;
+    color: var(--textdimmed);
+}
+
+.go_to_vault .vault_token {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.go_to_vault img {
+    width: 16px;
+    height: 16px;
+}
+
+.vault_token p {
+    font-size: 14px;
+    color: var(--textnormal);
 }
 
 .created {
