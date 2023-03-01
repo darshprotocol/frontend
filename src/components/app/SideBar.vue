@@ -71,7 +71,7 @@
             </div>
         </div>
         <div class="links">
-            <a href="" target="_blank">
+            <a href="#">
                 <div class="support">
                     <IconSupport />
                     <h3>Support</h3>

@@ -3,12 +3,13 @@ import AppHeader from '../components/app/AppHeader.vue';
 import NotificationPopUp from '../components/NotificationPopUp.vue';
 import SideBar from '../components/app/SideBar.vue';
 import SnackBar from '../components/SnackBar.vue';
+import WalletPopUp from '../components/WalletPopUp.vue';
 </script>
 
 <template>
     <div class="app-section">
         <div class="app-width">
-            <AppHeader v-on:notification="notification = true" :userAddress="userAddress"
+            <AppHeader v-on:notification="notification = true" v-on:wallet="wallet = true" :userAddress="userAddress"
                 v-on:connected="userAddress = $event" />
             <div class="app">
                 <SideBar class="sidebar" />
@@ -21,6 +22,7 @@ import SnackBar from '../components/SnackBar.vue';
 
         <SnackBar />
         <NotificationPopUp v-on:close="notification = false" v-if="notification" />
+        <WalletPopUp :userAddress="userAddress" v-on:close="wallet = false" v-if="wallet" />
     </div>
 </template>
 
@@ -29,9 +31,11 @@ export default {
     data() {
         return {
             userAddress: null,
-            notification: false
+            notification: false,
+            wallet: false
         };
-    }
+    },
+    components: { WalletPopUp }
 }
 </script>
 

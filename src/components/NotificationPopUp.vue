@@ -46,6 +46,9 @@
                     </div>
                 </div>
             </div>
+            <div class="mark_all">
+                <p>Mark All as Read</p>
+            </div>
         </div>
     </main>
 </template>
@@ -133,9 +136,13 @@ export default {
     },
     mounted() {
         this.generateImages()
+        document.body.classList.add('modal')
     },
     updated() {
         this.generateImages()
+    },
+    unmounted() {
+        document.body.classList.remove('modal')
     }
 }
 </script>
@@ -237,7 +244,7 @@ main {
 
 .scroll {
     overflow-y: auto;
-    height: calc(100% - 120px);
+    height: calc(100% - 180px);
 }
 
 .notification {
@@ -308,5 +315,20 @@ main {
 
 .notifications .active {
     background: var(--bglighter);
+}
+
+.mark_all {
+    height: 60px;
+    background: var(--bglighter);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mark_all p {
+    font-size: 14px;
+    text-decoration: underline;
+    margin-top: -4px;
+    color: var(--textnormal);
 }
 </style>

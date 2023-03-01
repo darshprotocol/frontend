@@ -6,6 +6,9 @@ import Profile from '../scripts/Profile'
 export default {
     // eslint-disable-next-line no-unused-vars
     install: (app, options) => {
+        app.config.globalProperties.$assets = () => {
+            return AssetLibrary.assets
+        },
         app.config.globalProperties.$findAsset = (address) => {
             return AssetLibrary.findAsset(address)
         },

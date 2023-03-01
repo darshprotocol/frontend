@@ -13,7 +13,7 @@
                     <IconNotification />
                     <div class="new_notification"></div>
                 </div>
-                <div class="connect_wallet" v-on:click="authenticate">
+                <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate()">
                     <IconMetamask />
                     <p v-if="userAddress">{{ userAddress.substring(0, 5) }}•••{{
                         userAddress.substring(userAddress.length - 5,
@@ -41,9 +41,13 @@ export default {
     props: ["userAddress"],
     methods: {
         authenticate: async function (request = false) {
+            if (this.userAddress) {
+                this.$emit('wallet')
+                return
+            }
+
             const userAddress = await Authentication.userAddress(request);
-            if (request)
-                this.$router.go();
+            if (request) { this.$router.go(); }
             this.$emit("connected", userAddress);
         }
     },
@@ -98,8 +102,7 @@ main {
 .connect_wallet {
     height: 40px;
     padding: 0 20px;
-    background: var(--bglight);
-    border: 1px solid rgba(105, 54, 245, 0.4);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -110,14 +113,17 @@ main {
     transition: .2s;
 }
 
+.connected {
+    background: var(--bglight);
+    border: 1px solid rgba(105, 54, 245, 0.4);
+}
+
 .connect_wallet:hover,
 .icon_badge:hover {
     transform: translateY(-2px);
 }
 
 .connect_wallet p {
-
-
     font-weight: 500;
     font-size: 14px;
     color: var(--textnormal);
