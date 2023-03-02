@@ -16,7 +16,8 @@
         </div>
         <div class="box" v-else-if="!fetching && user">
             <div class="title">
-                <h3>Lender's Stats</h3>
+                <h3 v-if="userType == 'Lender'">Lender's Stats</h3>
+                <h3 v-else>Borrower's Stats</h3>
                 <div>
                     <div class="close" v-on:click="$emit('close')">
                         <IconClose />

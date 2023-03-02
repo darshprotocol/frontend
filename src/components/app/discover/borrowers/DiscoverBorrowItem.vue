@@ -132,7 +132,7 @@
                     <LoanBoxes v-on:payback="payback = $event" v-on:info="loanInfo = $event" :offer="offer"
                         :lenderLoan="lenderLoan" :userType="userType" />
 
-                    <BorrowerStats v-if="userType != 'borrower'" :score="lenderScore" />
+                    <BorrowerStats v-if="userType != 'borrower'" v-on:profile="profile = true" :score="lenderScore" />
                 </div>
             </div>
         </div>
