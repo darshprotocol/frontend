@@ -137,6 +137,8 @@
             </div>
         </div>
 
+        <ProfilePopUp :userType="'Borrower'" :address="offer.creator" v-if="profile" v-on:close="profile = false" />
+
         <LendRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
 
         <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="payback" v-if="payback && lenderLoan"
@@ -163,7 +165,7 @@ import IconSort from '../../../icons/IconSort.vue';
 import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import LendRequestPopUp from './LendRequestPopUp.vue';
 import LoanBoxes from './LoanBoxes.vue';
-import BorrowerStats from './LenderStats.vue';
+import BorrowerStats from './BorrowerStats.vue';
 </script>
 
 <script>
@@ -173,24 +175,26 @@ import HealthScore from '../../../../scripts/DarshScore'
 import { messages } from '../../../../reactives/messages';
 import IconInformation from '../../../icons/IconInformation.vue';
 import Profile from '../../../../scripts/Profile';
+import ProfilePopUp from '../ProfilePopUp.vue';
 export default {
     components: {
-        LendPopUp,
-        LoanInfoPopUp,
-        IconClock,
-        IconAdd,
-        IconChart,
-        RequestTable,
-        PrimaryButton,
-        IconInterest,
-        ProgressBox,
-        IconSort,
-        LoanPayBackPopUp,
-        LendRequestPopUp,
-        LoanBoxes,
-        BorrowerStats,
-        IconInformation
-    },
+    LendPopUp,
+    LoanInfoPopUp,
+    IconClock,
+    IconAdd,
+    IconChart,
+    RequestTable,
+    PrimaryButton,
+    IconInterest,
+    ProgressBox,
+    IconSort,
+    LoanPayBackPopUp,
+    LendRequestPopUp,
+    LoanBoxes,
+    BorrowerStats,
+    IconInformation,
+    ProfilePopUp
+},
     data() {
         return {
             offer: null,
@@ -204,7 +208,8 @@ export default {
             lenderScore: '•••',
             lend: false,
             payback: false,
-            request: false
+            request: false,
+            profile: false
         };
     },
     async created() {

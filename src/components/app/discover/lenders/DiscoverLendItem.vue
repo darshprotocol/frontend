@@ -144,7 +144,7 @@
             </div>
         </div>
 
-        <ProfilePopUp v-if="profile" v-on:close="profile = false" />
+        <ProfilePopUp :userType="'Lender'" :address="offer.creator" v-if="profile" v-on:close="profile = false" />
 
         <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request"
             v-on:close="request = false" />
@@ -172,16 +172,16 @@ import ProgressBox from '../../../ProgressBox.vue'
 import IconSort from '../../../icons/IconSort.vue';
 import LoanPayBackPopUp from '../LoanPayBackPopUp.vue';
 import BorrowRequestPopUp from './BorrowRequestPopUp.vue';
-import BorrowerStats from './BorrowerStats.vue';
+import BorrowerStats from './LenderStats.vue';
 import IconInformation from '../../../icons/IconInformation.vue';
 import LoanBoxes from './LoanBoxes.vue';
+import ProfilePopUp from '../ProfilePopUp.vue';
 </script >
 
 <script>
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
-import ProfilePopUp from '../ProfilePopUp.vue';
 import { messages } from '../../../../reactives/messages';
 import Profile from '../../../../scripts/Profile';
 import IconOut from '../../../icons/IconOut.vue';

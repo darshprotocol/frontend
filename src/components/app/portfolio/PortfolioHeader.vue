@@ -37,21 +37,24 @@
                 <div class="stat">
                     <div class="stat_item">
                         <p>Active Loans</p>
-                        <p>6</p>
+                        <p>{{ user ? user.activeLoans : '0' }}</p>
                     </div>
                     <div class="stat_item">
                         <p>Total Loans Joined</p>
-                        <p>129</p>
+                        <p>{{ user ? user.borrowedTimes + user.lentTimes : '0' }}</p>
                     </div>
                 </div>
                 <div class="stat">
                     <div class="stat_item">
                         <p>Loans Defaulted</p>
-                        <p>6</p>
+                        <p>{{ user ? user.defaultedTimes : '0' }}</p>
                     </div>
                     <div class="stat_item">
                         <p>Total Loans Volume</p>
-                        <p>129</p>
+                        <p>${{ user ? $nFormat(
+                            $fromWei(user.borrowedVolume) +
+                            $fromWei(user.lentVolume)
+                        ) : '0' }}</p>
                     </div>
                 </div>
             </div>
@@ -113,7 +116,9 @@ import Profile from '../../../scripts/Profile';
 export default {
     data() {
         return {
-            userAddress: null
+            userAddress: null,
+            fetching: false,
+            user: null
         }
     },
     methods: {
@@ -125,10 +130,24 @@ export default {
                     dom.appendChild(el)
                 }
             }
-        }
+        },
+        getProfile: async function () {
+            this.fetching = true;
+            if (this.userAddress == null) {
+                return;
+            }
+            this.axios.get(`https://darshprotocol.onrender.com/users/${this.userAddress}`).then(response => {
+                this.user = response.data;
+                this.fetching = false;
+            }).catch(error => {
+                console.error(error);
+                this.fetching = false;
+            });
+        },
     },
     async mounted() {
         this.userAddress = await Authentication.userAddress()
+        this.getProfile()
         this.generateImages()
     },
     updated() {

@@ -2,7 +2,7 @@
     <div class="stats" v-if="userType != 'lender'">
         <div class="owner">
             <p>Borrower's Ratings</p>
-            <div>
+            <div v-on:click="$emit('profile')">
                 <IconInformation />
                 <p>Info</p>
             </div>
@@ -55,6 +55,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 6px;
+    cursor: pointer;
     padding: 0 12px;
     height: 30px;
     border-radius: 4px;
@@ -143,5 +144,4 @@ export default {
 .score>div:first-child span {
     color: var(--textnormal);
 }
-
 </style>

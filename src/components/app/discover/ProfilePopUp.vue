@@ -1,6 +1,20 @@
 <template>
     <main>
-        <div class="box">
+        <div class="p_box" v-if="fetching">
+            <div class="title">
+                <h3 v-if="userType == 'Lender'">Lender's Stats</h3>
+                <h3 v-else>Borrower's Stats</h3>
+                <div>
+                    <div class="close" v-on:click="$emit('close')">
+                        <IconClose />
+                    </div>
+                </div>
+            </div>
+            <div class="p_box2">
+                <ProgressBox />
+            </div>
+        </div>
+        <div class="box" v-else-if="!fetching && user">
             <div class="title">
                 <h3>Lender's Stats</h3>
                 <div>
@@ -21,7 +35,9 @@
                                 <p>Last updated: <span>Feb 20</span></p>
                                 <p>1000</p>
                             </div>
-                            <h3>On-Chain Credit Score <IconInfo /></h3>
+                            <h3>On-Chain Credit Score
+                                <IconInfo />
+                            </h3>
                         </div>
                     </div>
 
@@ -29,28 +45,28 @@
                         <div class="label">
                             <p class="label_title">Active Loans</p>
                             <div class="label_options">
-                                <p>6</p>
+                                <p>{{ user.activeLoans }}</p>
                                 <IconInfo />
                             </div>
                         </div>
                         <div class="label">
                             <p class="label_title">Loans Defaulted</p>
                             <div class="label_options">
-                                <p>6</p>
+                                <p>{{ user.defaultedTimes }}</p>
                                 <IconInfo />
                             </div>
                         </div>
                         <div class="label">
                             <p class="label_title">Total Loans Joined</p>
                             <div class="label_options">
-                                <p>6</p>
+                                <p>{{ user.borrowedTimes + user.lentTimes }}</p>
                                 <IconInfo />
                             </div>
                         </div>
                         <div class="label">
                             <p class="label_title">Total Loans Volume</p>
                             <div class="label_options">
-                                <p>6</p>
+                                <p>{{ user.borrowedVolume }}</p>
                                 <IconInfo />
                             </div>
                         </div>
@@ -59,15 +75,15 @@
             </div>
             <div class="action">
                 <div class="profile">
-                    <img src="/images/user1.png" alt="">
+                    <div class="img" id="img_profile"></div>
                     <div class="profile_names">
-                        <p>Lender A</p>
-                        <p>Lender</p>
+                        <p>{{ $shortName(address, 6) }}</p>
+                        <p>{{ userType }}</p>
                     </div>
                 </div>
-                <RouterLink to="">
+                <RouterLink :to="`/profile/${address}`">
                     <div class="link">
-                        <p>View Profile</p>
+                        <p>Portfolio</p>
                         <IconOut />
                     </div>
                 </RouterLink>
@@ -84,44 +100,84 @@ import IconOut from '../../icons/IconOut.vue';
 
 <script>
 import ArcProgress from 'arc-progress';
+import ProgressBox from '../../ProgressBox.vue';
+import Profile from '../../../scripts/Profile';
 export default {
+    props: ["address", "userType"],
     data() {
         return {
-
-        }
+            user: null,
+            fetching: true,
+            arc: null
+        };
+    },
+    methods: {
+        loadArc: function () {
+            if (this.user && !this.arc) {
+                this.arc = new ArcProgress({
+                    el: "#progress-container",
+                    progress: 0.5,
+                    speed: 5,
+                    size: 220,
+                    arcStart: 180,
+                    thickness: 12,
+                    fillThickness: 12,
+                    arcEnd: 360,
+                    fillColor: "#6936F5",
+                    emptyColor: "#141416",
+                    lineCap: "square"
+                });
+                new ArcProgress({
+                    el: "#progress-container-border",
+                    progress: 1,
+                    animation: false,
+                    size: 208,
+                    thickness: 24,
+                    arcStart: 180,
+                    arcEnd: 360,
+                    fillColor: "rgba(20, 20, 22, 0.4)",
+                    emptyColor: "rgba(20, 20, 22, 0.4)",
+                    lineCap: "square"
+                });
+            }
+        },
+        generateImages: function () {
+            if (this.address) {
+                let el = Profile.generate(36, this.address)
+                let dom = document.getElementById('img_profile')
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el)
+                }
+            }
+        },
+        getProfile: async function () {
+            this.fetching = true;
+            if (this.address == null) {
+                return;
+            }
+            this.axios.get(`https://darshprotocol.onrender.com/users/${this.address}`).then(response => {
+                this.user = response.data;
+                this.fetching = false;
+            }).catch(error => {
+                console.error(error);
+                this.fetching = false;
+            });
+        },
     },
     mounted() {
-        new ArcProgress({
-            el: '#progress-container',
-            progress: .5,
-            speed: 5,
-            size: 220,
-            arcStart: 180,
-            thickness: 12,
-            fillThickness: 12,
-            arcEnd: 360,
-            fillColor: '#6936F5',
-            emptyColor: '#141416',
-            lineCap: 'square'
-        });
-
-        new ArcProgress({
-            el: '#progress-container-border',
-            progress: 1,
-            animation: false,
-            size: 208,
-            thickness: 24,
-            arcStart: 180,
-            arcEnd: 360,
-            fillColor: 'rgba(20, 20, 22, 0.4)',
-            emptyColor: 'rgba(20, 20, 22, 0.4)',
-            lineCap: 'square'
-        });
+        this.generateImages()
+        this.getProfile()
+        this.loadArc()
         document.body.classList.add("modal");
+    },
+    updated() {
+        this.generateImages()
+        this.loadArc()
     },
     unmounted() {
         document.body.classList.remove("modal");
     },
+    components: { ProgressBox }
 }
 </script>
 
@@ -141,14 +197,30 @@ main {
     animation: fade_in .2s ease-in-out;
 }
 
-.box {
+.p_box {
     width: 500px;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: var(--bglight);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bglight);
     border-radius: 6px;
     overflow: hidden;
     animation: slide_in_up .2s ease-in-out;
+}
+
+.p_box2 {
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.box {
+    width: 500px;
+    background: var(--bglight);
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .title {
@@ -234,7 +306,8 @@ main {
     margin-top: 68px;
 }
 
-.arc_labels p:first-child, p:last-child {
+.arc_labels p:first-child,
+p:last-child {
     font-size: 12px;
     color: var(--textdimmed);
 }
@@ -267,7 +340,7 @@ main {
     gap: 16px;
 }
 
-.profile img {
+.profile .img {
     width: 36px;
     height: 36px;
     border-radius: 50%;
