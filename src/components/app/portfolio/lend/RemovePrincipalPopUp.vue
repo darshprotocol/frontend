@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="slider">
-                <Slider v-model="percentage" :step="25" :min="min()" :max="100" :format="{ suffix: '%' }" />
+                <Slider v-model="percentage" :step="25" :max="max()" :format="{ suffix: '%' }" />
             </div>
             <div class="terms">
                 <div class="terms_item">
@@ -53,7 +53,7 @@ export default {
         }
     },
     methods: {
-        min: function () {
+        max: function () {
             return (this.offer.currentPrincipal / this.offer.initialPrincipal) * 100
         },
         getPrincipal: function () {
@@ -66,7 +66,7 @@ export default {
             this.removing = true
             const trx = await LendingPoolAPI.removePrincipal(
                 this.offer.offerId,
-                this.percentage - this.min(),
+                this.percentage,
                 await Authentication.userAddress()
             )
 
