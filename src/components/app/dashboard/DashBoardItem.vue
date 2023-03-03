@@ -1,90 +1,93 @@
 <template>
-    <main>
-        <div class="header">
-            <h3 class="title">My Darshboard</h3>
-            <div class="total_loans">
-                <div class="total_loans_joined">
-                    <p>Total Loans Joined</p>
-                    <p>1,884</p>
-                </div>
-                <div class="total_loans_volume">
-                    <p>Total Loans Volume</p>
-                    <p>$141,324</p>
+    <main v-if="!authenticating">
+        <NoWallet v-if="!userAddress" />
+        <div class="dashboard_item" v-else>
+            <div class="header">
+                <h3 class="title">My Darshboard</h3>
+                <div class="total_loans">
+                    <div class="total_loans_joined">
+                        <p>Total Loans Joined</p>
+                        <p>1,884</p>
+                    </div>
+                    <div class="total_loans_volume">
+                        <p>Total Loans Volume</p>
+                        <p>$141,324</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="dashboard">
-            <div class="chart">
-                <div class="toolbar">
-                    <div class="toolbar_label">
-                        <p>Total Value Locked</p>
-                        <p>$19,582 <span>
-                                <IconArrowDown :color="'var(--accentgreen)'" /> +10%
-                            </span></p>
+            <div class="dashboard">
+                <div class="chart">
+                    <div class="toolbar">
+                        <div class="toolbar_label">
+                            <p>Total Value Locked</p>
+                            <p>$19,582 <span>
+                                    <IconArrowDown :color="'var(--accentgreen)'" /> +10%
+                                </span></p>
+                        </div>
+                        <div class="dates">
+                            <div>1D</div>
+                            <div class="active">1W</div>
+                            <div>1M</div>
+                            <div>1Y</div>
+                        </div>
                     </div>
-                    <div class="dates">
-                        <div>1D</div>
-                        <div class="active">1W</div>
-                        <div>1M</div>
-                        <div>1Y</div>
+                    <div class="chart_box">
+                        <div class="chart_grid">
+                            <div class="chart_box_row" v-for="index in 6" :key="index"></div>
+                        </div>
+                        <div class="chart_grid_2">
+                            <div class="chart_box_column" v-for="index in 11" :key="index"></div>
+                        </div>
+                        <div id="chart"></div>
                     </div>
                 </div>
-                <div class="chart_box">
-                    <div class="chart_grid">
-                        <div class="chart_box_row" v-for="index in 6" :key="index"></div>
+                <div class="stats">
+                    <div class="tabs">
+                        <div class="tab active">Lends</div>
+                        <div class="tab">Borrows</div>
                     </div>
-                    <div class="chart_grid_2">
-                        <div class="chart_box_column" v-for="index in 11" :key="index"></div>
-                    </div>
-                    <div id="chart"></div>
-                </div>
-            </div>
-            <div class="stats">
-                <div class="tabs">
-                    <div class="tab active">Lends</div>
-                    <div class="tab">Borrows</div>
-                </div>
-                <div class="stat_detail">
-                    <p class="tag">Total Value Lent</p>
-                    <p class="amount">$19,582</p>
+                    <div class="stat_detail">
+                        <p class="tag">Total Value Lent</p>
+                        <p class="amount">$19,582</p>
 
-                    <div class="natives">
-                        <div class="tokens">
-                            <div class="images">
-                                <img src="/images/ftm.png" alt="">
-                                <img src="/images/btc.png" alt="">
-                                <img src="/images/eth.png" alt="">
-                                <p>Natives</p>
+                        <div class="natives">
+                            <div class="tokens">
+                                <div class="images">
+                                    <img src="/images/ftm.png" alt="">
+                                    <img src="/images/btc.png" alt="">
+                                    <img src="/images/eth.png" alt="">
+                                    <p>Natives</p>
+                                </div>
+                                <div class="percent">60%</div>
                             </div>
-                            <div class="percent">60%</div>
-                        </div>
-                        <div class="progress_bar">
-                            <div class="progress"></div>
-                            <div class="dot"></div>
-                        </div>
-                    </div>
-
-                    <div class="stables">
-                        <div class="tokens">
-                            <div class="images">
-                                <img src="/images/usdc.png" alt="">
-                                <img src="/images/usdt.png" alt="">
-                                <img src="/images/dai.png" alt="">
-                                <p>Stables</p>
+                            <div class="progress_bar">
+                                <div class="progress"></div>
+                                <div class="dot"></div>
                             </div>
-                            <div class="percent">60%</div>
                         </div>
-                        <div class="progress_bar">
-                            <div class="progress"></div>
-                            <div class="dot"></div>
+
+                        <div class="stables">
+                            <div class="tokens">
+                                <div class="images">
+                                    <img src="/images/usdc.png" alt="">
+                                    <img src="/images/usdt.png" alt="">
+                                    <img src="/images/dai.png" alt="">
+                                    <p>Stables</p>
+                                </div>
+                                <div class="percent">60%</div>
+                            </div>
+                            <div class="progress_bar">
+                                <div class="progress"></div>
+                                <div class="dot"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <ActivityTable class="activity" />
+            <ActivityTable class="activity" />
+        </div>
     </main>
 </template>
 
@@ -95,13 +98,21 @@ import ActivityTable from './ActivityTable.vue';
 
 <script>
 import ApexCharts from 'apexcharts'
+import NoWallet from '../../NoWallet.vue';
+import Authentication from '../../../scripts/Authentication';
 export default {
+    data() {
+        return {
+            userAddress: null,
+            authenticating: true
+        }
+    },
     mounted() {
         var options = {
             stroke: {
-                curve: 'smooth',
+                curve: "smooth",
                 width: 2,
-                colors: ['#6936F5']
+                colors: ["#6936F5"]
             },
             grid: {
                 xaxis: {
@@ -122,31 +133,31 @@ export default {
                 }
             },
             chart: {
-                type: 'area',
+                type: "area",
                 toolbar: { show: false },
                 height: 205,
-                width: '100%',
+                width: "100%",
                 zoom: { enabled: false }
             },
             tooltip: {
                 x: { show: false },
                 marker: { show: false },
                 style: {
-                    fontSize: '12px',
-                    fontFamily: 'Axiforma'
+                    fontSize: "12px",
+                    fontFamily: "Axiforma"
                 }
             },
             markers: {
-                strokeColors: '#6936F5',
-                colors: ['#EEF1F8'],
+                strokeColors: "#6936F5",
+                colors: ["#EEF1F8"],
                 strokeWidth: 4,
                 radius: 2
             },
             fill: {
-                type: 'gradient',
+                type: "gradient",
                 gradient: {
                     type: "vertical",
-                    gradientToColors: ['#6936F5', '#6936F5'],
+                    gradientToColors: ["#6936F5", "#6936F5"],
                     inverseColors: true,
                     opacityFrom: 0.5,
                     opacityTo: 0.05
@@ -156,18 +167,18 @@ export default {
                 enabled: false
             },
             series: [{
-                name: 'TVL',
+                name: "TVL",
                 data: [34, 35, 31, 38, 40, 35, 42, 38, 34, 38, 80],
             }],
             xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
                 labels: { show: false },
                 axisBorder: { show: false },
                 axisTicks: { show: false },
                 tooltip: {
                     style: {
-                        fontSize: '12px',
-                        fontFamily: 'Axiforma'
+                        fontSize: "12px",
+                        fontFamily: "Axiforma"
                     }
                 }
             },
@@ -177,12 +188,15 @@ export default {
                 axisTicks: { show: false },
             },
             legend: { show: false }
-        }
-
+        };
         var chart = new ApexCharts(document.querySelector("#chart"), options);
-
         chart.render();
-    }
+    },
+    async created() {
+        this.userAddress = await Authentication.userAddress()
+        this.authenticating = false
+    },
+    components: { NoWallet }
 }
 </script>
 

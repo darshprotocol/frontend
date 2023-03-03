@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main v-if="!authencating">
         <p v-if="!userAddress">
             <NoWallet />
         </p>
@@ -102,11 +102,13 @@ export default {
         return {
             offers: [],
             fetching: true,
-            userAddress: null
+            userAddress: null,
+            authencating: true
         };
     },
     async created() {
-        this.userAddress = await Authentication.userAddress();
+        this.userAddress = await Authentication.userAddress();   
+             this.authencating = false
         this.fetchLendingOffers();
     },
     methods: {
