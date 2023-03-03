@@ -1,7 +1,13 @@
 <template>
     <main v-if="userAddress">
         <div class="header">
-            <h3 class="title">Portfolio</h3>
+            <div class="path">
+                <RouterLink :to="lastPath ? lastPath  : '/discover'">
+                    <p>Go back</p>
+                </RouterLink>
+                <span>/</span>
+                <p class="cr">User's Porfolio</p>
+            </div>
             <div class="ratings">
                 <div class="label">
                     <p>Ratings</p>
@@ -60,19 +66,14 @@
         </div>
         <div class="toolbar">
             <div class="tab_items">
-                <RouterLink to="/portfolio">
-                    <div :class="$route.name == 'portfolio-lends' ? 'tab tab_active' : 'tab'">
+                <RouterLink :to="`/profile/${userAddress}`">
+                    <div :class="$route.name == 'profile-lends' ? 'tab tab_active' : 'tab'">
                         <p>My Lends</p>
                     </div>
                 </RouterLink>
-                <RouterLink to="/portfolio/borrows">
-                    <div :class="$route.name == 'portfolio-borrows' ? 'tab tab_active' : 'tab'">
+                <RouterLink :to="`/profile/${userAddress}/borrows`">
+                    <div :class="$route.name == 'profile-borrows' ? 'tab tab_active' : 'tab'">
                         <p>My Borrows</p>
-                    </div>
-                </RouterLink>
-                <RouterLink to="/portfolio/vaults">
-                    <div :class="$route.name == 'portfolio-vaults' ? 'tab tab_active' : 'tab'">
-                        <p>Vaults</p>
                     </div>
                 </RouterLink>
             </div>
@@ -84,18 +85,6 @@
                     <IconSort />
                     <p>Sort By</p>
                 </div>
-                <RouterLink v-if="$route.name == 'portfolio-lends'" to="/portfolio/lends/create">
-                    <div class="filter create_offer">
-                        <IconAdd :color="'#fff'" />
-                        <p>Create Offer</p>
-                    </div>
-                </RouterLink>
-                <RouterLink v-else-if="$route.name == 'portfolio-borrows'" to="/portfolio/borrows/create">
-                    <div class="filter create_offer">
-                        <IconAdd :color="'#fff'" />
-                        <p>Create Offer</p>
-                    </div>
-                </RouterLink>
             </div>
         </div>
     </main>
@@ -104,18 +93,17 @@
 <script setup>
 import IconInfo from '../../icons/IconInfo.vue';
 import IconSort from '../../icons/IconSort.vue';
-import IconAdd from '../../icons/IconAdd.vue';
 import IconCopy from '../../icons/IconCopy.vue';
 import IconBadge from '../../icons/IconBadge.vue';
 </script>
 
 <script>
-import Authentication from '../../../scripts/Authentication'
 import Profile from '../../../scripts/Profile';
 export default {
     data() {
         return {
-            userAddress: null,
+            lastPath: this.$router.options.history.state.back,
+            userAddress: this.$route.params.address,
             fetching: false,
             user: null
         }
@@ -145,7 +133,6 @@ export default {
         },
     },
     async mounted() {
-        this.userAddress = await Authentication.userAddress()
         this.getProfile()
         this.generateImages()
     },
@@ -170,12 +157,27 @@ main {
     justify-content: space-between;
 }
 
-.title {
-    font-weight: 500;
-    font-size: 30px;
-    color: var(--textnormal);
+.header .path {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
+.header p,
+.header span {
+
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.path a,
+.path span {
+    color: var(--textdimmed);
+}
+
+.path .cr {
+    color: var(--textnormal);
+}
 
 .ratings {
     display: flex;

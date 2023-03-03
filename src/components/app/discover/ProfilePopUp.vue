@@ -67,7 +67,9 @@
                         <div class="label">
                             <p class="label_title">Total Loans Volume</p>
                             <div class="label_options">
-                                <p>{{ user.borrowedVolume }}</p>
+                                <p>${{ $nFormat(
+                                    Number($fromWei(user.borrowedVolume)) + Number($fromWei(user.lentVolume))
+                                ) }}</p>
                                 <IconInfo />
                             </div>
                         </div>

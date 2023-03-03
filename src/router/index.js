@@ -5,6 +5,7 @@ import HomeView from '../views/HomeView.vue'
 import DiscoverView from '../views/DiscoverView.vue'
 import PortfolioView from '../views/PortfolioView.vue'
 import VaultView from '../views/VaultView.vue'
+import ProfileView from '../views/ProfileView.vue'
 
 import FaucetPage from '../components/app/FaucetPage.vue'
 
@@ -31,6 +32,9 @@ import VaultLendItem from '../components/app/portfolio/vault/lends/VaultLendItem
 import VaultBorrowItem from '../components/app/portfolio/vault/borrows/VaultBorrowItem.vue'
 
 import DashBoardItem from '../components/app/dashboard/DashBoardItem.vue'
+
+import ProfileLend from '../components/app/profile/ProfileLend.vue'
+import ProfileBorrow from '../components/app/profile/ProfileBorrow.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -152,6 +156,23 @@ const router = createRouter({
           path: '/stake',
           name: 'stake',
           component: StakePage
+        },
+        {
+          path: '/profile/:address',
+          name: 'profile',
+          component: ProfileView,
+          children: [
+            {
+              path: '/profile/:address',
+              name: 'profile-lends',
+              component: ProfileLend
+            },
+            {
+              path: '/profile/:address/borrows',
+              name: 'profile-borrows',
+              component: ProfileBorrow
+            }
+          ]
         }
       ]
     }
