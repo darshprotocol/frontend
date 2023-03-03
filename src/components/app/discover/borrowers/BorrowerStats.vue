@@ -7,17 +7,17 @@
                 <p>Info</p>
             </div>
         </div>
-        <div :class="`score ${score.tag}`">
+        <div :class="`score ${score ? score.tag : ''}`">
             <div>
                 <!-- <p>Trust Score</p> -->
                 <div>
                     <IconBadge />
-                    <p><span>{{ score.score }}</span> of 100</p>
+                    <p><span>{{ score ? score.score : 0 }}</span> of 100</p>
                 </div>
             </div>
-            <div>{{ score.label }}</div>
+            <div>{{ score ? score.label : '' }}</div>
         </div>
-</div>
+    </div>
 </template>
 
 <script setup>
