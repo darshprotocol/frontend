@@ -85,8 +85,8 @@
                         <div class="extra_user">0 <span>Borrowers</span></div>
                     </div>
                     <div class="borrowers" v-else>
-                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId"
-                            :src="`/images/user${index + 1}.png`" />
+                        <div class="img" v-for="(loan, index) in offer.loans" :key="loan.loanId"
+                            :id="`img_portfolio_lend${index}`"></div>
                         <div class="extra_user">{{ offer.loans.length }} <span>Borrowers</span></div>
                     </div>
                     <div class="expires_at" v-if="offer.loans.length == 0">
@@ -133,6 +133,7 @@ import Countdown from '../../../../utils/Countdown';
 import IconOut from '../../../icons/IconOut.vue';
 import RemovePrincipalPopUp from './RemovePrincipalPopUp.vue';
 import NoWallet from '../../../NoWallet.vue';
+import Profile from '../../../../scripts/Profile';
 export default {
     data() {
         return {
@@ -172,11 +173,30 @@ export default {
                 console.error(error);
                 // this.fetching = false;
             });
+        }, 
+        generateImages: function () {
+            if (this.offer) {
+                for (let index = 0; index < this.offer.loans.length; index++) {
+                    const loan = this.offer.loans[index];
+                    let elx = Profile.generate(40, loan.borrower);
+                    let domx = document.getElementById(`img_portfolio_lend${index}`);
+                    if (domx && domx.childNodes.length == 0) {
+                        domx.appendChild(elx);
+                    }
+
+                }
+            }
         }
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchLendingOffer(true);
+    },
+    mounted() {
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages();
     },
     components: { RemovePrincipalPopUp, NoWallet }
 }
@@ -465,6 +485,7 @@ export default {
     font-size: 12px;
     color: var(--textnormal);
     margin-left: -4px;
+    z-index: 1;
 }
 
 .borrowers span {

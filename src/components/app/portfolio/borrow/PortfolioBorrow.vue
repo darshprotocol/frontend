@@ -9,7 +9,7 @@
         </div>
 
         <div class="lends" v-if="!fetching && userAddress != null">
-            <RouterLink v-for="offer in offers" :to="`/portfolio/borrows/${offer._id}`" :key="offer.offerId">
+            <RouterLink v-for="offer, fIndex in offers" :to="`/portfolio/borrows/${offer._id}`" :key="offer.offerId">
                 <div class="lend">
                     <div class="asset">
                         <div class="label">
@@ -48,7 +48,10 @@
                     </div>
                     <div class="progress" v-else>
                         <div class="users">
-                            <img src="/images/user1.png" v-for="loan in offer.loans" :key="loan.loanId" alt="">
+                            <div class="img" v-for="loan, index in offer.loans" :key="index"
+                                :id="`${fIndex}img_lender${index}`">
+                            </div>
+
                             <div class="extra_user">{{ offer.loans.length }}</div>
                         </div>
                         <div class="needed">
@@ -85,6 +88,7 @@ import ProgressBox from '../../../ProgressBox.vue'
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
 import NoWallet from '../../../NoWallet.vue';
+import Profile from '../../../../scripts/Profile';
 export default {
     data() {
         return {
@@ -123,7 +127,28 @@ export default {
                 console.error(error);
                 // this.fetching = false;
             });
+        },
+        generateImages: function () {
+            if (this.offers) {
+                for (let fIndex = 0; fIndex < this.offers.length; fIndex++) {
+                    const offer = this.offers[fIndex];
+                    for (let index = 0; index < offer.loans.length; index++) {
+                        const loan = offer.loans[index];
+                        let el = Profile.generate(30, loan.lender)
+                        let dom = document.getElementById(`${fIndex}img_lender${index}`)
+                        if (dom && dom.childNodes.length == 0) {
+                            dom.appendChild(el)
+                        }
+                    }
+                }
+            }
         }
+    },
+    mounted() {
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages()
     },
     components: { NoWallet }
 }
@@ -263,24 +288,24 @@ export default {
     align-items: center;
 }
 
-.users img {
+.users img,
+.users .img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-}
-
-.users img {
     margin-left: -16px;
+    background: var(--bglight);
 }
 
-.users img:first-child {
+.users img:first-child,
+.users .img:first-child {
     margin: 0;
 }
 
 .extra_user {
-    width: 32px;
+    width: 40px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -289,6 +314,7 @@ export default {
     font-size: 12px;
     color: var(--textdimmed);
     margin-left: -16px;
+    z-index: 1;
 }
 
 .needed>div {

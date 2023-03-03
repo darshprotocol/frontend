@@ -80,7 +80,8 @@
                         <div class="extra_user">0 <span>Lenders</span></div>
                     </div>
                     <div class="borrowers" v-else>
-                        <img v-for="(loan, index) in offer.loans" :key="loan.loanId" :src="`/images/user${index + 1}.png`" />
+                        <div class="img" v-for="(loan, index) in offer.loans" :key="loan.loanId"
+                            :id="`img_portfolio_borrow${index}`"></div>
                         <div class="extra_user">{{ offer.loans.length }} <span>Lenders</span></div>
                     </div>
                     <div class="expires_at" v-if="offer.loans.length == 0">
@@ -123,6 +124,7 @@ import ProgressBox from '../../../ProgressBox.vue';
 import Authentication from '../../../../scripts/Authentication';
 import Countdown from '../../../../utils/Countdown';
 import NoWallet from '../../../NoWallet.vue';
+import Profile from '../../../../scripts/Profile';
 export default {
     data() {
         return {
@@ -161,11 +163,30 @@ export default {
                 console.error(error);
                 // this.fetching = false;
             });
+        },
+        generateImages: function () {
+            if (this.offer) {
+                for (let index = 0; index < this.offer.loans.length; index++) {
+                    const loan = this.offer.loans[index];
+                    let elx = Profile.generate(40, loan.lender);
+                    let domx = document.getElementById(`img_portfolio_borrow${index}`);
+                    if (domx && domx.childNodes.length == 0) {
+                        domx.appendChild(elx);
+                    }
+
+                }
+            }
         }
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
         this.fetchBorrowingOffer(true);
+    },
+    mounted() {
+        this.generateImages()
+    },
+    updated() {
+        this.generateImages();
     },
     components: { NoWallet }
 }
@@ -456,6 +477,7 @@ export default {
     font-size: 12px;
     color: var(--textnormal);
     margin-left: -4px;
+    z-index: 1;
 }
 
 .borrowers span {
