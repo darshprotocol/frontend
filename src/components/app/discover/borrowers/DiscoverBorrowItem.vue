@@ -173,7 +173,7 @@ import BorrowerStats from './BorrowerStats.vue';
 import { messages } from '../../../../reactives/messages';
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
-import HealthScore from '../../../../scripts/DarshScore'
+import DarshScore from '../../../../scripts/DarshScore'
 import IconInformation from '../../../icons/IconInformation.vue';
 import Profile from '../../../../scripts/Profile';
 import ProfilePopUp from '../ProfilePopUp.vue';
@@ -284,7 +284,7 @@ export default {
             this.payback = true
         },
         getBorrowerScore: async function (address) {
-            this.lenderScore = await HealthScore.getHealthScore(address)
+            this.lenderScore = await DarshScore.getDarshScore(address)
         },
         sortRequests: function (requests) {
             return requests.filter(request => request.state == 0);

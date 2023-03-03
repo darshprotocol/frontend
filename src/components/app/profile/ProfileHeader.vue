@@ -8,16 +8,16 @@
                 <span>/</span>
                 <p class="cr">User's Porfolio</p>
             </div>
-            <div class="ratings">
+             <div class="ratings" v-if="userLtv">
                 <div class="label">
                     <p>Ratings</p>
                     <div class="ratings_item">
                         <IconBadge />
-                        <p><span>80</span> of 100</p>
+                        <p><span>{{ userLtv.score }}</span> of 100</p>
                     </div>
                 </div>
-                <div class="tag">
-                    <p>Good</p>
+                <div :class="`tag ${userLtv.tag}`">
+                    <p>{{ userLtv.label }}</p>
                 </div>
             </div>
         </div>
@@ -99,6 +99,7 @@ import IconBadge from '../../icons/IconBadge.vue';
 
 <script>
 import Profile from '../../../scripts/Profile';
+import LtvAPI from '../../../scripts/DarshScore';
 export default {
     data() {
         return {
@@ -118,6 +119,11 @@ export default {
                 }
             }
         },
+         getLtv: async function () {
+            if (this.userAddress) {
+                this.userLtv = await LtvAPI.getDarshScore(this.userAddress)
+            }
+        },
         getProfile: async function () {
             this.fetching = true;
             if (this.userAddress == null) {
@@ -134,6 +140,7 @@ export default {
     },
     async mounted() {
         this.getProfile()
+        this.getLtv()
         this.generateImages()
     },
     updated() {
@@ -211,14 +218,40 @@ main {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    background: rgba(139, 187, 37, 0.1);
     border-radius: 2px;
 }
 
 
 .ratings .tag p {
     font-size: 16px;
+}
+
+/*  */
+.ratings .bad {
+    background: rgba(233, 71, 3, 0.1);
+}
+
+.ratings .bad p {
+    color: var(--accentred);
+}
+
+/*  */
+.ratings .good {
+    background: rgba(139, 187, 37, 0.1);
+}
+
+.ratings .good p {
     color: var(--accentgreen);
+}
+
+/*  */
+
+.ratings .excellent {
+    background: rgba(105, 54, 245, 0.1);
+}
+
+.ratings .excellent p {
+    color: var(--primary);
 }
 
 .profile {

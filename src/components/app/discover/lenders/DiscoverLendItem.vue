@@ -181,7 +181,7 @@ import ProfilePopUp from '../ProfilePopUp.vue';
 <script>
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
-import HealthScore from '../../../../scripts/DarshScore'
+import DarshScore from '../../../../scripts/DarshScore'
 import { messages } from '../../../../reactives/messages';
 import Profile from '../../../../scripts/Profile';
 import IconOut from '../../../icons/IconOut.vue';
@@ -274,7 +274,7 @@ export default {
             this.payback = true;
         },
         getLenderScore: async function (address) {
-            this.lenderScore = await HealthScore.getHealthScore(address);
+            this.lenderScore = await DarshScore.getDarshScore(address);
         },
         generateImages: function () {
             if (this.offer) {

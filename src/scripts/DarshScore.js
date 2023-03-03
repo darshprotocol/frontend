@@ -8,19 +8,19 @@ const LtvAPI = {
     getInstance: async function () {
         if (this.instance != null) return this.instance
 
-        const HealthScore = contract(DarshScoreABI)
+        const DarshScore = contract(DarshScoreABI)
         const web3 = new Web3('https://fantom-testnet.public.blastapi.io');
-        HealthScore.setProvider(web3.currentProvider)
+        DarshScore.setProvider(web3.currentProvider)
 
         try {
-            this.instance = await HealthScore.deployed()
+            this.instance = await DarshScore.deployed()
             return this.instance
         } catch (error) {
             console.error(error);
             return null
         }
     },
-    getHealthScore: async function (userAddress) {
+    getDarshScore: async function (userAddress) {
         const instance = await this.getInstance()
         if (instance == null) return null
         let score = await instance.getScore(userAddress)
