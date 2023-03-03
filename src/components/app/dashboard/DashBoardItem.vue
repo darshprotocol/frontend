@@ -7,11 +7,13 @@
                 <div class="total_loans">
                     <div class="total_loans_joined">
                         <p>Total Loans Joined</p>
-                        <p>1,884</p>
+                        <p>{{ user ? (user.borrowedTimes + user.lentTimes) : 0 }}</p>
                     </div>
                     <div class="total_loans_volume">
                         <p>Total Loans Volume</p>
-                        <p>$141,324</p>
+                        <p>${{ user ? $nFormat(
+                            Number($fromWei(user.borrowedVolume)) + Number($fromWei(user.lentVolume))
+                        ) : 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -21,7 +23,9 @@
                     <div class="toolbar">
                         <div class="toolbar_label">
                             <p>Total Value Locked</p>
-                            <p>$19,582 <span>
+                            <p>${{ user ? $nFormat(
+                                Number($fromWei(user.borrowedVolume)) + Number($fromWei(user.lentVolume))
+                            ) : 0 }} <span>
                                     <IconArrowDown :color="'var(--accentgreen)'" /> +10%
                                 </span></p>
                         </div>
@@ -104,96 +108,119 @@ export default {
     data() {
         return {
             userAddress: null,
-            authenticating: true
+            authenticating: true,
+            user: null,
+            chart: null
         }
     },
-    mounted() {
-        var options = {
-            stroke: {
-                curve: "smooth",
-                width: 2,
-                colors: ["#6936F5"]
-            },
-            grid: {
-                xaxis: {
-                    lines: {
-                        show: false
+    methods: {
+        renderChart: function () {
+            var options = {
+                stroke: {
+                    curve: "smooth",
+                    width: 2,
+                    colors: ["#6936F5"]
+                },
+                grid: {
+                    xaxis: {
+                        lines: {
+                            show: false
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: false
+                        }
+                    },
+                    padding: {
+                        top: -28,
+                        right: 0,
+                        bottom: 0,
+                        left: -9
                     }
                 },
-                yaxis: {
-                    lines: {
-                        show: false
-                    }
+                chart: {
+                    type: "area",
+                    toolbar: { show: false },
+                    height: 205,
+                    width: "100%",
+                    zoom: { enabled: false }
                 },
-                padding: {
-                    top: -28,
-                    right: 0,
-                    bottom: 0,
-                    left: -9
-                }
-            },
-            chart: {
-                type: "area",
-                toolbar: { show: false },
-                height: 205,
-                width: "100%",
-                zoom: { enabled: false }
-            },
-            tooltip: {
-                x: { show: false },
-                marker: { show: false },
-                style: {
-                    fontSize: "12px",
-                    fontFamily: "Axiforma"
-                }
-            },
-            markers: {
-                strokeColors: "#6936F5",
-                colors: ["#EEF1F8"],
-                strokeWidth: 4,
-                radius: 2
-            },
-            fill: {
-                type: "gradient",
-                gradient: {
-                    type: "vertical",
-                    gradientToColors: ["#6936F5", "#6936F5"],
-                    inverseColors: true,
-                    opacityFrom: 0.5,
-                    opacityTo: 0.05
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            series: [{
-                name: "TVL",
-                data: [34, 35, 31, 38, 40, 35, 42, 38, 34, 38, 80],
-            }],
-            xaxis: {
-                categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
-                labels: { show: false },
-                axisBorder: { show: false },
-                axisTicks: { show: false },
                 tooltip: {
+                    x: { show: false },
+                    marker: { show: false },
                     style: {
                         fontSize: "12px",
                         fontFamily: "Axiforma"
                     }
-                }
-            },
-            yaxis: {
-                labels: { show: false },
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-            },
-            legend: { show: false }
-        };
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
-        chart.render();
+                },
+                markers: {
+                    strokeColors: "#6936F5",
+                    colors: ["#EEF1F8"],
+                    strokeWidth: 4,
+                    radius: 2
+                },
+                fill: {
+                    type: "gradient",
+                    gradient: {
+                        type: "vertical",
+                        gradientToColors: ["#6936F5", "#6936F5"],
+                        inverseColors: true,
+                        opacityFrom: 0.5,
+                        opacityTo: 0.05
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                series: [{
+                    name: "TVL",
+                    data: [34, 35, 31, 38, 40, 35, 42, 38, 34, 38, 80],
+                }],
+                xaxis: {
+                    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"],
+                    labels: { show: false },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    tooltip: {
+                        style: {
+                            fontSize: "12px",
+                            fontFamily: "Axiforma"
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: { show: false },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                },
+                legend: { show: false }
+            };
+            let dom = document.querySelector("#chart")
+            if (dom && !this.chart) {
+                this.chart = new ApexCharts(dom, options);
+                this.chart.render();
+            }
+        },
+        getProfile: async function () {
+            if (this.userAddress == null) {
+                return;
+            }
+            this.axios.get(`https://darshprotocol.onrender.com/users/${this.userAddress}`).then(response => {
+                this.user = response.data;
+                this.fetching = false;
+            }).catch(error => {
+                console.error(error);
+                this.fetching = false;
+            });
+        }
+    },
+    updated() {
+        this.renderChart()
     },
     async created() {
         this.userAddress = await Authentication.userAddress()
+        this.getProfile()
         this.authenticating = false
     },
     components: { NoWallet }

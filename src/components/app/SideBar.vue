@@ -10,7 +10,7 @@
                 <div class="tab_parent">
                     <RouterLink to="/discover">
                         <div class="title">
-                            <IconDiscover />
+                            <IconDiscover :active="$route.name.startsWith('discover')" />
                             <h3>Discover</h3>
                             <div :class="$route.name.startsWith('discover') ? 'indicator indicator_active' : 'indicator'">
                             </div>
@@ -29,7 +29,7 @@
                 <div class="tab_parent">
                     <RouterLink to="/stake">
                         <div class="title">
-                            <IconStake />
+                            <IconStake :active="$route.name.startsWith('stake')" />
                             <h3>Stake <span>Coming</span></h3>
                             <div :class="$route.name.startsWith('stake') ? 'indicator indicator_active' : 'indicator'">
                             </div>
@@ -39,7 +39,7 @@
                 <div class="tab_parent">
                     <RouterLink to="/portfolio">
                         <div class="title">
-                            <IconBriefcase />
+                            <IconBriefcase :active="$route.name.startsWith('portfolio')" />
                             <h3>Portfolio</h3>
                             <div :class="$route.name.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'">
                             </div>
@@ -61,7 +61,7 @@
                 <div class="tab_parent">
                     <RouterLink to="/darshboard">
                         <div class="title">
-                            <IconCategory />
+                            <IconCategory :active="$route.name.startsWith('darshboard')" />
                             <h3>Darshboard</h3>
                             <div :class="$route.name.startsWith('darshboard') ? 'indicator indicator_active' : 'indicator'">
                             </div>
