@@ -1,228 +1,230 @@
 <template>
-    <!---->
-    <div class="active_loans" v-if="userType == 'lender' && lenderLoan" :class="getState(lenderLoan.loanId)">
-        <h3>Lend Loan</h3>
-        <div>
-            <!---->
-            <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) != 'repaid'">
-                <p>Borrower's Outstanding</p>
-                <div>
-                    <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
-                    <h3>{{ $toMoney($fromWei(lenderLoan.currentPrincipal)) }} {{
-                        $findAsset(lenderLoan.principalToken).symbol
-                    }}</h3>
-                </div>
-            </div>
-            <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) == 'repaid'">
-                <p>Total Repaid</p>
-                <div>
-                    <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
-                    <h3>{{ $toMoney($fromWei(lenderLoan.initialPrincipal)) }} {{
-                        $findAsset(lenderLoan.principalToken).symbol
-                    }}</h3>
-                </div>
-            </div>
-
-            <!---->
-            <div class="loan_info">
-                <p>State</p>
-                <LoanState :state="getState(lenderLoan.loanId)" />
-            </div>
-        </div>
-        <div>
-            <!---->
-            <div v-if="getState(lenderLoan.loanId) != 'defaulted'">
-                <p>Borrower's Collateral</p>
-                <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
-                    <div style="border: none;">
-                        <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
-                        <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }}</p>
-                        <IconOut />
-                    </div>
-                </RouterLink>
-            </div>
-            <div v-if="getState(lenderLoan.loanId) == 'defaulted'">
-                <p>My Collateral</p>
-                <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
-                    <div style="border: none;">
-                        <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
-                        <p class="strike">{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }} {{
-                            $findAsset(lenderLoan.collateralToken).symbol
-                        }}</p>
-                        <IconOut />
-                    </div>
-                </RouterLink>
-            </div>
-
-            <!----->
-            <div v-if="getState(lenderLoan.loanId) == 'open'">
-                <p>Due in</p>
-                <div>
-                    <IconClock />
-                    <p>{{ dueDate }} days</p>
-                </div>
-            </div>
-            <div v-if="getState(lenderLoan.loanId) == 'repaid'">
-                <p>Repaid on</p>
-                <div>
-                    <IconCalendar />
-                    <p>{{ dueDate }} days</p>
-                </div>
-            </div>
-            <div v-if="getState(lenderLoan.loanId) == 'defaulting'">
-                <p>Default in</p>
-                <div>
-                    <IconCalendar />
-                    <p>{{ dueDate }} days</p>
-                </div>
-            </div>
-            <div v-if="getState(lenderLoan.loanId) == 'defaulted'">
-                <p>Defaulted on</p>
-                <div>
-                    <IconCalendar />
-                    <p>{{ dueDate }} days</p>
-                </div>
-            </div>
-        </div>
-
+    <main>
         <!---->
-        <div class="claim">
-            <p v-if="lenderLoan.unClaimedPrincipal > 0">Repayments</p>
-            <div class="claim_asset" v-if="lenderLoan.unClaimedPrincipal > 0">
-                <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
-                <h3>
-                    {{ $toMoney($fromWei(lenderLoan.unClaimedPrincipal)) }}
-                    {{ $findAsset(lenderLoan.principalToken).symbol }}
-                </h3>
-            </div>
-
-            <!---->
-            <div class="borrower_action">
-                <PrimaryButton v-on:click="emitLoan(lenderLoan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
-
-                <PrimaryButton :state="(lenderLoan.unClaimedPrincipal == 0 || claimingPayback) ? 'disable' : ''"
-                    :progress="claimingPayback" v-on:click="claimPayback()" class="claim_button" :text="'Claim'" />
-            </div>
-        </div>
-    </div>
-
-    <!---->
-    <div class="mySwiper" v-if="userType == 'borrower' && offer.loans.length > 0">
-        <div class="navigate">
-            <h3>Borrow Loans</h3>
+        <div class="active_loans" v-if="userType == 'lender' && lenderLoan" :class="getState(lenderLoan.loanId)">
+            <h3>Lend Loan</h3>
             <div>
-                <IconArrowLeft v-on:click="prevLoan()" />
-                <p>{{ loanIndex + 1 }} <span>of {{ offer.loans.length }}</span></p>
-                <IconArrowRight v-on:click="nextLoan()" />
-            </div>
-        </div>
-        <div class="active_loans" :class="getState(offer.loans[loanIndex].loanId)">
-            <h3></h3>
-            <div>
-                <div class="amount_borrowed">
-                    <p>Outstanding</p>
+                <!---->
+                <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) != 'repaid'">
+                    <p>Borrower's Outstanding</p>
                     <div>
-                        <img :src="`/images/${$findAsset(offer.loans[loanIndex].principalToken).image}.png`" alt="">
-                        <h3>{{ $toMoney($fromWei(offer.loans[loanIndex].currentPrincipal)) }} {{
-                            $findAsset(offer.loans[loanIndex].principalToken).symbol }}</h3>
+                        <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
+                        <h3>{{ $toMoney($fromWei(lenderLoan.currentPrincipal)) }} {{
+                            $findAsset(lenderLoan.principalToken).symbol
+                        }}</h3>
+                    </div>
+                </div>
+                <div class="amount_borrowed" v-if="getState(lenderLoan.loanId) == 'repaid'">
+                    <p>Total Repaid</p>
+                    <div>
+                        <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
+                        <h3>{{ $toMoney($fromWei(lenderLoan.initialPrincipal)) }} {{
+                            $findAsset(lenderLoan.principalToken).symbol
+                        }}</h3>
                     </div>
                 </div>
 
                 <!---->
                 <div class="loan_info">
                     <p>State</p>
-                    <LoanState :state="getState(offer.loans[loanIndex].loanId)" />
+                    <LoanState :state="getState(lenderLoan.loanId)" />
                 </div>
             </div>
             <div>
                 <!---->
-                <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
-                    <p>My Collateral</p>
+                <div v-if="getState(lenderLoan.loanId) != 'defaulted'">
+                    <p>Borrower's Collateral</p>
                     <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
                         <div style="border: none;">
-                            <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
-                            <p>{{ $toMoney($fromWei(offer.loans[loanIndex].initialCollateral)) }} </p>
+                            <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
+                            <p>{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }}</p>
                             <IconOut />
                         </div>
                     </RouterLink>
                 </div>
-                <div v-else>
+                <div v-if="getState(lenderLoan.loanId) == 'defaulted'">
                     <p>My Collateral</p>
                     <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
                         <div style="border: none;">
-                            <img :src="`/images/${$findAsset(offer.loans[loanIndex].collateralToken).image}.png`" alt="">
-                            <p>{{ $toMoney($fromWei(offer.loans[loanIndex].currentCollateral)) }} </p>
+                            <img :src="`/images/${$findAsset(lenderLoan.collateralToken).image}.png`" alt="">
+                            <p class="strike">{{ $toMoney($fromWei(lenderLoan.currentCollateral)) }} {{
+                                $findAsset(lenderLoan.collateralToken).symbol
+                            }}</p>
                             <IconOut />
                         </div>
                     </RouterLink>
                 </div>
-
 
                 <!----->
-                <div v-if="getState(offer.loans[loanIndex].loanId) == 'open'">
+                <div v-if="getState(lenderLoan.loanId) == 'open'">
                     <p>Due in</p>
                     <div>
                         <IconClock />
-                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
-                <div v-if="getState(offer.loans[loanIndex].loanId) == 'repaid'">
+                <div v-if="getState(lenderLoan.loanId) == 'repaid'">
                     <p>Repaid on</p>
                     <div>
                         <IconCalendar />
-                        <p>
-                            {{ $toDate(offer.loans[loanIndex].repaidOn).month }}
-                            {{ $toDate(offer.loans[loanIndex].repaidOn).date }}
-                        </p>
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
-                <div v-if="getState(offer.loans[loanIndex].loanId) == 'defaulting'">
+                <div v-if="getState(lenderLoan.loanId) == 'defaulting'">
                     <p>Default in</p>
                     <div>
                         <IconCalendar />
-                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
-                <div v-if="getState(offer.loans[loanIndex].loanId) == 'defaulted'">
+                <div v-if="getState(lenderLoan.loanId) == 'defaulted'">
                     <p>Defaulted on</p>
                     <div>
                         <IconCalendar />
-                        <p>{{ getDate(offer.loans[loanIndex]) }} days</p>
+                        <p>{{ dueDate }} days</p>
                     </div>
                 </div>
             </div>
 
-
             <!---->
             <div class="claim">
+                <p v-if="lenderLoan.unClaimedPrincipal > 0">Repayments</p>
+                <div class="claim_asset" v-if="lenderLoan.unClaimedPrincipal > 0">
+                    <img :src="`/images/${$findAsset(lenderLoan.principalToken).image}.png`" alt="">
+                    <h3>
+                        {{ $toMoney($fromWei(lenderLoan.unClaimedPrincipal)) }}
+                        {{ $findAsset(lenderLoan.principalToken).symbol }}
+                    </h3>
+                </div>
+
                 <!---->
                 <div class="borrower_action">
-                    <PrimaryButton v-on:click="emitLoan(offer.loans[loanIndex])" :text="'Loan Info'"
-                        :bg="'rgba(108, 110, 115, 0.1)'" />
+                    <PrimaryButton v-on:click="emitLoan(lenderLoan)" :text="'Loan Info'" :bg="'rgba(108, 110, 115, 0.1)'" />
 
-                    <PrimaryButton :state="(offer.loans[loanIndex].currentPrincipal < 100) ? 'disable' : ''"
-                        v-on:click="(offer.loans[loanIndex].currentPrincipal < 100) ? null : $emit('payback', offer.loans[loanIndex])"
-                        class="claim_button" :text="'Payback'" />
+                    <PrimaryButton :state="(lenderLoan.unClaimedPrincipal == 0 || claimingPayback) ? 'disable' : ''"
+                        :progress="claimingPayback" v-on:click="claimPayback()" class="claim_button" :text="'Claim'" />
                 </div>
             </div>
         </div>
-    </div>
 
-    <!---->
-    <div class="open_loans" v-if="(!lenderLoan || offer.loans.length == 0) && userType != 'borrower'">
-        <h3>Open Loans</h3>
-        <div class="box">
-            <IconReceipt />
-            <p>No open loan Found on <br> this Borrow offer.</p>
+        <!---->
+        <div class="mySwiper" v-if="userType == 'borrower' && offer.loans.length > 0">
+            <div class="navigate">
+                <h3>Borrow Loans</h3>
+                <div>
+                    <IconArrowLeft v-on:click="prevLoan()" />
+                    <p>{{ loanIndex + 1 }} <span>of {{ offer.loans.length }}</span></p>
+                    <IconArrowRight v-on:click="nextLoan()" />
+                </div>
+            </div>
+            <div class="active_loans" :class="getState(getLoan().loanId)">
+                <h3></h3>
+                <div>
+                    <div class="amount_borrowed">
+                        <p>Outstanding</p>
+                        <div>
+                            <img :src="`/images/${$findAsset(getLoan().principalToken).image}.png`" alt="">
+                            <h3>{{ $toMoney($fromWei(getLoan().currentPrincipal)) }} {{
+                                $findAsset(getLoan().principalToken).symbol }}</h3>
+                        </div>
+                    </div>
+
+                    <!---->
+                    <div class="loan_info">
+                        <p>State</p>
+                        <LoanState :state="getState(getLoan().loanId)" />
+                    </div>
+                </div>
+                <div>
+                    <!---->
+                    <div v-if="getState(getLoan().loanId) == 'repaid'">
+                        <p>My Collateral</p>
+                        <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
+                            <div style="border: none;">
+                                <img :src="`/images/${$findAsset(getLoan().collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(getLoan().initialCollateral)) }} </p>
+                                <IconOut />
+                            </div>
+                        </RouterLink>
+                    </div>
+                    <div v-else>
+                        <p>My Collateral</p>
+                        <RouterLink :to="`/portfolio/vaults/borrows/${$route.params.id}`">
+                            <div style="border: none;">
+                                <img :src="`/images/${$findAsset(getLoan().collateralToken).image}.png`" alt="">
+                                <p>{{ $toMoney($fromWei(getLoan().currentCollateral)) }} </p>
+                                <IconOut />
+                            </div>
+                        </RouterLink>
+                    </div>
+
+
+                    <!----->
+                    <div v-if="getState(getLoan().loanId) == 'open'">
+                        <p>Due in</p>
+                        <div>
+                            <IconClock />
+                            <p>{{ getDate(getLoan()) }} days</p>
+                        </div>
+                    </div>
+                    <div v-if="getState(getLoan().loanId) == 'repaid'">
+                        <p>Repaid on</p>
+                        <div>
+                            <IconCalendar />
+                            <p>
+                                {{ $toDate(getLoan().repaidOn).month }}
+                                {{ $toDate(getLoan().repaidOn).date }}
+                            </p>
+                        </div>
+                    </div>
+                    <div v-if="getState(getLoan().loanId) == 'defaulting'">
+                        <p>Default in</p>
+                        <div>
+                            <IconCalendar />
+                            <p>{{ getDate(getLoan()) }} days</p>
+                        </div>
+                    </div>
+                    <div v-if="getState(getLoan().loanId) == 'defaulted'">
+                        <p>Defaulted on</p>
+                        <div>
+                            <IconCalendar />
+                            <p>{{ getDate(getLoan()) }} days</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!---->
+                <div class="claim">
+                    <!---->
+                    <div class="borrower_action">
+                        <PrimaryButton v-on:click="emitLoan(getLoan())" :text="'Loan Info'"
+                            :bg="'rgba(108, 110, 115, 0.1)'" />
+
+                        <PrimaryButton :state="(getLoan().currentPrincipal < 100) ? 'disable' : ''"
+                            v-on:click="(getLoan().currentPrincipal < 100) ? null : $emit('payback', getLoan())"
+                            class="claim_button" :text="'Payback'" />
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="open_loans" v-if="offer.loans.length == 0 && userType == 'borrower'">
-        <h3>Open Loans</h3>
-        <div class="box">
-            <IconReceipt />
-            <p>No open loan Found on <br> this Borrow offer.</p>
+
+        <!---->
+        <div class="open_loans" v-if="(!lenderLoan || offer.loans.length == 0) && userType != 'borrower'">
+            <h3>Open Loans</h3>
+            <div class="box">
+                <IconReceipt />
+                <p>No open loan Found on <br> this Borrow offer.</p>
+            </div>
         </div>
-    </div>
+        <div class="open_loans" v-if="offer.loans.length == 0 && userType == 'borrower'">
+            <h3>Open Loans</h3>
+            <div class="box">
+                <IconReceipt />
+                <p>No open loan Found on <br> this Borrow offer.</p>
+            </div>
+        </div>
+    </main>
 </template>
 
 <script setup>
@@ -243,7 +245,6 @@ import LendingPoolAPI from '../../../../scripts/LendingPoolAPI';
 import Authentication from '../../../../scripts/Authentication';
 export default {
     props: ["offer", "lenderLoan", "userType"],
-    emits: ["payback", "info"],
     components: {
         IconReceipt,
         IconOut,
@@ -264,6 +265,9 @@ export default {
     methods: {
         emitLoan: function (loan) {
             this.$emit('info', loan)
+        },
+        getLoan: function () {
+            return this.offer.loans[this.loanIndex]
         },
         getDate: function (loan) {
             let txt = "";

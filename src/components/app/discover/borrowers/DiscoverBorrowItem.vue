@@ -130,7 +130,7 @@
                         </RouterLink>
                     </div>
                     <LoanBoxes v-on:payback="payback = $event" v-on:info="loanInfo = $event" :offer="offer"
-                        :lenderLoan="lenderLoan" :userType="userType" />
+                        :lenderLoan="lenderLoan" :userType="userType" v-on:done="fetchBorrowingOffer(false)" />
 
                     <BorrowerStats v-if="userType != 'borrower'" v-on:profile="profile = true" :score="lenderScore" />
                 </div>
@@ -139,14 +139,15 @@
 
         <ProfilePopUp :userType="'Borrower'" :address="offer.creator" v-if="profile" v-on:close="profile = false" />
 
-        <LendRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request" v-on:close="request = false" />
+        <LendRequestPopUp v-on:done="fetchBorrowingOffer(false)" :offer="offer" v-if="request"
+            v-on:close="request = false" />
 
-        <LoanPayBackPopUp v-on:done="fetchLendingOffer(false)" :loan="payback" v-if="payback && lenderLoan"
+        <LoanPayBackPopUp v-on:done="fetchBorrowingOffer(false)" :loan="payback" v-if="payback"
             v-on:close="payback = false" />
 
-        <LendPopUp v-on:done="fetchLendingOffer(false)" v-if="lend" :offer="offer" v-on:close="onLend()" />
+        <LendPopUp v-on:done="fetchBorrowingOffer(false)" v-if="lend" :offer="offer" v-on:close="onLend()" />
 
-        <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo && lenderLoan"
+        <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo"
             v-on:close="loanInfo = false" />
     </main>
 </template>
@@ -169,32 +170,32 @@ import BorrowerStats from './BorrowerStats.vue';
 </script>
 
 <script>
+import { messages } from '../../../../reactives/messages';
 import Countdown from '../../../../utils/Countdown';
 import Authentication from '../../../../scripts/Authentication';
 import HealthScore from '../../../../scripts/DarshScore'
-import { messages } from '../../../../reactives/messages';
 import IconInformation from '../../../icons/IconInformation.vue';
 import Profile from '../../../../scripts/Profile';
 import ProfilePopUp from '../ProfilePopUp.vue';
 export default {
     components: {
-    LendPopUp,
-    LoanInfoPopUp,
-    IconClock,
-    IconAdd,
-    IconChart,
-    RequestTable,
-    PrimaryButton,
-    IconInterest,
-    ProgressBox,
-    IconSort,
-    LoanPayBackPopUp,
-    LendRequestPopUp,
-    LoanBoxes,
-    BorrowerStats,
-    IconInformation,
-    ProfilePopUp
-},
+        LendPopUp,
+        LoanInfoPopUp,
+        IconClock,
+        IconAdd,
+        IconChart,
+        RequestTable,
+        PrimaryButton,
+        IconInterest,
+        ProgressBox,
+        IconSort,
+        LoanPayBackPopUp,
+        LendRequestPopUp,
+        LoanBoxes,
+        BorrowerStats,
+        IconInformation,
+        ProfilePopUp
+    },
     data() {
         return {
             offer: null,
@@ -213,7 +214,7 @@ export default {
         };
     },
     async created() {
-        this.fetchLendingOffer()
+        this.fetchBorrowingOffer()
         this.userAddress = await Authentication.userAddress()
     },
     methods: {
@@ -240,7 +241,7 @@ export default {
             let interest = this.$fromWei(result.toString())
             return this.$toMoney(interest)
         },
-        fetchLendingOffer: async function (fetching = true) {
+        fetchBorrowingOffer: async function (fetching = true) {
             this.fetching = fetching;
             let id = this.$route.params.id;
             try {

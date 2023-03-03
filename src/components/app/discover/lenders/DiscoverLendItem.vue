@@ -149,13 +149,13 @@
         <BorrowRequestPopUp v-on:done="fetchLendingOffer(false)" :offer="offer" v-if="request"
             v-on:close="request = false" />
 
-        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback && borrowerLoan" v-on:done="fetchLendingOffer(false)"
+        <LoanPayBackPopUp :loan="borrowerLoan" v-if="payback" v-on:done="fetchLendingOffer(false)"
             v-on:close="payback = false" />
 
         <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
 
         <LoanInfoPopUp v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
-            v-if="loanInfo && borrowerLoan" v-on:close="loanInfo = false" />
+            v-if="loanInfo" v-on:close="loanInfo = false" />
     </main>
 </template>
 

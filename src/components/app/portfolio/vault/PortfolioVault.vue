@@ -271,7 +271,7 @@ export default {
 }
 
 .info>div {
-    padding: 26px 20px;
+    padding: 26px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
