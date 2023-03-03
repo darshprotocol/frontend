@@ -78,16 +78,16 @@
                 </div>
             </a>
             <div class="socials">
-                <a href="" target="_blank">
+                <a href="#">
                     <IconMedium class="social_icon" />
                 </a>
-                <a href="" target="_blank">
+                <a href="#">
                     <IconTwitter class="social_icon" />
                 </a>
-                <a href="" target="_blank">
+                <a href="#">
                     <IconDiscord class="social_icon" />
                 </a>
-                <a href="" target="_blank">
+                <a href="#">
                     <IconTelegram class="social_icon" />
                 </a>
             </div>
