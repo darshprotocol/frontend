@@ -228,10 +228,10 @@ export default {
 </script>
 
 <style scoped>
-main {
+/* main {
     padding: 0 60px;
     padding-top: 60px;
-}
+} */
 
 .header {
     display: flex;
