@@ -240,7 +240,12 @@ export default {
         },
         claimCollateral: async function () {
             this.claimingCollateral = true;
-            const trx = await LendingPoolAPI.claimCollateral(this.loan.loanId, await Authentication.userAddress());
+
+            const trx = await LendingPoolAPI.claimCollateral(
+                this.loan.loanId, 
+                await Authentication.userAddress()
+            );
+            
             if (trx && trx.tx) {
                 messages.insertMessage({
                     title: "Collateral claimed",
@@ -257,6 +262,7 @@ export default {
                     type: "failed"
                 });
             }
+
             this.claimingCollateral = false;
             this.fetchOffer(false);
         }

@@ -281,10 +281,9 @@ export default {
                         type: 'failed'
                     })
                 }
-                this.fetchOffer(false)
             }
 
-
+            this.fetchOffer(false)
             this.claimingCollateral = false
         }
     },
