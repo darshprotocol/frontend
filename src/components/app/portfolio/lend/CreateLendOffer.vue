@@ -56,7 +56,7 @@
                                 <div class="token">
                                     <img :src="`/images/${asset.image}.png`" />
                                     <h3 class="symbol">{{ asset.symbol }}</h3>
-                                    <p class="name">{{ asset.name }}</p>
+                                    <p class="name">{{ asset.shortName }}</p>
                                 </div>
                                 <div class="selected">
                                     <IconAdd class="icon_add" :color="'var(--bglighter)'" />
