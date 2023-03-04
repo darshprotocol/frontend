@@ -118,8 +118,20 @@ export default {
         },
         fetchLendingOffers: function () {
             this.fetching = true
-            this.axios.get('https://darshprotocol.onrender.com/offers?offerType=0').then(response => {
-                this.offers = response.data
+            this.axios.get(`https://darshprotocol.onrender.com/offers?offerType=0`).then(response => {
+                const offers = response.data
+                const now = (Date.now() / 1000).toFixed(0)
+
+                this.offers = offers.filter(offer => {
+                    if (offer.currentPrincipal == 0 || offer.initialPrincipal == 0) {
+                        return false
+                    } else if (offer.loans.length == 0) {
+                        return offer.expiresAt > now
+                    } else {
+                        return true
+                    }
+                })
+
                 this.fetching = false
             }).catch(error => {
                 console.error(error);
