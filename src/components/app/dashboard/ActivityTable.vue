@@ -3,8 +3,7 @@
         <div class="table_head">
             <div class="title">
                 <p>My Actvities</p>
-                <span>0</span>
-                <!-- <span>{{ sortActivities(offer.transfers).length }}</span> -->
+                <span>{{ transfers.length }}</span>
             </div>
             <div class="sort_by">
                 <IconSort />
@@ -16,30 +15,29 @@
                 <tr>
                     <td>User</td>
                     <td>Action</td>
-                    <td>Type</td>
                     <td>Date</td>
                     <td>Amount</td>
-                    <td>Actions</td>
+                    <td>
+                        <div class="menu">
+                            Actions
+                        </div>
+                    </td>
                 </tr>
             </thead>
-            <!-- <div class="tbody">
-                <tbody v-for="transfer in sortActivities(offer.transfers)" :key="transfer._id">
+            <div class="tbody">
+                <tbody v-for="transfer, index in transfers" :key="transfer._id">
                     <tr>
                         <td>
                             <div>
-                                <img v-if="transfer.from == userAddress" :src="`/images/user1.png`" alt="">
-                                <img v-else :src="`/images/user2.png`" alt="">
-                                
-                                <p v-if="transfer.from == userAddress">You</p>
-                                <p v-else-if="transfer.from != userAddress && offer.offerType == 0">Lender 1</p>
-                                <p v-else-if="transfer.from != userAddress && offer.offerType == 1">Borrower 1</p>
+                                <div :id="`img_vault${index}`" class="img"></div>
+                                <p>You</p>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <IconAddCircle v-if="transfer.type == 0" />
-                                <IconLock v-if="transfer.type == 1" />
-                                <IconCoin v-if="transfer.type == 2" />
+                                <IconCoin v-if="transfer.type == 1" />
+                                <IconLock v-if="transfer.type == 2" />
                                 <IconMinusCircle v-if="transfer.type == 3" />
 
                                 <p v-if="transfer.type == 0">Adds</p>
@@ -50,15 +48,9 @@
                         </td>
                         <td>
                             <div>
-                                <p v-if="transfer.token == offer.principalToken">Principal</p>
-                                <p v-else>Collateral</p>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
                                 <p>{{ $toDate(transfer.timestamp).month + ' ' + $toDate(transfer.timestamp).date }}, <span>
-                                    {{ $toDate(transfer.timestamp).hour + ':' + $toDate(transfer.timestamp).min }}
-                                </span></p>
+                                        {{ $toDate(transfer.timestamp).hour + ':' + $toDate(transfer.timestamp).min }}
+                                    </span></p>
                             </div>
                         </td>
                         <td>
@@ -71,45 +63,52 @@
                             </div>
                         </td>
                         <td>
-                            <a target="_blank" :href="`https://testnet.ftmscan.com/tx/${transfer.hash}`">
-                                <div class="link">
-                                    <p>View Txn</p>
-                                    <IconOut />
-                                </div>
-                            </a>
+                            <div class="menu">
+                                <IconMenu :color="'var(--textnormal)'" />
+                            </div>
                         </td>
                     </tr>
                 </tbody>
-            </div> -->
-            <div class="t_empty" v-if="true">
-                <img src="../../../assets/images/receipt-text.png" alt="">
-                <p>No activity found.</p>
+            </div>
+            <div class="t_empty" v-if="transfers.length == 0">
+                <img src="../../../../../assets/images/receipt-text.png" alt="">
+                <p>No activity.</p>
             </div>
         </table>
     </div>
 </template>
 
 <script setup>
-import IconOut from '../../icons/IconOut.vue';
 import IconSort from '../../icons/IconSort.vue';
 import IconAddCircle from '../../icons/IconAddCircle.vue'
 import IconMinusCircle from '../../icons/IconMinusCircle.vue'
 import IconCoin from '../../icons/IconCoin.vue';
 import IconLock from '../../icons/IconLock.vue';
+import Profile from '../../../scripts/Profile';
+import IconMenu from '../../icons/IconMenu.vue';
 </script >
 
 <script>
 export default {
-    props: ["offer", "userAddress"],
+    props: ["transfers"],
     methods: {
-        sortActivities: function (activities) {
-            if (this.offer.creator == this.userAddress.toLowerCase()) {
-                return activities
-            } else {
-                return activities.filter(activity => activity.from == this.userAddress.toLowerCase())
+        generateImages: function () {
+            for (let index = 0; index < this.transfers.length; index++) {
+                let el = Profile.generate(20, this.transfers[index].from);
+                let dom = document.getElementById(`img_vault${index}`);
+                if (dom && dom.childNodes.length == 0) {
+                    dom.appendChild(el);
+                }
             }
-        },
-    }
+        }
+    },
+    mounted() {
+        this.generateImages();
+    },
+    updated() {
+        this.generateImages();
+    },
+    components: { IconMenu }
 }
 </script>
 
@@ -219,6 +218,11 @@ export default {
     margin-top: 2px;
 }
 
+.request_table tbody td .img {
+    width: 20px;
+    height: 20px;
+}
+
 .request_table tbody td img {
     width: 20px;
     height: 20px;
@@ -251,17 +255,18 @@ export default {
     background: rgba(233, 71, 3, 0.08);
 }
 
-.link {
-    justify-content: center !important;
+.menu {
+    display: flex;
+    justify-content: center;
 }
 
-.link p {
-    color: var(--textdimmed) !important;
-}
-
-.link svg {
-    width: 14px;
-    height: 14px;
+tbody .menu svg {
+    padding: 3px 8px;
+    width: 40px;
+    height: 30px;
+    background: rgba(108, 110, 115, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .t_empty {

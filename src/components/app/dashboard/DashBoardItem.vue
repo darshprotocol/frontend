@@ -96,7 +96,7 @@
                 </div>
             </div>
 
-            <ActivityTable class="activity" />
+            <ActivityTable :transfers="transfers" class="activity" />
         </div>
     </main>
 </template>
@@ -119,6 +119,7 @@ export default {
             chart: null,
             tabIndex: 0,
             loans: [],
+            transfers: [],
             natives: { lent: 0, borrowed: 0 },
             stables: { lent: 0, borrowed: 0 }
         }
@@ -257,12 +258,18 @@ export default {
         },
         getProfile: async function () {
             if (!this.userAddress) return
-            this.axios.get(`https://darshprotocol.onrender.com/users/${this.userAddress}`).then(response => {
+            this.axios.get(`https://darshprotocol.onrender.com/users/${this.userAddress.toLowerCase()}`).then(response => {
                 this.user = response.data;
-                this.fetching = false;
             }).catch(error => {
                 console.error(error);
-                this.fetching = false;
+            });
+        },
+        getTransfers: function() {
+            if (!this.userAddress) return
+            this.axios.get(`https://darshprotocol.onrender.com/transfers?from=${this.userAddress.toLowerCase()}`).then(response => {
+                this.transfers = response.data;
+            }).catch(error => {
+                console.error(error);
             });
         }
     },
@@ -273,6 +280,7 @@ export default {
         this.userAddress = await Authentication.userAddress()
         this.getProfile()
         this.getLoans()
+        this.getTransfers()
         this.authenticating = false
     }
 }
