@@ -93,7 +93,7 @@
                     <div>
                         <PrimaryButton :progress="approving" :state="approving ? 'disable' : ''"
                             v-on:click="!approving ? approve() : null" :text="'Approve'"
-                            v-if="$fromWei(allowance) < $fromWei(getPrincipal())" />
+                            v-if="Number($fromWei(allowance)) < Number($fromWei(getPrincipal()))" />
 
                         <PrimaryButton :progress="requesting" :state="requesting ? 'disable' : ''" v-else
                             v-on:click="!requesting ? createRequest() : null" :text="'Make Request'" />

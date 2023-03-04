@@ -14,7 +14,7 @@
                     :text="'Create'" :state="'disable'" />
 
                 <PrimaryButton :state="creating ? 'disable' : ''" :progress="creating"
-                    v-else-if="$fromWei(allowance) >= safePrincipal()" v-on:click="createPopUp = true" :text="'Create'"
+                    v-else-if="Number($fromWei(allowance)) >= Number(safePrincipal())" v-on:click="createPopUp = true" :text="'Create'"
                     :width="'160px'" />
 
                 <PrimaryButton v-else :progress="approving" :state="approving ? 'disable' : ''"

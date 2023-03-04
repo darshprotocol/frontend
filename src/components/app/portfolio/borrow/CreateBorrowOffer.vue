@@ -12,7 +12,7 @@
                 <PrimaryButton :progress="(approving || fetchingPrice)" v-if="(collateralAmount <= 0 || !checkbox)"
                     :width="'160px'" :text="'Create'" :state="'disable'" />
 
-                <PrimaryButton v-else-if="$fromWei(allowance) >= $fromWei(collateralAmount)"
+                <PrimaryButton v-else-if="Number($fromWei(allowance)) >= Number($fromWei(collateralAmount))"
                     :progress="(creating || fetchingPrice)" :state="(creating || fetchingPrice) ? 'disable' : ''"
                     v-on:click="createPopUp = true" :text="'Create'" :width="'160px'" />
 

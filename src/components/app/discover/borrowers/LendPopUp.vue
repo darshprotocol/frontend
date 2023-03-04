@@ -36,7 +36,7 @@
             </div>
             <div>
                 <PrimaryButton :progress="approving" :state="approving ? 'disable' : ''"
-                    v-if="$fromWei(allowance) < $fromWei(getPrincipal())" v-on:click="approve()"
+                    v-if="Number($fromWei(allowance)) < Number($fromWei(getPrincipal()))" v-on:click="approve()"
                     :text="`Approve ${$findAsset(offer.principalToken).symbol}`" />
 
                 <PrimaryButton :progress="lending" :state="lending ? 'disable' : ''" v-else v-on:click="lendLoan()"

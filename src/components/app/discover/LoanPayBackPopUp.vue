@@ -23,7 +23,7 @@
             <div>
                 <PrimaryButton :progress="(fetchingPrice || approving)"
                     :state="(fetchingPrice || approving) ? 'disable' : ''"
-                    v-if="$fromWei(allowance) < $fromWei(getPaybackAmount())"
+                    v-if="Number($fromWei(allowance)) < Number($fromWei(getPaybackAmount()))"
                     v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
 
                 <PrimaryButton :progress="(fetchingPrice || payingback)"
@@ -118,7 +118,7 @@ export default {
             )
             this.fetchingPrice = false
 
-            this.allowance = amount
+            this.allowance = amount.toString()
         },
         approve: async function () {
             this.approving = true
