@@ -48,12 +48,18 @@
                 </div>
                 <div class="stats">
                     <div class="tabs">
-                        <div class="tab active">Lends</div>
-                        <div class="tab">Borrows</div>
+                        <div :class="tabIndex == 0 ? 'tab active' : 'tab'" v-on:click="tabIndex = 0">Lends</div>
+                        <div :class="tabIndex == 1 ? 'tab active' : 'tab'" v-on:click="tabIndex = 1">Borrows</div>
                     </div>
                     <div class="stat_detail">
-                        <p class="tag">Total Value Lent</p>
-                        <p class="amount">$19,582</p>
+                        <p v-if="tabIndex == 0" class="tag">Total Value Lent</p>
+                        <p v-else class="tag">Total Value Borrowed</p>
+
+                        <p class="amount" v-if="user">${{
+                            tabIndex == 0 ? $toMoney($fromWei(user.lentVolume)) :
+                            $toMoney($fromWei(user.borrowedVolume))
+                        }}</p>
+                        <p class="amount" v-else>$0</p>
 
                         <div class="natives">
                             <div class="tokens">
@@ -63,11 +69,11 @@
                                     <img src="/images/eth.png" alt="">
                                     <p>Natives</p>
                                 </div>
-                                <div class="percent">60%</div>
+                                <div class="percent">{{ getProgress('native') }}%</div>
                             </div>
                             <div class="progress_bar">
-                                <div class="progress"></div>
-                                <div class="dot"></div>
+                                <div :style="`width: ${getProgress('native')}%`" class="progress"></div>
+                                <div :style="`left: ${getProgress('native')}%`" class="dot"></div>
                             </div>
                         </div>
 
@@ -79,11 +85,11 @@
                                     <img src="/images/dai.png" alt="">
                                     <p>Stables</p>
                                 </div>
-                                <div class="percent">60%</div>
+                                <div class="percent">{{ getProgress('stable') }}%</div>
                             </div>
                             <div class="progress_bar">
-                                <div class="progress"></div>
-                                <div class="dot"></div>
+                                <div :style="`width: ${getProgress('stable')}%`" class="progress"></div>
+                                <div :style="`left: ${getProgress('stable')}%`" class="dot"></div>
                             </div>
                         </div>
                     </div>
@@ -110,7 +116,11 @@ export default {
             userAddress: null,
             authenticating: true,
             user: null,
-            chart: null
+            chart: null,
+            tabIndex: 0,
+            loans: [],
+            natives: { lent: 0, borrowed: 0 },
+            stables: { lent: 0, borrowed: 0 }
         }
     },
     methods: {
@@ -202,10 +212,51 @@ export default {
                 this.chart.render();
             }
         },
-        getProfile: async function () {
-            if (this.userAddress == null) {
-                return;
+        getLoans: function () {
+            if (!this.userAddress) return
+            this.axios.get(`https://darshprotocol.onrender.com/loans/vault?address=${this.userAddress.toLowerCase()}`).then(response => {
+                this.loans = response.data;
+
+                for (let index = 0; index < this.loans.length; index++) {
+                    const loan = this.loans[index];
+                    let principalType = this.$findAsset(loan.principalToken).type
+
+                    
+                    if (loan.lender == this.userAddress.toLowerCase()) {
+                        if (principalType == 'native') {
+                            this.natives.lent += 1
+                        } else {
+                            this.stables.lent += 1
+                        }
+                    }
+                    else if (loan.borrower == this.userAddress.toLowerCase()) {
+                        if (principalType == 'native') {
+                            this.natives.borrowed += 1
+                        } else {
+                            this.stables.borrowed += 1
+                        }
+                    }
+                }
+
+            }).catch(error => {
+                console.error(error);
+            });
+        },
+        getProgress: function (type) {
+            if (this.tabIndex == 0) {
+                if (type == 'native') {
+                    return ((this.natives.lent / (this.natives.lent + this.stables.lent)) * 100)
+                }
+                return ((this.stables.lent / (this.natives.lent + this.stables.lent)) * 100)
             }
+
+            if (type == 'native') {
+                return ((this.natives.borrowed / (this.natives.borrowed + this.stables.borrowed)) * 100)
+            }
+            return ((this.stables.borrowed / (this.natives.borrowed + this.stables.borrowed)) * 100)
+        },
+        getProfile: async function () {
+            if (!this.userAddress) return
             this.axios.get(`https://darshprotocol.onrender.com/users/${this.userAddress}`).then(response => {
                 this.user = response.data;
                 this.fetching = false;
@@ -221,17 +272,17 @@ export default {
     async created() {
         this.userAddress = await Authentication.userAddress()
         this.getProfile()
+        this.getLoans()
         this.authenticating = false
-    },
-    components: { NoWallet }
+    }
 }
 </script>
 
 <style scoped>
-/* main {
+.dashboard_item {
     padding: 0 60px;
     padding-top: 60px;
-} */
+}
 
 .header {
     display: flex;
@@ -390,6 +441,8 @@ export default {
     justify-content: center;
     font-size: 16px;
     color: var(--textdimmed);
+    cursor: pointer;
+    user-select: none;
 }
 
 .tabs .active {
@@ -462,7 +515,6 @@ export default {
     height: 4px;
     border-radius: 5px;
     background: var(--primary);
-    width: 50%;
 }
 
 .progress_bar .dot {
@@ -472,7 +524,6 @@ export default {
     height: 14px;
     background: var(--textnormal);
     border-radius: 5px;
-    left: 50%;
     transform: translate(-50%, -5px);
 }
 

@@ -101,7 +101,7 @@
                     <div>
                         <PrimaryButton :progress="fetchingPrice || approving" :state="(fetchingPrice || approving) ? 'disable' : ''"
                             v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'"
-                            v-if="$fromWei(allowance) >= $fromWei(collateralAmount)" />
+                            v-if="$fromWei(allowance) < $fromWei(collateralAmount)" />
 
                         <PrimaryButton :progress="fetchingPrice || requesting" :state="(fetchingPrice || requesting) ? 'disable' : ''"
                             v-else v-on:click="!(fetchingPrice || requesting) ? createRequest() : null"

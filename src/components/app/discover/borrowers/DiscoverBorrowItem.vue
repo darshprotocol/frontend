@@ -82,7 +82,7 @@
                         </div>
                         <div class="borrow">
                             <PrimaryButton v-if="lenderLoan || userType != 'lender'" :text="'Lend'" :state="'disable'" />
-                            <PrimaryButton v-else v-on:click="lend = true" :text="'Lend'" />
+                            <PrimaryButton v-else v-on:click="onLend()" :text="'Lend'" />
                         </div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
         <LoanPayBackPopUp v-on:done="fetchBorrowingOffer(false)" :loan="payback" v-if="payback"
             v-on:close="payback = false" />
 
-        <LendPopUp v-on:done="fetchBorrowingOffer(false)" v-if="lend" :offer="offer" v-on:close="onLend()" />
+        <LendPopUp v-on:done="fetchBorrowingOffer(false)" v-if="lend" :offer="offer" v-on:close="lend = false" />
 
         <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo"
             v-on:close="loanInfo = false" />
