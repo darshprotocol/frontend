@@ -210,6 +210,7 @@ export default {
         },
         findTokenBalance: function () {
             let address = this.principalToken.toLowerCase();
+            if (this.tokenBalances.length == 0) return
 
             if (address == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
                 address = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";

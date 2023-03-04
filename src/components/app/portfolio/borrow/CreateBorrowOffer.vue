@@ -221,12 +221,15 @@ export default {
         },
         findTokenBalance: function () {
             let address = this.collateralToken;
+            if (this.tokenBalances.length == 0) return
+
             if (address == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
                 address = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
             }
             let token = this.tokenBalances.find(token => token.contract_address.toLowerCase() == address.toLowerCase());
             if (!token)
                 return "0.00";
+                
             return this.$toMoney(this.$fromWei(token.balance));
         },
         selectedPrincipal: function (address) {
