@@ -23,7 +23,7 @@
                         </div>
                         <div class="accrued" v-if="loanState == 'repaid'">
                             <IconAdd class="icon" />
-                            <p>{{ $toMoney($fromWei(loan.totalInterestPaid)) }}</p>
+                            <p>{{ $toMoney($fromWei(loan.totalInterestPaid), 6) }}</p>
                         </div>
                     </div>
                 </div>
@@ -89,7 +89,9 @@
 
                 <!---->
                 <div class="grid_2" v-if="loanState != 'defaulted'">
-                    <p>My Collateral</p>
+                    <p v-if="!claimer">My Collateral</p>
+                    <p v-else>Collateral</p>
+
                     <div>
                         <p>{{ $toMoney($fromWei(loan.currentCollateral)) }}
                         </p>
@@ -97,7 +99,9 @@
                     </div>
                 </div>
                 <div class="grid_2" v-if="loanState == 'defaulted'">
-                    <p>My Collateral</p>
+                    <p v-if="!claimer">My Collateral</p>
+                    <p v-else>Collateral</p>
+
                     <div>
                         <p class="strike">{{ $toMoney($fromWei(loan.currentCollateral)) }}
                         </p>
@@ -105,9 +109,13 @@
                     </div>
                 </div>
             </div>
-            <div class="action">
+            <div class="action" v-if="!claimer">
                 <PrimaryButton v-if="loanState != 'repaid'" :text="'Payback'" v-on:click="$emit('payback')" />
                 <PrimaryButton v-if="loanState == 'repaid'" :text="'Payback'" :state="'disable'" />
+            </div>
+            <div class="action" v-else>
+                <PrimaryButton v-if="loan.unClaimedPrincipal > 0" :text="'Claim'" v-on:click="$emit('claim')" />
+                <PrimaryButton v-else :text="'Claim'" :state="'disable'" />
             </div>
         </div>
     </main>
@@ -127,7 +135,7 @@ import Countdown from '../../../utils/Countdown';
 import IconCalendar from '../../icons/IconCalendar.vue';
 import Profile from '../../../scripts/Profile';
 export default {
-    props: ["loan"],
+    props: ["loan", "claimer"],
     data() {
         return {
             dueDate: 0,
