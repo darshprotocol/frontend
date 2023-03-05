@@ -67,7 +67,7 @@ export default {
             return ((this.loan.initialPrincipal - this.loan.currentPrincipal) / this.loan.initialPrincipal) * 100
         },
         getPaybackAmount: function () {
-            return ((this.loan.initialPrincipal * this.percentage) / 100) + this.getAccrued()
+            return ((this.loan.currentPrincipal * this.percentage) / 100) + this.getAccrued()
         },
         getAccrued: function () {
             let now = Date.now() + (2 * 60 * 1000)
