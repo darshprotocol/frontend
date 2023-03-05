@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const Authentication = {
-    userAddress: async function (request = false) {
+    userAddress: async function (request = false, callback = null) {
         if (typeof ethereum === 'undefined') return null
         try {
             if (!this.isAuth() && !request) return null
@@ -14,6 +14,9 @@ const Authentication = {
                     this.setAuth("false")
                 } else {
                     accounts = _accounts
+                }
+                if (callback) {
+                    callback()
                 }
             })
             this.setAuth("true")

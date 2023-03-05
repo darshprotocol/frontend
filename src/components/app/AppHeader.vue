@@ -12,7 +12,8 @@
                 <div class="notifications icon_badge" v-on:click="$emit('notification')">
                     <IconNotification />
                     <div class="new_notification">
-                        <IconInformation :color="'var(--primary)'" :stripe="'var(--textnormal)'" v-if="unReadNotifications.length > 0" />
+                        <IconInformation :color="'var(--primary)'" :stripe="'var(--textnormal)'"
+                            v-if="unReadNotifications.length > 0" />
                     </div>
                 </div>
                 <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate(true)">
@@ -56,7 +57,9 @@ export default {
                 this.$emit("wallet");
                 return;
             }
-            const userAddress = await Authentication.userAddress(request);
+            const userAddress = await Authentication.userAddress(request, () => {
+                this.$router.go()
+            });
             if (request && !userAddress) {
                 messages.insertMessage({
                     title: "Failed to connect wallet",
