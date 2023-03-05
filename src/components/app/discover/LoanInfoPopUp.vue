@@ -114,7 +114,7 @@
                 <PrimaryButton v-if="loanState == 'repaid'" :text="'Payback'" :state="'disable'" />
             </div>
             <div class="action" v-else>
-                <PrimaryButton v-if="loan.unClaimedPrincipal > 0" :text="'Claim'" v-on:click="$emit('claim')" />
+                <PrimaryButton v-if="loan.unClaimedPrincipal > 0" :text="'Claim'" v-on:click="$emit('claimpayback')" />
                 <PrimaryButton v-else :text="'Claim'" :state="'disable'" />
             </div>
         </div>

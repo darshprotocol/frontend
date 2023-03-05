@@ -21,7 +21,7 @@ import WalletPopUp from '../components/WalletPopUp.vue';
         </div>
 
         <SnackBar />
-        <NotificationPopUp v-on:close="notification = false" v-if="notification" />
+        <NotificationPopUp :userAddress="userAddress" v-on:close="notification = false" v-if="notification" />
         <WalletPopUp :userAddress="userAddress" v-on:close="wallet = false" v-if="wallet" />
     </div>
 </template>
@@ -35,7 +35,9 @@ export default {
             wallet: false
         };
     },
-    components: { WalletPopUp }
+    mounted() {
+        
+    }
 }
 </script>
 

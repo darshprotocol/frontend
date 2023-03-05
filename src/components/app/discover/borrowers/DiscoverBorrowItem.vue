@@ -147,7 +147,7 @@
 
         <LendPopUp v-on:done="fetchBorrowingOffer(false)" v-if="lend" :offer="offer" v-on:close="lend = false" />
 
-        <LoanInfoPopUp v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo"
+        <LoanInfoPopUp :claimer="userType == 'borrower'" v-on:payback="paybackCall()" :loan="loanInfo" v-if="loanInfo"
             v-on:close="loanInfo = false" />
     </main>
 </template>

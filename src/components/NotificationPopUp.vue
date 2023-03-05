@@ -9,31 +9,31 @@
             </div>
             <div class="tabs">
                 <div class="tab">
-                    <p>All</p> <span>4</span>
+                    <p>All</p> <span>{{ notifications.length }}</span>
                 </div>
                 <div class="tab">
-                    <p>Actions</p> <span>4</span>
+                    <p>Actions</p> <span>0</span>
                 </div>
                 <div class="tab active">
-                    <p>Requests</p> <span>4</span>
+                    <p>Requests</p> <span>{{ notifications.length }}</span>
                 </div>
             </div>
             <div class="scroll">
                 <div class="notifications">
-                    <div v-for="(notification, index) in data" :key="index"
-                        :class="!notification.markedAsRead ? 'notification active' : 'notification'">
+                    <div v-for="(notification, index) in notifications" :key="index"
+                        :class="notification.readAt == 0 ? 'notification active' : 'notification'">
                         <div class="image">
                             <div class="img" :id="`img_notification${index}`"></div>
                         </div>
                         <div class="text">
                             <p class="action">
-                                <span>{{ $shortName(notification.from.address, 6) }}</span>
-                                {{ notification.action }}
+                                <span>{{ $shortName(notification.from, 6) }}</span>
+                                {{ getActionText(notification.id) }}
                             </p>
                             <p class="timestamp">
-                                {{ notification.timestamp }}
+                                <timeago auto-update :datetime="new Date(notification.timestamp * 1000)" />
                             </p>
-                            <div class="actions" v-if="!notification.markedAsRead">
+                            <div class="actions" v-if="notification.readAt == 0">
                                 <div class="mark_as_read">
                                     <p>Mark as read</p>
                                 </div>
@@ -61,81 +61,47 @@ import IconOut from './icons/IconOut.vue';
 
 <script>
 export default {
+    props: ["userAddress"],
     data() {
         return {
-            data: [
-                {
-                    from: {
-                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
-                    },
-                    action: "accepts your request.",
-                    actionCode: 1,
-                    timestamp: 2983737392,
-                    markedAsRead: false
-                },
-                {
-                    from: {
-                        address: "0x0Ae2BbC63Ac6A365E4424a6E4BD91f99B8C006dC",
-                    },
-                    action: "rejects your request.",
-                    actionCode: 2,
-                    timestamp: 2983847392,
-                    markedAsRead: false
-                },
-                {
-                    from: {
-                        address: "0x36c8f83F1dcC316d591d5c15935951D240752558",
-                    },
-                    action: "Your request expires.",
-                    actionCode: 3,
-                    timestamp: 2983737392,
-                    markedAsRead: true
-                },
-                {
-                    from: {
-                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
-                    },
-                    action: "You accepted a request.",
-                    actionCode: 1,
-                    timestamp: 2983737392,
-                    markedAsRead: true
-                },
-                {
-                    from: {
-                        image: "/images/user1.png",
-                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2",
-                    },
-                    action: "You rejected a request.",
-                    actionCode: 2,
-                    timestamp: 2983737392,
-                    markedAsRead: true
-                },
-                {
-                    from: {
-                        image: "/images/user1.png",
-                        address: "0xd0d7d86cB4E28342DE2d30a797301Ab6Bb083aF2"
-                    },
-                    action: "rejects your request.",
-                    actionCode: 2,
-                    timestamp: 2983847392,
-                    markedAsRead: true
-                }
-            ]
+            notifications: [],
+            fetching: false
         }
     },
     methods: {
         generateImages: function () {
-            for (let index = 0; index < this.data.length; index++) {
-                let el = Profile.generate(50, this.data[index].from.address)
+            for (let index = 0; index < this.notifications.length; index++) {
+                let el = Profile.generate(50, this.notifications[index].from)
                 let dom = document.getElementById(`img_notification${index}`)
                 if (dom && dom.childNodes.length == 0) {
                     dom.appendChild(el)
                 }
             }
+        },
+        getActionText: function(code) {
+            switch (code) {
+                case 100: return 'accepts your request.'
+                case 101: return 'rejects your request.'
+                case 102: return 'Your request expires.'
+                case 103: return 'repaid their loan.'
+                default: return '';
+            }
+        },
+        getNotifications: function() {
+            if (!this.userAddress) return  
+            this.fetching = true
+            this.axios.get(`https://darshprotocol.onrender.com/notifications?to=${this.userAddress.toLowerCase()}`).then(response => {
+                this.notifications = response.data
+                this.fetching = false
+            }).catch(error => {
+                console.error(error);
+                this.fetching = false
+            })
         }
     },
     mounted() {
         this.generateImages()
+        this.getNotifications()
         document.body.classList.add('modal')
     },
     updated() {
