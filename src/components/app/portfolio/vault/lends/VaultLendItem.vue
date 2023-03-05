@@ -153,7 +153,7 @@
             <div class="second_box">
                 <div class="emission">
                     <h3 class="emission_title">Unlocked
-                        <IconInformation />
+                        <IconInformation :color="'var(--textdimmed)'" :stripe="'var(--textnormal)'" />
                     </h3>
                     <div class="emission_grid">
                         <div>
