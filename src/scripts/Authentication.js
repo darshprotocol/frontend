@@ -37,6 +37,10 @@ const Authentication = {
         }
     },
 
+    logOut: function () {
+        this.setAuth("false")
+    },
+
     switchToFantomTestnet: async function () {
         try {
             await window.ethereum.request({

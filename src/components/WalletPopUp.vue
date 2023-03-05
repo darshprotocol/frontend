@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mark_all">
+            <div class="mark_all" v-on:click="logOut()">
                 <IconLogout /> <p>Disconnect</p>
             </div>
         </div>
@@ -59,6 +59,7 @@ import IconLogout from './icons/IconLogout.vue';
 
 <script>
 import CovalentAPI from '../utils/CovalentAPI'
+import Authentication from '../scripts/Authentication';
 export default {
     props: ["userAddress"],
     data() {
@@ -87,6 +88,10 @@ export default {
 
             return this.$toMoney(this.$fromWei(token.balance));
         },
+        logOut: function() {
+            Authentication.logOut()
+            this.$router.go()
+        }
     },
     mounted() {
         this.getTokenBalances()
@@ -275,6 +280,8 @@ main {
     gap: 10px;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    user-select: none;
 }
 
 .mark_all p {
