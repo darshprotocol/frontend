@@ -11,7 +11,9 @@
             <div class="actions">
                 <div class="notifications icon_badge" v-on:click="$emit('notification')">
                     <IconNotification />
-                    <div class="new_notification"></div>
+                    <div class="new_notification">
+                        <IconInformation :color="'var(--primary)'" :stripe="'var(--textnormal)'" v-if="unReadNotifications.length > 0" />
+                    </div>
                 </div>
                 <div :class="userAddress ? 'connected connect_wallet' : 'connect_wallet'" v-on:click="authenticate(true)">
                     <IconMetamask v-if="userAddress" />
@@ -40,8 +42,14 @@ import IconSettings from '../icons/IconSettings.vue';
 import Authentication from '../../scripts/Authentication'
 import IconWallet from '../icons/IconWallet.vue';
 import { messages } from '../../reactives/messages';
+import IconInformation from '../icons/IconInformation.vue';
 export default {
     props: ["userAddress"],
+    data() {
+        return {
+            unReadNotifications: []
+        }
+    },
     methods: {
         authenticate: async function (request = false) {
             if (this.userAddress) {
@@ -49,24 +57,33 @@ export default {
                 return;
             }
             const userAddress = await Authentication.userAddress(request);
-
             if (request && !userAddress) {
                 messages.insertMessage({
-                    title: 'Failed to connect wallet',
-                    description: 'Please check your network, refresh or try again.',
-                    type: 'failed'
-                })
+                    title: "Failed to connect wallet",
+                    description: "Please check your network, refresh or try again.",
+                    type: "failed"
+                });
             }
             else if (userAddress && request) {
                 this.$router.go();
             }
-
+            this.checkNotification(userAddress);
             this.$emit("connected", userAddress);
+        },
+        checkNotification: function (userAddress) {
+            if (!userAddress)
+                return;
+            this.axios.get(`https://darshprotocol.onrender.com/notifications?to=${userAddress.toLowerCase()}&readAt=0`).then(response => {
+                this.unReadNotifications = response.data;
+            }).catch(error => {
+                console.error(error);
+            });
         }
     },
     mounted() {
         this.authenticate();
-    }
+    },
+    components: { IconInformation }
 }
 </script>
 
@@ -153,5 +170,12 @@ main {
     cursor: pointer;
     user-select: none;
     transition: .2s;
+    position: relative;
+}
+
+.new_notification {
+    position: absolute;
+    left: 20px;
+    bottom: 10px;
 }
 </style>

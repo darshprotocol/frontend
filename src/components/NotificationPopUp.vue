@@ -8,13 +8,13 @@
                 </div>
             </div>
             <div class="tabs">
-                <div class="tab">
+                <div class="tab active">
                     <p>All</p> <span>{{ notifications.length }}</span>
                 </div>
                 <div class="tab">
                     <p>Actions</p> <span>0</span>
                 </div>
-                <div class="tab active">
+                <div class="tab">
                     <p>Requests</p> <span>{{ notifications.length }}</span>
                 </div>
             </div>

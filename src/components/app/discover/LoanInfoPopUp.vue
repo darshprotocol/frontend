@@ -79,11 +79,19 @@
                 </div>
             </div>
             <div class="grid">
-                <div class="grid_2">
+                <!---->
+                <div class="grid_2" v-if="!claimer">
                     <p>Lender</p>
                     <div>
                         <div class="img" id="img_lender_loan"></div>
                         <p>{{ $shortName(loan.lender, 6) }}</p>
+                    </div>
+                </div>
+                <div class="grid_2" v-else>
+                    <p>Borrower</p>
+                    <div>
+                        <div class="img" id="img_lender_loan"></div>
+                        <p>{{ $shortName(loan.borrower, 6) }}</p>
                     </div>
                 </div>
 
@@ -114,7 +122,8 @@
                 <PrimaryButton v-if="loanState == 'repaid'" :text="'Payback'" :state="'disable'" />
             </div>
             <div class="action" v-else>
-                <PrimaryButton v-if="loan.unClaimedPrincipal > 0" :text="'Claim'" v-on:click="$emit('claimpayback')" />
+                <PrimaryButton :state="claimingPayback ? 'disable' : ''" :progress="claimingPayback"
+                    v-if="loan.unClaimedPrincipal > 0" :text="'Claim'" v-on:click="claimPrincipal()" />
                 <PrimaryButton v-else :text="'Claim'" :state="'disable'" />
             </div>
         </div>
@@ -134,12 +143,16 @@ import PrimaryButton from '../../PrimaryButton.vue';
 import Countdown from '../../../utils/Countdown';
 import IconCalendar from '../../icons/IconCalendar.vue';
 import Profile from '../../../scripts/Profile';
+import Authentication from '../../../scripts/Authentication';
+import LendingPoolAPI from '../../../scripts/LendingPoolAPI';
+import { messages } from '../../../reactives/messages';
 export default {
     props: ["loan", "claimer"],
     data() {
         return {
             dueDate: 0,
-            loanState: "open"
+            loanState: "open",
+            claimingPayback: false
         };
     },
     methods: {
@@ -186,6 +199,36 @@ export default {
             if (dom && dom.childNodes.length == 0) {
                 dom.appendChild(el)
             }
+        },
+        claimPrincipal: async function () {
+            if (this.claimingPayback) return
+            this.claimingPayback = true
+
+            const trx = await LendingPoolAPI.claimPrincipal(
+                this.loan.loanId,
+                await Authentication.userAddress()
+            )
+
+            if (trx && trx.tx) {
+                messages.insertMessage({
+                    title: 'Repayment claimed',
+                    description: 'Repayment was successfully claimed.',
+                    type: 'success',
+                    linkTitle: 'View Trx',
+                    linkUrl: `https://testnet.ftmscan.com/tx/${trx.tx}`
+                })
+            } else {
+                messages.insertMessage({
+                    title: 'Claimimg failed',
+                    description: 'Repayment claim failed.',
+                    type: 'failed'
+                })
+            }
+
+            this.$emit('done')
+            this.$emit('close')
+
+            this.claimingPayback = false
         }
     },
     mounted() {

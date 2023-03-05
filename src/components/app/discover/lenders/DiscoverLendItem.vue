@@ -136,7 +136,7 @@
                         </RouterLink>
                     </div>
 
-                    <LoanBoxes v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
+                    <LoanBoxes refs="loanBoxes" v-on:payback="payback = true" v-on:info="loanInfo = $event" :offer="offer"
                         :borrowerLoan="borrowerLoan" :userType="userType" v-on:done="fetchLendingOffer(false)" />
 
                     <BorrowerStats v-on:profile="profile = true" v-if="userType != 'lender'" :score="lenderScore" />
@@ -154,7 +154,7 @@
 
         <BorrowPopUp v-on:done="fetchLendingOffer(false)" v-if="borrow" :offer="offer" v-on:close="borrow = false" />
 
-        <LoanInfoPopUp :claimer="userType == 'lender'" v-on:payback="paybackCall()" v-on:claimpayback="claimpayback($event)" :loan="loanInfo"
+        <LoanInfoPopUp :claimer="userType == 'lender'" v-on:payback="paybackCall()" v-on:done="fetchLendingOffer(false)" :loan="loanInfo"
             v-if="loanInfo" v-on:close="loanInfo = false" />
     </main>
 </template>
