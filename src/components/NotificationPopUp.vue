@@ -309,6 +309,8 @@ main {
 .mark_all {
     height: 60px;
     background: var(--bglighter);
+    cursor: pointer;
+    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
