@@ -52,7 +52,7 @@ export default {
         }
     },
     watch: {
-        '$route': function() {
+        $route: function() {
             this.checkNotification()
         }
     },
