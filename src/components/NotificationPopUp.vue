@@ -71,11 +71,6 @@ export default {
             fetching: false
         }
     },
-    watch: {
-        $route() {
-            this.getNotifications()
-        }
-    },
     methods: {
         generateImages: function () {
             for (let index = 0; index < this.notifications.length; index++) {

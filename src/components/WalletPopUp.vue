@@ -68,11 +68,6 @@ export default {
             tokenBalances: []
         }
     },
-    watch: {
-        $route() {
-            this.getTokenBalances()
-        }
-    },
     methods: {
         getTokenBalances: async function () {
             let response = await CovalentAPI.getTokenBalances(this.userAddress);

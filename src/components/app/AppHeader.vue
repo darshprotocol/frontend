@@ -51,6 +51,11 @@ export default {
             unReadNotifications: []
         }
     },
+    watch: {
+        '$route': function() {
+            this.checkNotification()
+        }
+    },
     methods: {
         authenticate: async function (request = false) {
             if (this.userAddress) {
