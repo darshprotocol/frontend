@@ -37,7 +37,7 @@
                                 <div class="mark_as_read" v-on:click="markAsRead(notification._id)">
                                     <p>Mark as read</p>
                                 </div>
-                                <RouterLink
+                                <RouterLink v-on:click="$emit('close')"
                                     :to="`/discover/${notification.offerType == 0 ? 'lenders' : 'borrowers'}/${notification.offerId}`">
                                     <div class="view">
                                         <p>View</p>
@@ -295,6 +295,11 @@ main {
 .view svg {
     width: 12px;
     height: 12x;
+}
+
+.notifications {
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .notifications .active {
