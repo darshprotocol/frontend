@@ -6,10 +6,10 @@
           <img src="../../assets/images/logo2.png" alt="">
         </div>
         <div class="pages">
-          <a href="/about" target="_blank">About</a>
+          <a href="#">About</a>
           <a href="https://darshprotocol.gitbook.io/product-docs" target="_blank">Docs</a>
-          <a href="">Governance</a>
-          <a href="" target="_blank">Litepaper </a>
+          <a href="#">Governance</a>
+          <a href="#">Litepaper </a>
         </div>
         <div class="actions">
           <RouterLink to="/discover">
@@ -47,7 +47,7 @@ main {
 }
 
 .header {
-  width: 1600px;
+  width: 1180px;
   max-width: 90%;
   display: grid;
   grid-template-columns: 200px auto 200px;
@@ -71,8 +71,8 @@ main {
 }
 
 .pages a {
-  
-  
+
+
   font-weight: 500;
   font-size: 16px;
   color: #989898;
@@ -89,15 +89,13 @@ main {
 .connect_wallet {
   height: 50px;
   padding: 0 40px;
-  background: #1C1A2F;
-  border: 1px solid #6936F5;
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  user-select: none;
   transition: .2s;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 .connect_wallet:hover,
@@ -106,8 +104,8 @@ main {
 }
 
 .connect_wallet p {
-  
-  
+
+
   font-weight: 500;
   font-size: 16px;
   color: var(--textnormal);

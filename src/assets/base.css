@@ -86,6 +86,11 @@ body {
   max-width: 100%;
 }
 
+.home-width {
+  width: 1920px;
+  max-width: 90%;
+}
+
 .app-section {
   display: flex;
   justify-content: center;
