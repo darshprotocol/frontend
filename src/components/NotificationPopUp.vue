@@ -87,14 +87,14 @@ export default {
             }
         },
         markAsRead: async function (id) {
-            this.axios.post(`https://darshprotocol.onrender.com/notifications/mark/${id}}`).then(() => {
+            this.axios.post(`https://darshprotocol.onrender.com/notifications/mark/${id}`).then(() => {
                 this.getNotifications()
             }).catch(error => {
                 console.error(error);
             })
         },
         markAllAsRead: async function () {
-            this.axios.post(`https://darshprotocol.onrender.com/notifications/markall?to=${this.userAddress.toLowerCase()}}`).then(() => {
+            this.axios.post(`https://darshprotocol.onrender.com/notifications/markall?to=${this.userAddress.toLowerCase()}`).then(() => {
                 this.getNotifications()
             }).catch(error => {
                 console.error(error);
