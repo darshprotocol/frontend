@@ -3,7 +3,7 @@
         <div class="box">
             <div class="title">
                 <h3>Loan Payback</h3>
-                <div class="close"  v-if="!(payingback || approving)" v-on:click="$emit('close')">
+                <div class="close" v-if="!(payingback || approving)" v-on:click="$emit('close')">
                     <IconClose />
                 </div>
             </div>
@@ -27,8 +27,7 @@
                     v-on:click="!(fetchingPrice || approving) ? approve() : null" :text="'Approve'" />
 
                 <PrimaryButton :progress="(fetchingPrice || payingback)"
-                    :state="(fetchingPrice || payingback) ? 'disable' : ''"
-                   v-else
+                    :state="(fetchingPrice || payingback) ? 'disable' : ''" v-else
                     v-on:click="!(fetchingPrice || payingback) ? repayLoan() : null" :text="'Payback'" />
 
             </div>
@@ -49,8 +48,8 @@ import { messages } from '../../../reactives/messages';
 export default {
     props: ['loan'],
     components: {
-        Slider, 
-        IconClose, 
+        Slider,
+        IconClose,
         PrimaryButton
     },
     data() {
@@ -105,7 +104,7 @@ export default {
                     type: 'failed'
                 })
             }
-            
+
             this.$emit('done')
             this.$emit('close')
 
@@ -135,6 +134,11 @@ export default {
     },
     mounted() {
         this.getAllowance()
+
+        if (this.min() > 25 && this.min() < 100) {
+            this.percentage = this.min() + 25
+        }
+
         document.body.classList.add('modal')
     },
     unmounted() {
