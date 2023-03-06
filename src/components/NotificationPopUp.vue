@@ -34,19 +34,22 @@
                                 <timeago auto-update :datetime="new Date(notification.timestamp * 1000)" />
                             </p>
                             <div class="actions" v-if="notification.readAt == 0">
-                                <div class="mark_as_read">
+                                <div class="mark_as_read" v-on:click="markAsRead(notification._id)">
                                     <p>Mark as read</p>
                                 </div>
-                                <div class="view">
-                                    <p>View</p>
-                                    <IconOut />
-                                </div>
+                                <RouterLink
+                                    :to="`/discover/${notification.offerType == 0 ? 'lenders' : 'borrowers'}/${notification.offerId}`">
+                                    <div class="view">
+                                        <p>View</p>
+                                        <IconOut />
+                                    </div>
+                                </RouterLink>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="mark_all">
+            <div class="mark_all" v-on:click="markAllAsRead()">
                 <p>Mark All as Read</p>
             </div>
         </div>
@@ -68,6 +71,11 @@ export default {
             fetching: false
         }
     },
+    watch: {
+        $route() {
+            this.getNotifications()
+        }
+    },
     methods: {
         generateImages: function () {
             for (let index = 0; index < this.notifications.length; index++) {
@@ -78,17 +86,32 @@ export default {
                 }
             }
         },
-        getActionText: function(code) {
+        markAsRead: async function (id) {
+            this.axios.post(`https://darshprotocol.onrender.com/notifications/mark/${id}}`).then(() => {
+                this.getNotifications()
+            }).catch(error => {
+                console.error(error);
+            })
+        },
+        markAllAsRead: async function () {
+            this.axios.post(`https://darshprotocol.onrender.com/notifications/markall?to=${this.userAddress.toLowerCase()}}`).then(() => {
+                this.getNotifications()
+            }).catch(error => {
+                console.error(error);
+            })
+        },
+        getActionText: function (code) {
             switch (code) {
                 case 100: return 'accepts your request.'
                 case 101: return 'rejects your request.'
                 case 102: return 'Your request expires.'
                 case 103: return 'repaid their loan.'
+                case 104: return 'liquidates their loan.'
                 default: return '';
             }
         },
-        getNotifications: function() {
-            if (!this.userAddress) return  
+        getNotifications: function () {
+            if (!this.userAddress) return
             this.fetching = true
             this.axios.get(`https://darshprotocol.onrender.com/notifications?to=${this.userAddress.toLowerCase()}`).then(response => {
                 this.notifications = response.data

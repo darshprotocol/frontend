@@ -43,7 +43,8 @@
                 </div>
             </div>
             <div class="mark_all" v-on:click="logOut()">
-                <IconLogout /> <p>Disconnect</p>
+                <IconLogout />
+                <p>Disconnect</p>
             </div>
         </div>
     </main>
@@ -67,6 +68,11 @@ export default {
             tokenBalances: []
         }
     },
+    watch: {
+        $route() {
+            this.getTokenBalances()
+        }
+    },
     methods: {
         getTokenBalances: async function () {
             let response = await CovalentAPI.getTokenBalances(this.userAddress);
@@ -88,7 +94,7 @@ export default {
 
             return this.$toMoney(this.$fromWei(token.balance));
         },
-        logOut: function() {
+        logOut: function () {
             Authentication.logOut()
             this.$router.go()
         }
@@ -257,13 +263,15 @@ main {
     gap: 14px;
 }
 
-.detail_info p:first-child, .balance p:first-child {
+.detail_info p:first-child,
+.balance p:first-child {
     font-size: 14px;
     font-weight: 500;
     color: var(--textnormal);
 }
 
-.detail_info p:last-child, .balance p:last-child {
+.detail_info p:last-child,
+.balance p:last-child {
     margin-top: 4px;
     font-size: 12px;
     color: var(--textdimmed);
@@ -293,5 +301,4 @@ main {
 
 .mark_all svg {
     margin-top: -4px;
-}
-</style>
+}</style>
