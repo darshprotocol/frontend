@@ -53,16 +53,21 @@ main {
   position: fixed;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid var(--bglightest);
+  border-image-source: linear-gradient(to left, transparent, #28233A, transparent);
   z-index: 10;
   background: rgba(20, 17, 37, 0.02);
   backdrop-filter: blur(8.5px);
   transition: .2s;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-bottom: 1px solid;
+  border-image-slice: 1;
 }
 
 .glass {
   background: #FFFFFF !important;
-  border: none !important;
+  border-image-source: linear-gradient(to left, transparent, #CCCAD3, transparent);
 }
 
 .header {
