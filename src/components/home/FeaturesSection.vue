@@ -62,20 +62,6 @@
     </main>
 </template>
 
-<script>
-export default {
-    // methods: {
-    //     visibilityChanged(isVisible, entry) {
-    //         console.log(entry);
-    //         if (isVisible) {
-    //             let domElement = entry.target;
-    //             domElement.classList.add('animate')
-    //         }
-    //     }
-    // }
-}
-</script>
-
 <style scoped>
 main {
     display: flex;
