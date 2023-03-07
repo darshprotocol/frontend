@@ -1,9 +1,10 @@
 <template>
   <div class="app_section">
-    <main>
+    <main id="main_header">
       <div class="header">
         <div class="logo">
           <img src="../../assets/images/logo2.png" alt="">
+          <img src="/images/logo4.png" alt="">
         </div>
         <div class="pages">
           <a href="#">About</a>
@@ -28,7 +29,19 @@
 
 <script>
 export default {
-
+  mounted() {
+    this.determineGlass()
+    const _this = this
+    window.addEventListener('scroll', function () {
+      _this.determineGlass()
+    })
+  },
+  methods: {
+    determineGlass() {
+      const header = document.getElementById('main_header')
+      header.classList.toggle('glass', window.scrollY > 700)
+    }
+  }
 }
 </script>
 
@@ -44,6 +57,12 @@ main {
   z-index: 10;
   background: rgba(20, 17, 37, 0.02);
   backdrop-filter: blur(8.5px);
+  transition: .2s;
+}
+
+.glass {
+  background: #FFFFFF !important;
+  border: none !important;
 }
 
 .header {
@@ -63,6 +82,18 @@ main {
   height: 30px;
 }
 
+.logo img:last-child {
+  display: none;
+}
+
+.glass .logo img:last-child {
+  display: block;
+}
+
+.glass .logo img:first-child {
+  display: none;
+}
+
 .pages {
   display: flex;
   align-items: center;
@@ -71,12 +102,14 @@ main {
 }
 
 .pages a {
-
-
   font-weight: 500;
   font-size: 16px;
   color: #989898;
   text-decoration: none;
+}
+
+.glass .pages a {
+  color: #39375C;
 }
 
 .actions {
@@ -104,12 +137,21 @@ main {
 }
 
 .connect_wallet p {
-
-
   font-weight: 500;
   font-size: 16px;
   color: var(--textnormal);
 }
+
+
+.glass .connect_wallet {
+  border: 1px solid #F1F1F1;
+}
+
+
+.glass .connect_wallet p {
+  color: #39375C;
+}
+
 
 .icon_badge {
   width: 40px;

@@ -74,6 +74,7 @@ main {
 .high_stack {
     width: 1160px;
     animation: highstack 1.5s ease-in-out both 1;
+    background-color: #fff;
 }
 
 .high_stack1,

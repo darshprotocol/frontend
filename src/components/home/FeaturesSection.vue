@@ -26,7 +26,7 @@
                             <h3>Access Fixed-Term Loans on-chain.</h3>
                             <p>Borrow loans with predictable terms, to be paid back anytime within the loan duration
                                 assigned.</p>
-                            <RouterLink to="/discover">
+                            <RouterLink to="/discover/borrowers">
                                 <div class="action">Start Borrowing</div>
                             </RouterLink>
                         </div>
@@ -53,7 +53,6 @@
 
 <style scoped>
 main {
-    background: #F5F7F9;
     display: flex;
     justify-content: center;
 }
