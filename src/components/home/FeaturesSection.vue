@@ -37,9 +37,9 @@
                         <div class="text">
                             <h3>Earn emissions on supplied assets.</h3>
                             <p>Idle assets Supplied on Darsh, earns yield from trusted third party liquidity protocol, while being matched to a borrower.</p>
-                            <RouterLink to="/discover">
+                            <a target="_blank" href="https://darshprotocol.gitbook.io/product-docs/product-guide/lending">
                                 <div class="action">Learn More</div>
-                            </RouterLink>
+                            </a>
                         </div>
                         <div class="image">
                             <img src="/images/emission.png" alt="">
