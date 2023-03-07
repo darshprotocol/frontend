@@ -72,7 +72,7 @@
                             <IconChart />
                             <p class="deep_text">{{
                                 $nFormat(
-                                    ($fromWei(offer.currentCollateral))
+                                    ($fromWei(offer.currentPrincipal))
                                 )
                             }}<span>/{{
     $nFormat($fromWei(offer.initialPrincipal)) }}
