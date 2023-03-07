@@ -11,9 +11,13 @@
                             </div>
                         </a>
                         <a href="#">
-                            <div class="social_icon"></div>
+                            <div class="social_icon">
+                                <IconHomeMedium />
+                            </div>
                         </a> <a href="#">
-                            <div class="social_icon"></div>
+                            <div class="social_icon">
+                                <IconHomeDiscord />
+                            </div>
                         </a> <a href="#">
                             <div class="social_icon">
                                 <IconHomeTwitter />
@@ -65,6 +69,8 @@
 <script setup>
 import IconHomeTwitter from '../icons/IconHomeTwitter.vue';
 import IconHomeTelegram from '../icons/IconHomeTelegram.vue';
+import IconHomeMedium from '../icons/IconHomeMedium.vue';
+import IconHomeDiscord from '../icons/IconHomeDiscord.vue';
 </script>
 
 <style scoped>
@@ -81,7 +87,6 @@ main {
 .footer {
     display: flex;
     gap: 140px;
-    padding-top: 90px;
 }
 
 .project {

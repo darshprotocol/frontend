@@ -4,6 +4,7 @@ import HeroSection from '../components/home/HeroSection.vue';
 import HomeDisplay from '../components/home/HomeDisplay.vue';
 import FeaturesSection from '../components/home/FeaturesSection.vue';
 import HomeFooter from '../components/home/HomeFooter.vue';
+import HomeShowcase from '../components/home/HomeShowcase.vue';
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import HomeFooter from '../components/home/HomeFooter.vue';
         <HomeDisplay />
         <div class="linesbg">
             <FeaturesSection />
+            <HomeShowcase />
             <HomeFooter />
         </div>
         <div class="ma"></div>

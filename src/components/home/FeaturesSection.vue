@@ -9,7 +9,10 @@
                             <p>As a lender, Create lend offer and control earnings to be earned on supplied assets by
                                 setting loan terms.</p>
                             <RouterLink to="/discover">
-                                <div class="action">Start Lending</div>
+                                <div class="action">
+                                    <div class="div"></div>
+                                    <p>Start Lending</p>
+                                </div>
                             </RouterLink>
                         </div>
                         <div class="image">
@@ -27,18 +30,26 @@
                             <p>Borrow loans with predictable terms, to be paid back anytime within the loan duration
                                 assigned.</p>
                             <RouterLink to="/discover/borrowers">
-                                <div class="action">Start Borrowing</div>
+                                <div class="action">
+                                    <div class="div"></div>
+                                    <p>Start Borrowing</p>
+                                </div>
                             </RouterLink>
                         </div>
                     </div>
                 </div>
                 <div class="feature">
+                    <div class="soon">Coming Soon</div>
                     <div class="box">
                         <div class="text">
                             <h3>Earn emissions on supplied assets.</h3>
-                            <p>Idle assets Supplied on Darsh, earns yield from trusted third party liquidity protocol, while being matched to a borrower.</p>
+                            <p>Idle assets Supplied on Darsh, earns yield from trusted third party liquidity protocol, while
+                                being matched to a borrower.</p>
                             <a target="_blank" href="https://darshprotocol.gitbook.io/product-docs/product-guide/lending">
-                                <div class="action">Learn More</div>
+                                <div class="action">
+                                    <div class="div"></div>
+                                    <p>Learn More</p>
+                                </div>
                             </a>
                         </div>
                         <div class="image">
@@ -50,6 +61,20 @@
         </div>
     </main>
 </template>
+
+<script>
+export default {
+    // methods: {
+    //     visibilityChanged(isVisible, entry) {
+    //         console.log(entry);
+    //         if (isVisible) {
+    //             let domElement = entry.target;
+    //             domElement.classList.add('animate')
+    //         }
+    //     }
+    // }
+}
+</script>
 
 <style scoped>
 main {
@@ -69,6 +94,8 @@ main {
     align-items: center;
     justify-content: center;
     width: 100%;
+    position: relative;
+    /* transform: translateY(-300px); */
 }
 
 .feature .box {
@@ -117,15 +144,38 @@ main {
 }
 
 .text .action {
-    display: flex;
     height: 50px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 40px;
+    min-width: 200px;
     border: 1px solid rgba(105, 54, 245, 0.4);
     border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.action p {
+    position: absolute;
+    top: -8px;
     font-size: 16px;
     color: var(--primary);
+    width: 100%;
+    transition: .3s;
+}
+
+.action div {
+    background: var(--primary);
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    bottom: -50px;
+    transition: .3s;
+}
+
+.action:hover p {
+    color: #FFFFFF;
+}
+
+.action:hover div {
+    bottom: 0;
 }
 
 .image {
@@ -136,5 +186,23 @@ main {
 
 .image img {
     width: 385px;
+}
+
+.animate {
+    transform: translateY(0);
+}
+
+.soon {
+    height: 30px;
+    background: #6936F5;
+    border-radius: 2px 2px 0px 0px;
+    position: absolute;
+    padding: 0 20px;
+    top: 225px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--textnormal);
 }
 </style>
