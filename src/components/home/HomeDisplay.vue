@@ -1,20 +1,22 @@
 <template>
     <main>
         <div class="home-width">
-            <div class="display">
-                <div class="low_stack"></div>
-                <img src="/images/display_image.png" alt="" class="high_stack">
-                <img src="/images/display_image_1.png" alt="" data-speed="-1" class="layer high_stack1">
-                <img src="/images/display_image_2.png" alt="" data-speed="1.4" class="layer high_stack2">
+            <div class="container">
+                <div class="display">
+                    <div class="low_stack"></div>
+                    <img src="/images/display_image.png" alt="" class="high_stack">
+                    <img src="/images/display_image_1.png" alt="" data-speed="-1" class="layer high_stack1">
+                    <img src="/images/display_image_2.png" alt="" data-speed="1.4" class="layer high_stack2">
+                </div>
+            </div>
 
-                <div class="built">
-                    <p>Built Using</p>
-                    <div class="images">
-                        <img src="/images/chainlink.png" alt="">
-                        <img src="/images/covalent.png" alt="">
-                        <img src="/images/fantom.png" alt="">
-                        <img src="/images/cred.png" alt="">
-                    </div>
+            <div class="built">
+                <p>Built Using</p>
+                <div class="images">
+                    <img src="/images/chainlink.png" alt="">
+                    <img src="/images/covalent.png" alt="">
+                    <img src="/images/fantom.png" alt="">
+                    <img src="/images/cred.png" alt="">
                 </div>
             </div>
         </div>
@@ -41,14 +43,15 @@ export default {
 
 <style scoped>
 main {
-    min-height: 960px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     background: white;
 }
 
-.home-width {
+.container {
     position: relative;
+    min-height: 800px;
 }
 
 .display {
@@ -92,8 +95,10 @@ main {
 }
 
 .built {
-    bottom: -260px;
-    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 90px;
 }
 
 .built p {

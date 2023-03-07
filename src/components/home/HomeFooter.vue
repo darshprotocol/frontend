@@ -71,6 +71,7 @@ import IconHomeTelegram from '../icons/IconHomeTelegram.vue';
 main {
     display: flex;
     justify-content: center;
+    background-image: linear-gradient(to top, #F5F7F9, transparent, transparent);
 }
 
 .home-width {
@@ -92,7 +93,7 @@ main {
 }
 
 .socials {
-    margin-top: 16px;
+    margin-top: 50px;
     display: flex;
     gap: 10px;
 }
