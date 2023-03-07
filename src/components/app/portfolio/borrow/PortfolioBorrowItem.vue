@@ -1,9 +1,9 @@
 <template>
-    <p v-if="!userAddress">
+    <p v-if="!userAddress && !authenticating">
         <NoWallet />
     </p>
 
-    <div class="progress_box" v-if="fetching && userAddress != null">
+    <div class="progress_box" v-if="(authenticating || fetching && userAddress != null)">
         <ProgressBox />
     </div>
 
@@ -131,6 +131,7 @@ export default {
             fetching: true,
             userAddress: null,
             editOptions: false,
+            authenticating: true,
             offer: null,
             dueDate: ""
         };
@@ -180,6 +181,7 @@ export default {
     },
     async created() {
         this.userAddress = await Authentication.userAddress();
+        this.authenticating = false
         this.fetchBorrowingOffer(true);
     },
     mounted() {

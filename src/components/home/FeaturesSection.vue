@@ -8,7 +8,7 @@
                             <h3>Control earnings on supplied asset.</h3>
                             <p>As a lender, Create lend offer and control earnings to be earned on supplied assets by
                                 setting loan terms.</p>
-                            <RouterLink to="/discover">
+                            <RouterLink to="/portfolio/lends/create">
                                 <div class="action">
                                     <div class="div"></div>
                                     <p>Start Lending</p>
@@ -29,7 +29,7 @@
                             <h3>Access Fixed-Term Loans on-chain.</h3>
                             <p>Borrow loans with predictable terms, to be paid back anytime within the loan duration
                                 assigned.</p>
-                            <RouterLink to="/discover/borrowers">
+                            <RouterLink to="/discover">
                                 <div class="action">
                                     <div class="div"></div>
                                     <p>Start Borrowing</p>
