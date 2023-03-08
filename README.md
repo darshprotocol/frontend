@@ -8,7 +8,7 @@ Darsh's mission is to create a socialized way of lending and borrowing while mai
 Our main goal is to provide an efficient and sustainable way for lenders to maximize their rewards on supplied asset by enabling them the ability to structure their loan terms while also removing the risk of an unexpected liquidation of a borrower's collateralized loan all being settled on-chain in a fully decentralized manner.
 
 ## Links
-[website](https://darshprotocol.netlify.app) | [documentation](https://darshprotocol.gitbook.io/product-docs) | [figma design](https://darshprotocol.gitbook.io/product-docs) | [devpost](https://devpost.com/software/darsh-protocol)
+[website](https://darshprotocol.netlify.app) | [documentation](https://darshprotocol.gitbook.io/product-docs) | [figma design](https://www.figma.com/file/Sxzt8ogh9kVzs3jDVEYeIk/Darsh-Project?node-id=1371-56011&t=3Q91CFDVrVhd6pB5-0) | [devpost](https://devpost.com/software/darsh-protocol)
 
 # Flow diagram
 ![Loan Diagram](https://user-images.githubusercontent.com/123966451/222807924-377c0485-182d-468a-a16c-978bd75d9317.png)
@@ -64,7 +64,7 @@ The LendingPool contract is the main point of interaction with the DARSH protoco
 
 ![darsh](https://user-images.githubusercontent.com/123966451/222815877-9c242f12-2477-4396-88c5-709d848c4f3b.png)
 
-| **Darsh Token** | **DARSH** |
+| **Darsh Token** | **DSH** |
 
 This ensures the protocol can rapidly adjust to changing market conditions, as well as update core parts of the protocol as time goes on.
 
@@ -133,7 +133,7 @@ Create a `.env` like the `.env-example` and update with valid keys and mnemonic/
 ## Team
 **Arogundade Ibrahim**
  
-**Role:** Web3 Fullstack Developer
+**Position:** Web3 Fullstack Developer
  
 [contact me](https://linktr.ee/devarogundade)
 
@@ -141,6 +141,6 @@ Create a `.env` like the `.env-example` and update with valid keys and mnemonic/
  
 **Awolola Idowu**
  
-**Role:** UI/UX Designer
+**Position:** UI/UX Designer
  
 [contact me](https://www.pip.me/Kryptograph)
